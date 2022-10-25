@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "520321017960",
+    "project_id": "cookproject-ac2c0",
+    "storage_bucket": "cookproject-ac2c0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:520321017960:android:7ce85c70aa76b51834f3dd",
+        "android_client_info": {
+          "package_name": "com.example.lifesworkiguess"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "520321017960-u3jeascouoncp9kmhnab4pru15hclch1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAv26tXpZHQf2PasOVHFzBky57vYDzlrgE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "520321017960-u3jeascouoncp9kmhnab4pru15hclch1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
