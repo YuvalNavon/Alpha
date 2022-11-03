@@ -30,7 +30,7 @@ import java.util.Date;
 public class CameraUpload extends AppCompatActivity {
 
     String currentPhotoPath;
-    int CAMERA_PERM_CODE, CAMERA_REQUEST_CODE, REQUEST_TAKE_PHOTO;
+    int CAMERA_PERM_CODE, CAMERA_REQUEST_CODE;
     ImageView iv;
 
     @Override
@@ -40,7 +40,6 @@ public class CameraUpload extends AppCompatActivity {
 
         CAMERA_PERM_CODE = 101;
         CAMERA_REQUEST_CODE = 102;
-        REQUEST_TAKE_PHOTO = 1;
         iv = findViewById(R.id.taken);
 
     }
@@ -56,8 +55,11 @@ public class CameraUpload extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAMERA_REQUEST_CODE)
         {
-          if(requestCode == Activity.RESULT_OK){
-              File f = new File(currentPhotoPath);
+
+            if(resultCode == Activity.RESULT_OK){
+                System.out.println("WORKSSSSSSSSSSSSS 333333333333");
+
+                File f = new File(currentPhotoPath);
               iv.setImageURI(Uri.fromFile(f));
           }
         }
@@ -96,7 +98,7 @@ public class CameraUpload extends AppCompatActivity {
                         "com.example.lifesworkiguess.android.fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                startActivityForResult(takePictureIntent, CAMERA_REQUEST_CODE);
             }
         }
     }
