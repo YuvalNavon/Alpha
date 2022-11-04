@@ -72,6 +72,10 @@ public class MainActivity extends AppCompatActivity {
             Intent si = new Intent(this, CameraUpload.class);
             startActivity(si);
         }
+        if (item.getTitle().toString().equals("Notification Screen") ){
+            Intent si = new Intent(this, NotificationScreen.class);
+            startActivity(si);
+        }
 
         return true;
     }

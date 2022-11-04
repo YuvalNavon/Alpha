@@ -19,6 +19,11 @@
         android:orderInCategory="3"
         />
 
+    <item
+        android:id = "@+id/NotificationScreen"
+        android:title="Notification Screen"
+        android:orderInCategory="4"
+        />
 
 
 
