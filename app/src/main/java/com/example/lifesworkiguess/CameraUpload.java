@@ -138,12 +138,24 @@ public class CameraUpload extends AppCompatActivity {
      * @return	boolean true - mandatory
      */
     public boolean onOptionsItemSelected(MenuItem item){
-        if (item.getTitle().toString().equals("Gallary Upload") ){
+        if (item.getTitle().toString().equals("User Authentication") ){
+            Intent si = new Intent(this, MainActivity.class);
+            startActivity(si);
+        }
+        if (item.getTitle().toString().equals("Gallary Choose") ){
             Intent si = new Intent(this, GallaryChoose.class);
             startActivity(si);
         }
-        if (item.getTitle().toString().equals("User Authentication") ){
-            Intent si = new Intent(this, MainActivity.class);
+        if (item.getTitle().toString().equals("Notification") ){
+            Intent si = new Intent(this, NotificationScreen.class);
+            startActivity(si);
+        }
+        if (item.getTitle().toString().equals("Time Picker") ){
+            Intent si = new Intent(this, TimePickerToast.class);
+            startActivity(si);
+        }
+        if (item.getTitle().toString().equals("Create Recipe") ){
+            Intent si = new Intent(this, ExEmElFormat.class);
             startActivity(si);
         }
 

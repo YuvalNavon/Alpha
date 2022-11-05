@@ -21,8 +21,20 @@
 
     <item
         android:id = "@+id/NotificationScreen"
-        android:title="Notification Screen"
+        android:title="Notification"
         android:orderInCategory="4"
+        />
+
+    <item
+        android:id = "@+id/TimePickerScreen"
+        android:title="Time Picker"
+        android:orderInCategory="5"
+        />
+
+    <item
+        android:id = "@+id/XMLScreen"
+        android:title="Create Recipe"
+        android:orderInCategory="5"
         />
 
 

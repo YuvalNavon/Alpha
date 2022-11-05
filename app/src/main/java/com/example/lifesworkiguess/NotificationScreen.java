@@ -13,6 +13,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -95,10 +97,13 @@ public class NotificationScreen extends AppCompatActivity {
                 SimpleDateFormat format = new SimpleDateFormat("k: mm a");
                 String time = format.format(c.getTime());
                 timeTV.setText(time);
+                timePicked = true;
+
+
+
             }
         },hours, mins, false);
         timePickerDialog.show();
-        timePicked = true;
     }
 
     public void makeTimedNoti(View view){
@@ -122,4 +127,37 @@ public class NotificationScreen extends AppCompatActivity {
 
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.main, menu);
+        menu.removeItem(R.id.NotificationScreen);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item){
+        if (item.getTitle().toString().equals("User Authentication") ){
+            Intent si = new Intent(this, MainActivity.class);
+            startActivity(si);
+        }
+        if (item.getTitle().toString().equals("Camera") ){
+            Intent si = new Intent(this, CameraUpload.class);
+            startActivity(si);
+        }
+        if (item.getTitle().toString().equals("Gallary Choose") ){
+            Intent si = new Intent(this, GallaryChoose.class);
+            startActivity(si);
+        }
+        if (item.getTitle().toString().equals("Time Picker") ){
+            Intent si = new Intent(this, TimePickerToast.class);
+            startActivity(si);
+        }
+        if (item.getTitle().toString().equals("Create Recipe") ){
+            Intent si = new Intent(this, ExEmElFormat.class);
+            startActivity(si);
+        }
+
+        return true;
+    }
+
 }
