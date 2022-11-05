@@ -2,31 +2,35 @@ package com.example.lifesworkiguess;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -37,13 +41,8 @@ public class ExEmElFormat extends AppCompatActivity {
 
 EditText nameET, ingredientsET, stepsET;
 String name, ingredients, steps;
-    FileOutputStream fos;
-    FileInputStream fis;
-    OutputStreamWriter osw;
-    InputStreamReader isr;
-    BufferedWriter bw;
-    BufferedReader br;
-    StringBuffer sb;
+StorageReference fStorage, fRef;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +53,14 @@ String name, ingredients, steps;
         ingredientsET = findViewById(R.id.Ingredients);
         stepsET = findViewById(R.id.Steps);
 
+        fStorage = FirebaseStorage.getInstance().getReference();
+
+
+
 
     }
+
+
 
     public void makeXML(View view) throws ParserConfigurationException, TransformerException {
         name = nameET.getText().toString();
@@ -66,48 +71,43 @@ String name, ingredients, steps;
 
         // root elements
         Document doc = docBuilder.newDocument();
-        Element rootElement = doc.createElement("Recipe" + name);
+        Element rootElement = doc.createElement("Recipe");
         doc.appendChild(rootElement);
+        Element nameE = doc.createElement("Title");
+        Attr actualName = doc.createAttribute("Recipe_Title");
+        actualName.setValue(name);
+        nameE.setAttributeNode(actualName);
+        rootElement.appendChild(nameE);
 
         Element ingredientsE = doc.createElement("Ingredients");
-        rootElement.appendChild(ingredientsE);
-        Attr actualIngredients = doc.createAttribute("actualIngredients");
+        nameE.appendChild(ingredientsE);
+        Attr actualIngredients = doc.createAttribute("Actual_Ingredients");
         actualIngredients.setValue(ingredients);
         ingredientsE.setAttributeNode(actualIngredients);
 
         Element stepsE = doc.createElement("Steps");
-        rootElement.appendChild(stepsE);
-        Attr actualSteps = doc.createAttribute("actualSteps");
+        nameE.appendChild(stepsE);
+        Attr actualSteps = doc.createAttribute("Actual_Steps");
         actualSteps.setValue(steps);
         stepsE.setAttributeNode(actualSteps);
 
-        String every = doc.toString();
-        System.out.println(every);
+
 
         //...create XML elements, and others...
 
         // write dom document to a file
-        try {
-            fos = openFileOutput("recipe.txt",MODE_PRIVATE);
-            osw = new OutputStreamWriter(fos);
-            bw = new BufferedWriter(osw);
-            bw.write(every);
-            bw.close();
-            Toast.makeText(this, "FILE CREATED", Toast.LENGTH_LONG).show();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "OOPS 1", Toast.LENGTH_LONG).show();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "OOPS 2", Toast.LENGTH_LONG).show();
-        }
 
-       try (FileOutputStream output =
-                     new FileOutputStream("recipe.xml")) {
+
+
+        try (FileOutputStream output =
+                     new FileOutputStream(this.getFilesDir().getPath() + "/recipe2.xml")) {
            writeXml(doc, output);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        uploadXML();
+
 
 
     }
@@ -120,6 +120,9 @@ String name, ingredients, steps;
 
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
+
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
         DOMSource source = new DOMSource(doc);
         StreamResult result = new StreamResult(output);
 
@@ -127,6 +130,45 @@ String name, ingredients, steps;
 
 
     }
+
+
+
+    public String getFileExtension(Uri uri){
+        ContentResolver cr = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(cr.getType(uri));
+    }
+
+    public void uploadXML(){
+        String XMLFilePath = this.getFilesDir().getPath() + "/recipe2.xml";
+        File XMLFile = new File(XMLFilePath);
+        Uri XMLUri = Uri.fromFile(XMLFile);
+        if (XMLUri!=null){
+
+            fRef = fStorage.child(System.currentTimeMillis() + "." + getFileExtension(XMLUri));
+            fRef.putFile(XMLUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Toast.makeText(ExEmElFormat.this, "Recipe Uploaded!", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+        else
+        {
+            Toast.makeText(this, "Error, File was not selected", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void clear (View view){
+        nameET.setText("");
+        ingredientsET.setText("");
+        stepsET.setText("");
+    }
+
+    public void getXML(View view){
+
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){

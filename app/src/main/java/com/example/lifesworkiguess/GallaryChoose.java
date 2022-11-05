@@ -27,7 +27,6 @@ public class GallaryChoose extends AppCompatActivity {
     int SELECT_PICTURE;
     ImageView iv;
     StorageReference fStorage, fRef;
-    StorageTask fTask;
     Uri selectedImageUri;
 
 
@@ -71,6 +70,7 @@ public class GallaryChoose extends AppCompatActivity {
                     // update the preview image in the layout
 
                      iv.setImageURI(selectedImageUri);
+
 
                 }
             }
