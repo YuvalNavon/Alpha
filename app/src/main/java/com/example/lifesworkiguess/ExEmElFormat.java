@@ -8,14 +8,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,6 +37,13 @@ public class ExEmElFormat extends AppCompatActivity {
 
 EditText nameET, ingredientsET, stepsET;
 String name, ingredients, steps;
+    FileOutputStream fos;
+    FileInputStream fis;
+    OutputStreamWriter osw;
+    InputStreamReader isr;
+    BufferedWriter bw;
+    BufferedReader br;
+    StringBuffer sb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,21 +81,42 @@ String name, ingredients, steps;
         actualSteps.setValue(steps);
         stepsE.setAttributeNode(actualSteps);
 
+        String every = doc.toString();
+        System.out.println(every);
+
         //...create XML elements, and others...
 
         // write dom document to a file
-        try (FileOutputStream output =
-                     new FileOutputStream("C:\\Users\\bensv\\Desktop\\recipe.xml")) {
-            writeXml(doc, output);
+        try {
+            fos = openFileOutput("recipe.txt",MODE_PRIVATE);
+            osw = new OutputStreamWriter(fos);
+            bw = new BufferedWriter(osw);
+            bw.write(every);
+            bw.close();
+            Toast.makeText(this, "FILE CREATED", Toast.LENGTH_LONG).show();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "OOPS 1", Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "OOPS 2", Toast.LENGTH_LONG).show();
+        }
+
+       try (FileOutputStream output =
+                     new FileOutputStream("recipe.xml")) {
+           writeXml(doc, output);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+
     }
 
-    private static void writeXml(Document doc,
-                                 OutputStream output)
+    public void writeXml(Document doc,
+                          OutputStream output)
             throws TransformerException {
+
+        Toast.makeText(this, "FILE CREATED", Toast.LENGTH_LONG).show();
 
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
@@ -89,6 +124,7 @@ String name, ingredients, steps;
         StreamResult result = new StreamResult(output);
 
         transformer.transform(source, result);
+
 
     }
 

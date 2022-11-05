@@ -21,7 +21,6 @@
         android:gravity="center"
         android:hint="Enter Recipe Name:"
         android:inputType="textPersonName"
-        android:onClick="makeXML"
         android:textSize="24sp" />
 
     <Space
@@ -66,6 +65,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2"
+        android:onClick="makeXML"
         android:text="Create Recipe" />
 
     <Space

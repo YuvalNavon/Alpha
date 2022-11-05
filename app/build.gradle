@@ -14,6 +14,15 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        //xmlStuff
+        multiDexEnabled true
+
+    }
+
+    //xmlStuff
+    dexOptions {
+        javaMaxHeapSize "4g"
     }
 
     buildTypes {
@@ -48,6 +57,9 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:31.0.1')
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.android.gms:play-services-auth:20.3.0'
+
+    //xmlStuff
+    implementation 'com.android.support:multidex:1.0.3'
 
 
 }
