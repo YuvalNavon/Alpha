@@ -46,13 +46,6 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".TimePickerToast"
-            android:exported="false">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
-        <activity
             android:name=".NotificationScreen"
             android:exported="false">
             <meta-data

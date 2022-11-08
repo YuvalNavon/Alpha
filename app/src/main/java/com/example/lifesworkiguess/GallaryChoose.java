@@ -137,10 +137,7 @@ public class GallaryChoose extends AppCompatActivity {
             Intent si = new Intent(this, NotificationScreen.class);
             startActivity(si);
         }
-        if (item.getTitle().toString().equals("Time Picker") ){
-            Intent si = new Intent(this, TimePickerToast.class);
-            startActivity(si);
-        }
+
         if (item.getTitle().toString().equals("Create Recipe") ){
             Intent si = new Intent(this, ExEmElFormat.class);
             startActivity(si);
