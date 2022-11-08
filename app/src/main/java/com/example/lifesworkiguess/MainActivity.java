@@ -1,10 +1,13 @@
 package com.example.lifesworkiguess;
 
+import static android.os.Environment.DIRECTORY_DOWNLOADS;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
         passwordET = findViewById(R.id.password);
 
         fAuth = FirebaseAuth.getInstance();
+
+        System.out.println(getFilesDir().getPath());
+        System.out.println(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + DIRECTORY_DOWNLOADS + "/"+ "RecipeDown.xml");
     }
 
     public void Register(View view){

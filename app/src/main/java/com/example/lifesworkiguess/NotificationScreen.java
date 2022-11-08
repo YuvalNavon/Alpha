@@ -98,6 +98,7 @@ public class NotificationScreen extends AppCompatActivity {
                 String time = format.format(c.getTime());
                 timeTV.setText(time);
                 timePicked = true;
+                Toast.makeText(NotificationScreen.this, "TIME PICKED", Toast.LENGTH_LONG).show();
 
 
 
