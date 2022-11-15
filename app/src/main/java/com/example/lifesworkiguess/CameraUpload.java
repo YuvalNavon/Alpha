@@ -57,7 +57,6 @@ public class CameraUpload extends AppCompatActivity {
         {
 
             if(resultCode == Activity.RESULT_OK){
-                System.out.println("WORKSSSSSSSSSSSSS 333333333333");
 
                 File f = new File(currentPhotoPath);
               iv.setImageURI(Uri.fromFile(f));

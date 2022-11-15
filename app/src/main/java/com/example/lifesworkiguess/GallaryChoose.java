@@ -3,8 +3,12 @@ package com.example.lifesworkiguess;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.DownloadManager;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.storage.FirebaseStorage;
@@ -22,12 +27,18 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
+
 public class GallaryChoose extends AppCompatActivity {
 
     int SELECT_PICTURE;
     ImageView iv;
-    StorageReference fStorage, fRef;
+    StorageReference fStorage, fRef, fDownRef;
     Uri selectedImageUri;
+    String imageName;
+
+    boolean imagePicked, imageUploaded;
+
 
 
     @Override
@@ -35,9 +46,12 @@ public class GallaryChoose extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallary_choose);
 
-        fStorage = FirebaseStorage.getInstance().getReference();
+        fStorage = FirebaseStorage.getInstance().getReference("Pictures");
         SELECT_PICTURE = 1;
         iv = findViewById(R.id.tmuna);
+
+        imagePicked = false;
+        imageUploaded = false;
 
 
     }
@@ -67,12 +81,15 @@ public class GallaryChoose extends AppCompatActivity {
                 // Get the url of the image from data
                 selectedImageUri = data.getData();
                 if (null != selectedImageUri) {
-                    // update the preview image in the layout
 
-                     iv.setImageURI(selectedImageUri);
-
+                    imagePicked = true;
+                    UploadImage();
 
                 }
+                else Toast.makeText(this, "Error, File was not selected", Toast.LENGTH_LONG).show();
+
+
+
             }
         }
     }
@@ -84,31 +101,47 @@ public class GallaryChoose extends AppCompatActivity {
     }
 
     public void UploadImage(){
-        if (selectedImageUri!= null)
-        {
-            fRef = fStorage.child(System.currentTimeMillis() + "." + getFileExtension(selectedImageUri));
+            imageName = System.currentTimeMillis() + "." + getFileExtension(selectedImageUri);
+            fRef = fStorage.child(imageName);
             fRef.putFile(selectedImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     Toast.makeText(GallaryChoose.this, "Photo Uploaded!", Toast.LENGTH_LONG).show();
+                    imageUploaded = true;
                 }
             });
-        }
-        else
-        {
-            Toast.makeText(this, "Error, File was not selected", Toast.LENGTH_LONG).show();
-        }
+
+
     }
 
-    public void addPhoto(View view){
+    public void uploadPhoto(View view){
         imageChooser();
 
 
     }
 
-    public void upload(View view){
-        UploadImage();
+    public void getPhotoFromFirebase(View view){
+
+        if (imagePicked){
+            if (imageUploaded){
+                fDownRef = fStorage.child(imageName);
+                long MAXBYTES = 1024*1024;
+                fDownRef.getBytes(MAXBYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                    @Override
+                    public void onSuccess(byte[] bytes) {
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0 , bytes.length);
+                        iv.setImageBitmap(bitmap);
+                    }
+                });
+
+            }
+            else Toast.makeText(GallaryChoose.this, "DATABASE ERROR - Image not found/Uploaded yet", Toast.LENGTH_LONG).show();
+
+        }
+        else Toast.makeText(GallaryChoose.this, "Please Choose an image first", Toast.LENGTH_LONG).show();
+
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){

@@ -17,8 +17,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:onClick="addPhoto"
-        android:text="Choose Image" />
+        android:onClick="uploadPhoto"
+        android:text="Choose Image To upload" />
 
     <Space
         android:layout_width="match_parent"
@@ -42,8 +42,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:onClick="upload"
-        android:text="Upload " />
+        android:onClick="getPhotoFromFirebase"
+        android:text="Display photo" />
 
     <Space
         android:layout_width="match_parent"

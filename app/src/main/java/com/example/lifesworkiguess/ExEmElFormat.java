@@ -1,23 +1,18 @@
 package com.example.lifesworkiguess;
 
-import static android.os.Environment.DIRECTORY_DOWNLOADS;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.DownloadManager;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -38,11 +33,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -56,14 +48,12 @@ import javax.xml.transform.stream.StreamResult;
 
 public class ExEmElFormat extends AppCompatActivity {
 
-EditText nameET, ingredientsET, stepsET;
-String name, ingredients, steps, lastUploaded, filesDir, lastName, lastIng, lastSteps;
-StorageReference fStorage, fRef, fDownRef;
-boolean cleared, downloading;
-FileInputStream fis;
-InputStreamReader isr;
-BufferedReader br;
-StringBuffer sb;
+    EditText nameET, ingredientsET, stepsET;
+    String name, ingredients, steps, lastUploaded, filesDir;
+    StorageReference fStorage, fRef, fDownRef;
+    boolean cleared, downloading;
+    FileInputStream fis;
+
 
 
     @Override
@@ -75,7 +65,7 @@ StringBuffer sb;
         ingredientsET = findViewById(R.id.Ingredients);
         stepsET = findViewById(R.id.Steps);
 
-        fStorage = FirebaseStorage.getInstance().getReference();
+        fStorage = FirebaseStorage.getInstance().getReference("Recipes");
         filesDir = this.getFilesDir().getPath();
 
         cleared = false;
@@ -145,7 +135,7 @@ StringBuffer sb;
     }
 
     public void writeXml(Document doc,
-                          OutputStream output)
+                         OutputStream output)
             throws TransformerException {
 
 
@@ -179,9 +169,6 @@ StringBuffer sb;
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     Toast.makeText(ExEmElFormat.this, "Recipe Uploaded!", Toast.LENGTH_LONG).show();
                     lastUploaded = "Recipe For " + name + "." + "xml";
-                    lastName = name;
-                    lastIng = ingredients;
-                    lastSteps = steps;
                     downloading = false;
                 }
             });
@@ -337,7 +324,7 @@ StringBuffer sb;
             Intent si = new Intent(this, MainActivity.class);
             startActivity(si);
         }
-        if (item.getTitle().toString().equals("Gallary Choose") ){
+        if (item.getTitle().toString().equals("Gallary Upload") ){
             Intent si = new Intent(this, GallaryChoose.class);
             startActivity(si);
         }

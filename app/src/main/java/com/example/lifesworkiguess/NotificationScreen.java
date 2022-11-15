@@ -145,7 +145,7 @@ public class NotificationScreen extends AppCompatActivity {
             Intent si = new Intent(this, CameraUpload.class);
             startActivity(si);
         }
-        if (item.getTitle().toString().equals("Gallary Choose") ){
+        if (item.getTitle().toString().equals("Gallary Upload") ){
             Intent si = new Intent(this, GallaryChoose.class);
             startActivity(si);
         }
