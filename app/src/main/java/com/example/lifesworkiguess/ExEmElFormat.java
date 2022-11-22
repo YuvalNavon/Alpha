@@ -27,13 +27,11 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -79,8 +77,17 @@ public class ExEmElFormat extends AppCompatActivity {
         name = nameET.getText().toString();
         ingredients = ingredientsET.getText().toString();
         steps = stepsET.getText().toString();
+
+
+
         if (!name.equals("")&& !ingredients.equals("") && !steps.equals("")){
             cleared = false;
+
+            Recipe recipe = new Recipe(name);
+            Ingredient ingredient = new Ingredient(ingredients, "5" , "KG");
+            Step step = new Step (steps, "Description 2");
+            recipe.addIngredient(ingredient);
+            recipe.addStep(step);
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
@@ -94,17 +101,35 @@ public class ExEmElFormat extends AppCompatActivity {
             nameE.setAttributeNode(actualName);
             rootElement.appendChild(nameE);
 
-            Element ingredientsE = doc.createElement("Ingredients");
-            rootElement.appendChild(ingredientsE);
-            Attr actualIngredients = doc.createAttribute("Actual_Ingredients");
-            actualIngredients.setValue(ingredients);
-            ingredientsE.setAttributeNode(actualIngredients);
+            Element ingredientsListE = doc.createElement("Ingredients_List");
+            rootElement.appendChild(ingredientsListE);
+            Element ingredientE = doc.createElement("Ingredient");
+            Attr ingredientName = doc.createAttribute("Name");
+            ingredientName.setValue(ingredients);
+            Attr ingredientAmount = doc.createAttribute("Amount");
+            ingredientAmount.setValue("3");
+            Attr ingredientUnits = doc.createAttribute("Units");
+            ingredientUnits.setValue("Oz");
+            ingredientE.setAttributeNode(ingredientName);
+            ingredientE.setAttributeNode(ingredientAmount);
+            ingredientE.setAttributeNode(ingredientUnits);
+            ingredientsListE.appendChild(ingredientE);
 
-            Element stepsE = doc.createElement("Steps");
-            rootElement.appendChild(stepsE);
-            Attr actualSteps = doc.createAttribute("Actual_Steps");
-            actualSteps.setValue(steps);
-            stepsE.setAttributeNode(actualSteps);
+
+            Element stepsListE = doc.createElement("Steps_List");
+            rootElement.appendChild(stepsListE);
+            Element stepE = doc.createElement("Step");
+            Attr stepName = doc.createAttribute("Name");
+            stepName.setValue(steps);
+            Attr stepDescription = doc.createAttribute("Description");
+            stepDescription.setValue("Here description");
+            Attr stepNumber = doc.createAttribute("Number");
+            stepNumber.setValue("1");
+            stepE.setAttributeNode(stepName);
+            stepE.setAttributeNode(stepDescription);
+            stepE.setAttributeNode(stepNumber);
+            stepsListE.appendChild(stepE);
+
 
 
 

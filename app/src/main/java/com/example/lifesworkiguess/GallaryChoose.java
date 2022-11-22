@@ -114,7 +114,7 @@ public class GallaryChoose extends AppCompatActivity {
 
     }
 
-    public void uploadPhoto(View view){
+    public void PickPhoto(View view){
         imageChooser();
 
 

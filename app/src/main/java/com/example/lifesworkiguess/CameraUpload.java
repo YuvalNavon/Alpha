@@ -9,6 +9,7 @@ import androidx.core.content.FileProvider;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -19,8 +20,14 @@ import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +38,10 @@ public class CameraUpload extends AppCompatActivity {
 
     String currentPhotoPath;
     int CAMERA_PERM_CODE, CAMERA_REQUEST_CODE;
+    boolean photoMade;
     ImageView iv;
+    StorageReference fStorage, fRef;
+    Uri photoURI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,13 +52,36 @@ public class CameraUpload extends AppCompatActivity {
         CAMERA_REQUEST_CODE = 102;
         iv = findViewById(R.id.taken);
 
+        fStorage = FirebaseStorage.getInstance().getReference("Pictures");
+
+        photoMade = true;
+
+
     }
 
     public void takePhoto(View view){
         askCameraPermissions();
     }
 
+    public void uploadPhoto(View view){
+        if (photoMade){
+            String imageName = System.currentTimeMillis() + "." + getFileExtension(photoURI);
+            fRef = fStorage.child(imageName);
+            fRef.putFile(photoURI).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Toast.makeText(CameraUpload.this, "Photo Uploaded!", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
 
+    }
+
+    public String getFileExtension(Uri uri){
+        ContentResolver cr = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(cr.getType(uri));
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -93,11 +126,12 @@ public class CameraUpload extends AppCompatActivity {
 
             }
             if (photoFile!= null){
-                Uri photoURI = FileProvider.getUriForFile(this,
+                photoURI = FileProvider.getUriForFile(this,
                         "com.example.lifesworkiguess.android.fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, CAMERA_REQUEST_CODE);
+                photoMade = true;
             }
         }
     }
