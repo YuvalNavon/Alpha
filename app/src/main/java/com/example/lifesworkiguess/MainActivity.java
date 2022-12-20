@@ -87,6 +87,10 @@ public class MainActivity extends AppCompatActivity {
             Intent si = new Intent(this, ExEmElFormat.class);
             startActivity(si);
         }
+        if (item.getTitle().toString().equals("Test") ){
+            Intent si = new Intent(this, NewCreateRecipe.class);
+            startActivity(si);
+        }
 
         return true;
     }

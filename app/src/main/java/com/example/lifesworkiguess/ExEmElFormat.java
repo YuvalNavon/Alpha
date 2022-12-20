@@ -88,6 +88,8 @@ public class ExEmElFormat extends AppCompatActivity {
             Step step = new Step (steps, "Description 2");
             recipe.addIngredient(ingredient);
             recipe.addStep(step);
+
+
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
@@ -97,7 +99,7 @@ public class ExEmElFormat extends AppCompatActivity {
             doc.appendChild(rootElement);
             Element nameE = doc.createElement("Title");
             Attr actualName = doc.createAttribute("Recipe_Title");
-            actualName.setValue(name);
+            actualName.setValue(recipe.getTitle());
             nameE.setAttributeNode(actualName);
             rootElement.appendChild(nameE);
 
@@ -105,11 +107,11 @@ public class ExEmElFormat extends AppCompatActivity {
             rootElement.appendChild(ingredientsListE);
             Element ingredientE = doc.createElement("Ingredient");
             Attr ingredientName = doc.createAttribute("Name");
-            ingredientName.setValue(ingredients);
+            ingredientName.setValue(recipe.getIngredients().get(0).getName());
             Attr ingredientAmount = doc.createAttribute("Amount");
-            ingredientAmount.setValue("3");
+            ingredientAmount.setValue(recipe.getIngredients().get(0).getAmount());
             Attr ingredientUnits = doc.createAttribute("Units");
-            ingredientUnits.setValue("Oz");
+            ingredientUnits.setValue(recipe.getIngredients().get(0).getUnits());
             ingredientE.setAttributeNode(ingredientName);
             ingredientE.setAttributeNode(ingredientAmount);
             ingredientE.setAttributeNode(ingredientUnits);
@@ -120,11 +122,11 @@ public class ExEmElFormat extends AppCompatActivity {
             rootElement.appendChild(stepsListE);
             Element stepE = doc.createElement("Step");
             Attr stepName = doc.createAttribute("Name");
-            stepName.setValue(steps);
+            stepName.setValue(recipe.getSteps().get(0).getName());
             Attr stepDescription = doc.createAttribute("Description");
-            stepDescription.setValue("Here description");
+            stepDescription.setValue(recipe.getSteps().get(0).getDescription());
             Attr stepNumber = doc.createAttribute("Number");
-            stepNumber.setValue("1");
+            stepNumber.setValue(String.valueOf(recipe.getSteps().get(0).getNumber()));
             stepE.setAttributeNode(stepName);
             stepE.setAttributeNode(stepDescription);
             stepE.setAttributeNode(stepNumber);
@@ -133,7 +135,6 @@ public class ExEmElFormat extends AppCompatActivity {
 
 
 
-            //...create XML elements, and others...
 
             // write dom document to a file
 
@@ -282,14 +283,15 @@ public class ExEmElFormat extends AppCompatActivity {
 
                             System.out.println("TAGS: " + parser.getName());
                             if (parser.getAttributeCount()== 1){
-                                switch (parser.getAttributeName(0)){
-                                    case "Recipe_Title":
-                                        nameET.setText(parser.getAttributeValue(0));
-                                    case "Actual_Ingredients":
-                                        ingredientsET.setText(parser.getAttributeValue(0));
-                                    case "Actual_Steps":
-                                        stepsET.setText(parser.getAttributeValue(0));
-                                }
+                                    nameET.setText(parser.getAttributeValue(0));
+
+                            }
+                            if (parser.getName().equals("Ingredient")){
+                                ingredientsET.setText(parser.getAttributeValue(0));
+
+                            }
+                            if (parser.getName().equals("Step")){
+                                stepsET.setText(parser.getAttributeValue(0));
 
                             }
 

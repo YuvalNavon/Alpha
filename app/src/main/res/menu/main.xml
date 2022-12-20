@@ -31,6 +31,12 @@
         android:orderInCategory="5"
         />
 
+    <item
+        android:id = "@+id/XMLScreenTest"
+        android:title="Test"
+        android:orderInCategory="6"
+        />
+
 
 
 </menu>
