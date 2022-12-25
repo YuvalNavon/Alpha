@@ -6,12 +6,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -21,38 +23,33 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText emailET, passwordET;
-    String email, password;
-    FirebaseAuth fAuth;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        emailET = findViewById(R.id.email);
-        passwordET = findViewById(R.id.password);
 
-        fAuth = FirebaseAuth.getInstance();
+
+//        emailET = findViewById(R.id.email);
+//        passwordET = findViewById(R.id.password);
+
 
 
 
     }
 
-    public void Register(View view){
-        email = emailET.getText().toString();
-        password = passwordET.getText().toString();
-        fAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful())
-                {
-                    Toast.makeText(MainActivity.this, "User Created!", Toast.LENGTH_LONG).show();
 
 
-                }
-            }
-        });
+    public void chooseCourse(View view){
+        Intent si = new Intent(this, ChooseCourse.class);
+        startActivity(si);
+    }
+
+    public void logIn(View view){
+        Intent si = new Intent(this, LogIn.class);
+        startActivity(si);
     }
 
     @Override

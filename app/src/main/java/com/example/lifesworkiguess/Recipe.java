@@ -1,7 +1,5 @@
 package com.example.lifesworkiguess;
 
-import org.w3c.dom.Node;
-
 import java.util.ArrayList;
 
 public class Recipe {
@@ -17,6 +15,8 @@ public class Recipe {
 
 
     }
+
+
 
     public String getTitle() {
         return title;
@@ -42,6 +42,8 @@ public class Recipe {
         this.steps = steps;
     }
 
+
+
     public void addIngredient(Ingredient ingredient){
         this.ingredients.add(ingredient);
     }
@@ -50,4 +52,5 @@ public class Recipe {
         step.setNumber(steps.size()-1);
 
     }
+
 }

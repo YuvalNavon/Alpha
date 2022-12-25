@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -22,9 +23,8 @@ ArrayList<EditText[]> allIngredients, allSteps;
 ArrayList<ArrayList<EditText[]>> combinedList;
 Spinner spinIng, spinStep;
 
-String title, ingName, ingAmount, ingUnits, stepName, stepDescription, lastUploaded;
+String title, ingName, ingAmount, ingUnits, stepName, stepDescription,stepTime, stepAction, lastUploaded;
 int ingCount, stepCount;
-boolean downloading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,33 +97,7 @@ boolean downloading;
 
 
 
-    public void createRecipe(View view){
-        if (checkIfFilled(ingCount, stepCount)){
-            title = titleET.getText().toString();
-            Recipe recipe = new Recipe(title);
-            for (int i = 0; i<ingCount;i++){
-                ingName = allIngredients.get(i)[0].getText().toString();
-                ingAmount = allIngredients.get(i)[1].getText().toString();
-                ingUnits = allIngredients.get(i)[2].getText().toString();
-                Ingredient addedIng = new Ingredient
-                        (ingName, ingAmount, ingUnits);
-                recipe.addIngredient(addedIng);
-            }
 
-            for (int i = 0; i<stepCount;i++){
-                stepName = allSteps.get(i)[0].getText().toString();
-                stepDescription = allSteps.get(i)[1].getText().toString();
-                Step addedStep = new Step
-                        (stepName, stepDescription);
-                recipe.addStep(addedStep);
-            }
-
-            recipeToXML(NewCreateRecipe.this, recipe, title);
-            uploadXML(this, title);
-            lastUploaded = "Recipe For " + title + "." + "xml";
-            downloading = false;
-        }
-    }
 
 
 
@@ -142,7 +116,7 @@ boolean downloading;
         //Check all Step Fields
         for (int i = 0; i<stepCount; i++){
             for (int j = 0; j<Step1.length; j++){
-                if (allIngredients.get(i)[j].getText().toString().isEmpty()) return false;
+                if (allSteps.get(i)[j].getText().toString().isEmpty()) return false;
             }
 
         }
@@ -181,7 +155,7 @@ boolean downloading;
     }
 
     public void setSteps(int stepCount){
-        //NOTICE: stepCount is the ACTUAL number of ings, not the index in the arraylist
+        //NOTICE: stepCount is the ACTUAL number of steps, not the index in the arraylist
         for (int i = 0; i<stepCount; i++){
 
             allSteps.get(i)[0].setEnabled(true);
@@ -203,6 +177,41 @@ boolean downloading;
         }
     }
 
+    public void createRecipe(View view){
+        if (checkIfFilled(ingCount, stepCount)){
+            title = titleET.getText().toString();
+            Recipe recipe = new Recipe(title);
+            for (int i = 0; i<ingCount;i++){
+                ingName = allIngredients.get(i)[0].getText().toString();
+                ingAmount = allIngredients.get(i)[1].getText().toString();
+                ingUnits = allIngredients.get(i)[2].getText().toString();
+                Ingredient addedIng = new Ingredient
+                        (ingName, ingAmount, ingUnits);
+                recipe.addIngredient(addedIng);
+            }
+
+            for (int i = 0; i<stepCount;i++){
+                stepName = allSteps.get(i)[0].getText().toString();
+                stepDescription = allSteps.get(i)[1].getText().toString();
+                //UPDATE STEP TIME EDIT TEXT and STEP ACTION GIPHY
+                stepTime = "1 min.";
+                stepAction = "https://media.giphy.com/media/xUOxfjsW9fWPqEWouI/giphy.gif";
+                Step addedStep = new Step
+                        (stepName, stepDescription, stepTime, stepAction);
+                //THE NEXT LINE IS THE ONE THAT DECIDES THE STEP NUMBER THAT IS GOTTEN
+                //DURING THE RECIPETOXML METHOD
+                recipe.addStep(addedStep);
+            }
+
+            recipeToXML(NewCreateRecipe.this, recipe, title);
+            uploadXML(this, title);
+            lastUploaded = "Recipe For " + title + "." + "xml";
+        }
+        else{
+            Toast.makeText(this, "HUHH", Toast.LENGTH_LONG).show();
+        }
+    }
+
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
             if (adapterView.getId()== R.id.ingredientSpinner){
@@ -212,7 +221,6 @@ boolean downloading;
 
             if (adapterView.getId()== R.id.stepSpinner){
                 stepCount = i+ 1;
-                System.out.println(stepCount);
                 setSteps(stepCount);
             }
             
