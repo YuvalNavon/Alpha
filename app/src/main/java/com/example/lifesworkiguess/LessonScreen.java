@@ -21,7 +21,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 public class LessonScreen extends AppCompatActivity {
-
     String recipeName, lessonName, courseName;
     int currStepNumber;
 
@@ -138,6 +137,9 @@ public class LessonScreen extends AppCompatActivity {
     public void nextStep(View view){
         if (stepIsLast(currStepNumber)){
             Toast.makeText(this, "FINISHED", Toast.LENGTH_LONG).show();
+            Intent toLessonFinish = new Intent(this, LessonFinish.class);
+            startActivity(toLessonFinish);
+
         }
         else{
             currStepNumber+=1;

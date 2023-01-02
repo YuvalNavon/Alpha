@@ -40,6 +40,13 @@
         android:theme="@style/Theme.LifesWorkIGuess"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".LessonFinish"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".LessonScreen"
             android:exported="false">
             <meta-data
