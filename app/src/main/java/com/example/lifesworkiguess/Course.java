@@ -17,12 +17,9 @@ public class Course {
         this.courseName = courseName;
     }
 
-    public void addLesson(Lesson addedLesson){
-        lessonsList.add(addedLesson);
-    }
-
-    public void clearLessonsList(){
-        lessonsList.clear();
+    public Course(ArrayList<Lesson> lessonsList, String courseName) {
+        this.lessonsList = lessonsList;
+        this.courseName = courseName;
     }
 
     public ArrayList<Lesson> getLessonsList() {
@@ -40,4 +37,30 @@ public class Course {
     public void setCourseName(String courseName) {
         this.courseName = courseName;
     }
+
+    public void clearLessonsList(){
+        lessonsList.clear();
+    }
+
+    public void addLesson(Lesson addedLesson){
+        lessonsList.add(addedLesson);
+    }
+
+    public void sortLessonsListByNumber(){  //By default, FB sorts items by ABC, so this is used to sort lessons by predetermined numbers set by me
+        ArrayList<Lesson> sorted =new ArrayList<>();
+        int searchedIndex = 0;
+        while(sorted.size()!=lessonsList.size()){
+            for (int i = 0; i<lessonsList.size();i++ ){
+                if (lessonsList.get(i).getNumber()==searchedIndex){
+                    sorted.add(lessonsList.get(i));
+                    searchedIndex+=1;
+                }
+            }
+        }
+        lessonsList = sorted;
+
+
+
+    }
+
 }

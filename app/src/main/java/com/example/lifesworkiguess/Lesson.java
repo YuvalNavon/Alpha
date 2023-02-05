@@ -1,88 +1,55 @@
 package com.example.lifesworkiguess;
 
-import android.net.Uri;
-
-import com.example.lifesworkiguess.Recipe;
-
-import java.util.ArrayList;
-
 public class Lesson {
 
-    private String lessonName;
-    private String lessonRecipeName;
-    private ArrayList<String> extraInfoList;
-    private String extraInfo;
-    private String logoUri;
+    private String LessonName;
+    private String LessonRecipeName;
+    private String LogoUri;
+    private int Number;
 
     public Lesson(){
-        this.lessonName = "ERROR";
-        this.lessonRecipeName = null;
-        this.extraInfo = null;
-        this.extraInfoList = null;
-        this.logoUri = null;
+        this.LessonName = "ERROR";
+        this.LessonRecipeName = null;
+        this.LogoUri = null;
     }
 
-    public Lesson(String lessonName, String lessonRecipeName, String extraInfo, String logoUri) {
-        this.lessonName = lessonName;
-        this.lessonRecipeName = lessonRecipeName;
-        this.extraInfo = extraInfo;
-        this.logoUri = logoUri;
-        this.extraInfoList = new ArrayList<>();
-
+    public Lesson(String lessonName, String lessonRecipeName, String logoUri, int number) {
+        this.LessonName = lessonName;
+        this.LessonRecipeName = lessonRecipeName;
+        this.LogoUri = logoUri;
+        this.Number = number;
     }
 
-    public void formatExtraInfo(){
-        extraInfoList = new ArrayList<>();
-        int count = 0;
-        for (int i = 0; i<extraInfo.length(); i++){
-            if (extraInfo.charAt(i) ==',')count = count+1;
-        }
-        for (int i = 0; i<count; i++){
-            String currInfo = extraInfo.substring(0, extraInfo.indexOf(','));
-            extraInfoList.add(currInfo);
-            extraInfo =extraInfo.substring(extraInfo.indexOf(',')+1);
-
-        }
-        extraInfoList.add(extraInfo);
-    }
 
     public String getLessonName() {
-        return lessonName;
+        return LessonName;
     }
 
     public String getLessonRecipeName() {
-        return lessonRecipeName;
-    }
-
-    public String getExtraInfo() {
-        return extraInfo;
-    }
-
-    public ArrayList<String> getExtraInfoList() {
-        return extraInfoList;
+        return LessonRecipeName;
     }
 
     public String getLogoUri() {
-        return logoUri;
+        return LogoUri;
+    }
+
+    public int getNumber() {
+        return Number;
     }
 
     public void setLessonName(String lessonName) {
-        this.lessonName = lessonName;
+        this.LessonName = lessonName;
     }
 
     public void setLessonRecipeName(String lessonRecipeName) {
-        this.lessonRecipeName = lessonRecipeName;
-    }
-
-    public void setExtraInfo(String extraInfo) {
-        this.extraInfo = extraInfo;
+        this.LessonRecipeName = lessonRecipeName;
     }
 
     public void setLogoUri(String logoUri) {
-        this.logoUri = logoUri;
+        this.LogoUri = logoUri;
     }
 
-    public void setExtraInfoList(ArrayList<String> extraInfoList) {
-        this.extraInfoList = extraInfoList;
+    public void setNumber(int number) {
+        Number = number;
     }
 }

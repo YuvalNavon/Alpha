@@ -1,20 +1,15 @@
 package com.example.lifesworkiguess;
 
-import static android.os.Environment.DIRECTORY_DOWNLOADS;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.graphics.Color;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -23,17 +18,51 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
 
-
+    FirebaseAuth fAuth;
+    LinearLayout mainBackground;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //To make Loading seem smooth 1
+        mainBackground = findViewById(R.id.mainBackground);
+        mainBackground.setVisibility(View.INVISIBLE);
 
+        fAuth = FirebaseAuth.getInstance();
+        SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+        String email = settings.getString("Email", null);
+        String password = settings.getString("Password", null);
+        if ( email!=null && email.length()!=0 && password!=null && password.length()!=0){
+            fAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                // User exists
+                                Intent toHomeScreen = new Intent(MainActivity.this, HomeScreen.class);
+                                startActivity(toHomeScreen);
+                            }
+                            else {
+                                //Resetting Login Info
+                                SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+                                SharedPreferences.Editor editor=settings.edit();
+                                editor.putString("Email", null);
+                                editor.putString("Password", null);
+                                editor.commit();
 
-//        emailET = findViewById(R.id.email);
-//        passwordET = findViewById(R.id.password);
+                                //To make Loading seem smooth 2
+                                mainBackground.setVisibility(View.VISIBLE);
+
+                            }
+                            }
+                        });
+
+        }
+
+        else  mainBackground.setVisibility(View.VISIBLE);
+
 
 
 
@@ -42,9 +71,10 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public void chooseCourse(View view){
-        Intent si = new Intent(this, ChooseCourse.class);
-        startActivity(si);
+    public void getStarted(View view){
+        Intent toChooseCourse = new Intent(this, ChooseCourse.class);
+        toChooseCourse.putExtra(MyConstants.CHOOSE_COURSE_ORIGIN, MyConstants.FROM_MAIN_ACTIVITY);
+        startActivity(toChooseCourse);
     }
 
     public void logIn(View view){

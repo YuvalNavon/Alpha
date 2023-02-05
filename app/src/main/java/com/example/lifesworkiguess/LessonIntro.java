@@ -6,22 +6,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 public class LessonIntro extends AppCompatActivity {
 
@@ -31,12 +29,15 @@ public class LessonIntro extends AppCompatActivity {
     Lesson selectedLessonGlobal;
     Recipe recipe;
 
-    TextView lessonPositionTV, lessonNameTV, expectedTimeTV, difficultyTV, kosherTV;
+    TextView lessonPositionTV, lessonNameTV, expectedTimeTV, difficultyTV, kosherTV, serveCountTV;
     ImageView kosherIV, upArrowIV, downArrowIV ;
     RecyclerView ingredientsRV;
 
     FirebaseDatabase FBDB;
     DatabaseReference refLessons;
+
+    LinearLayout screen;
+    Button startBTN;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,16 +51,22 @@ public class LessonIntro extends AppCompatActivity {
         lessonFinal = getLessonData.getBooleanExtra("Is Lesson Final", false);
 
 
+        //To make loading smooth 1
+        screen = findViewById(R.id.lessonIntroScreen);
+        startBTN = findViewById(R.id.startLessonBTN);
+        screen.setVisibility(View.INVISIBLE);
+        startBTN.setEnabled(false);
+
         lessonPositionTV = findViewById(R.id.lessonTitleTV);
         lessonNameTV = findViewById(R.id.lessonNameIntroScreenTV);
         expectedTimeTV = findViewById(R.id.expectedTimeTV);
         difficultyTV = findViewById(R.id.difficultyTV);
         kosherTV = findViewById(R.id.kosherTV);
         kosherIV = findViewById(R.id.kosherIV);
+        serveCountTV = findViewById(R.id.lessonIntroScreenServeCountTV);
 
         upArrowIV = findViewById(R.id.upArrowIV);
         downArrowIV = findViewById(R.id.downArrowIV);
-
 
 
         FBDB = FirebaseDatabase.getInstance("https://cookproject-ac2c0-default-rtdb.europe-west1.firebasedatabase.app");
@@ -74,7 +81,18 @@ public class LessonIntro extends AppCompatActivity {
                                 Lesson selectedLesson = checkedLesson;
                                 setGlobalLesson(selectedLesson);
                                 getRecipe();
-                                makeRecyclerView();
+                                Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    public void run() {
+                                        // Actions to do after 1 seconds  (Has to be same delay as the delay in the getRecipe method)
+                                        makeRecyclerView();
+
+                                        //To make loading smooth 2
+                                        screen.setVisibility(View.VISIBLE);
+                                        startBTN.setEnabled(true);
+
+                                    }
+                                }, 1000);
                             }
 
 
@@ -93,7 +111,27 @@ public class LessonIntro extends AppCompatActivity {
 
     public void getRecipe(){
         myServices.downloadXML(this, selectedLessonGlobal.getLessonRecipeName(), "Courses/" + courseName + "/" + lessonName);
-        recipe = myServices.XMLToRecipe(LessonIntro.this, MyConstants.CURRENTLY_LEARNED_RECIPE);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                // Actions to do after 1 second (Has to be same delay as calling the makeRecyclerView method)
+                recipe = myServices.XMLToRecipe(LessonIntro.this, MyConstants.CURRENTLY_LEARNED_RECIPE);
+                lessonNameTV.setText("Make Some " + recipe.getTitle() + "!");
+                expectedTimeTV.setText(recipe.getTime());
+                difficultyTV.setText(recipe.getDifficulty());
+                if (recipe.isKosher()) {
+                    kosherTV.setText("KOSHER");
+                    kosherIV.setImageResource(com.firebase.ui.auth.R.drawable.fui_ic_check_circle_black_128dp);
+                }
+                else {
+                    kosherTV.setText("NOT\nKOSHER");
+                    kosherIV.setImageResource(android.R.drawable.ic_delete);
+                }
+                serveCountTV.setText(Integer.toString(recipe.getServeCount()));
+
+
+            }
+        }, 1000);
     }
 
 
@@ -139,13 +177,7 @@ public class LessonIntro extends AppCompatActivity {
     public void setGlobalLesson(Lesson lesson){
         selectedLessonGlobal = lesson;
         setPositionTV(lessonPosition);
-        lessonNameTV.setText("Make Some " + selectedLessonGlobal.getLessonName() + "!");
-        selectedLessonGlobal.formatExtraInfo();
-        expectedTimeTV.setText(selectedLessonGlobal.getExtraInfoList().get(MyConstants.EXPECTED_TIME_POSITION));
-        difficultyTV.setText(selectedLessonGlobal.getExtraInfoList().get(MyConstants.DIFFICULTY_POSITION));
-        kosherTV.setText(selectedLessonGlobal.getExtraInfoList().get(MyConstants.KOSHER_POSITION));
-        if (selectedLessonGlobal.getExtraInfoList().get(MyConstants.KOSHER_POSITION).equals("KOSHER")) kosherIV.setImageResource(com.firebase.ui.auth.R.drawable.fui_ic_check_circle_black_128dp);
-        else kosherIV.setImageResource(android.R.drawable.ic_delete);
+
 
 
 
@@ -159,11 +191,16 @@ public class LessonIntro extends AppCompatActivity {
     }
 
     public void startLesson(View view){
-        Intent toLessonScreen = new Intent(this, LessonScreen.class);
-        toLessonScreen.putExtra("Recipe Name", selectedLessonGlobal.getLessonRecipeName());
-        toLessonScreen.putExtra("Lesson Name", selectedLessonGlobal.getLessonName());
-        toLessonScreen.putExtra("Course Name", courseName);
-        startActivity(toLessonScreen);
+
+          Intent toLessonScreen = new Intent(LessonIntro.this, LessonScreen.class);
+          toLessonScreen.putExtra("Recipe Name", selectedLessonGlobal.getLessonRecipeName()); //RecipeName != Recipe.getTitle() ->
+            // RecipeName is used to access the recipe from FB Storage while (Recipe for ___.xml) while Recipe.getTitle() is just ____
+          toLessonScreen.putExtra("Lesson Name", selectedLessonGlobal.getLessonName());
+          toLessonScreen.putExtra("Lesson Position in List", lessonPosition);
+          toLessonScreen.putExtra("Course Name", courseName);
+          startActivity(toLessonScreen);
+
+
 
     }
 

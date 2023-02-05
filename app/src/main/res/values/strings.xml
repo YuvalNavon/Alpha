@@ -2,4 +2,5 @@
     <string name="app_name">Life\'sWorkIGuess</string>
     <color name="orange">#FF7518</color>
     <color name="gray">#AAAAAA</color>
+    <color name="red">#FFFF0000</color>
 </resources>

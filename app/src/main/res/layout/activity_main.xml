@@ -58,7 +58,7 @@
             android:layout_height="match_parent"
             android:layout_weight="2"
             android:backgroundTint="@color/orange"
-            android:onClick="chooseCourse"
+            android:onClick="getStarted"
             android:shadowColor="@color/gray"
             android:text="Get Started!" />
 

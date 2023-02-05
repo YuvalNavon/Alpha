@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:onClick="selectPFP"
     android:orientation="vertical"
     tools:context=".UsernameScreen">
 
@@ -22,20 +23,10 @@
         android:textColor="@color/orange"
         android:textSize="40sp" />
 
-    <TextView
-        android:id="@+id/textView18"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="How should we call you?"
-        android:textColor="@color/gray"
-        android:textSize="24sp" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="4"
+        android:layout_weight="5"
         android:orientation="horizontal">
 
         <Space
@@ -48,6 +39,24 @@
             android:layout_height="match_parent"
             android:layout_weight="50"
             android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/addPFPTV"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.5"
+                android:gravity="center"
+                android:text="Choose Your Profile Picture!"
+                android:textColor="@color/gray"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/addPFPIV"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="3"
+                android:onClick="selectPFP"
+                app:srcCompat="@drawable/defaultpfpwithplus" />
 
             <TextView
                 android:id="@+id/textView19"
@@ -63,7 +72,7 @@
                 android:id="@+id/usernameET"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.5"
+                android:layout_weight="1"
                 android:ems="10"
                 android:hint="Enter your Username"
                 android:inputType="textPersonName" />
@@ -79,8 +88,8 @@
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
+        android:layout_height="0dp"
+        android:layout_weight="0.5" />
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -13,7 +13,7 @@
         android:layout_weight="0.5" />
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/chooseCourseScreenTitleTV"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2"
@@ -163,13 +163,13 @@
             android:layout_weight="1" />
 
         <Button
-            android:id="@+id/button18"
+            android:id="@+id/chooseCourseScreenBTN"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="2"
             android:backgroundTint="@color/orange"
             android:shadowColor="@color/gray"
-            android:onClick="signUp"
+            android:onClick="signUpORChangeCourse"
             android:text="Next" />
 
         <Space

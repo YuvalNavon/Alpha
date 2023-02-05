@@ -2,13 +2,25 @@ package com.example.lifesworkiguess;
 
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -26,7 +38,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.annotation.Documented;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -42,12 +53,27 @@ import javax.xml.transform.stream.StreamResult;
 public class myServices {
 
 
+    //SIGN UP INFO VALIDATION
+    public static boolean emailInFormat(String email){
+        String regex = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
+        return email.matches(regex);
+    }
+
+    public static boolean passwordValid(String password){
+        return password.length()>6;
+    }
+
+    public static boolean usernameAvailable(String username){
+        return true;
+    }
+
+
+    //RECIPE, XML, DOWNLOADS
     public static Recipe XMLToRecipe(Context context, String fileName){
         String recipeName = "ERROR";
         Recipe recipe = new Recipe(recipeName);
         ArrayList<Ingredient> ingsList = new ArrayList<>();
         ArrayList<Step> stepsList = new ArrayList<>();
-        ArrayList<String> actionsList = new ArrayList<>();
         if (isFileExists(context, fileName)) {
             File file = new File(context.getExternalFilesDir("MyDir"), fileName);
             try {
@@ -58,9 +84,18 @@ public class myServices {
                 while (event != XmlPullParser.END_DOCUMENT) {
                     if (event == XmlPullParser.START_TAG) {
 
-                        if (parser.getAttributeCount()== 1){
+                        if (parser.getName().equals("General")){
                             recipeName = parser.getAttributeValue(0);
+                            String time = parser.getAttributeValue(1);
+                            String difficulty = parser.getAttributeValue(2);
+                            boolean kosher = Boolean.parseBoolean(parser.getAttributeValue(3));
+                            int serveCount = Integer.parseInt(parser.getAttributeValue(4));
+
                             recipe.setTitle(recipeName);
+                            recipe.setTime(time);
+                            recipe.setDifficulty(difficulty);
+                            recipe.setKosher(kosher);
+                            recipe.setServeCount(serveCount);
 
                         }
                         if (parser.getName().equals("Ingredient")){
@@ -74,7 +109,7 @@ public class myServices {
 
 
                             Step step = new Step(parser.getAttributeValue(0), parser.getAttributeValue(1),
-                                    parser.getAttributeValue(2), parser.getAttributeValue(3));
+                                    parser.getAttributeValue(2), parser.getAttributeValue(null, "Action"));
                             stepsList.add(step);
 
                         }
@@ -118,11 +153,30 @@ public class myServices {
         Document doc = docBuilder.newDocument();
         Element rootElement = doc.createElement("Recipe");
         doc.appendChild(rootElement);
-        Element nameE = doc.createElement("Title");
-        Attr actualName = doc.createAttribute("Recipe_Title");
-        actualName.setValue(recipe.getTitle());
-        nameE.setAttributeNode(actualName);
-        rootElement.appendChild(nameE);
+
+        //GENERAL TAG - Recipe Title, Time, Difficulty, Kosher and Serve Count
+
+        Element GeneralE = doc.createElement("General");
+        Attr recipeTitle = doc.createAttribute("Title");
+        recipeTitle.setValue(recipe.getTitle());
+
+        Attr recipeTime = doc.createAttribute("Time");
+        recipeTime.setValue(recipe.getTime());
+
+        Attr recipeDifficulty = doc.createAttribute("Difficulty");
+        recipeDifficulty.setValue(recipe.getDifficulty());
+
+        Attr recipeKosher = doc.createAttribute("Kosher");
+        recipeKosher.setValue(Boolean.toString(recipe.isKosher()));
+
+        Attr recipeServeCount = doc.createAttribute("Serve_Count");
+        recipeServeCount.setValue(Integer.toString(recipe.getServeCount()));
+
+        GeneralE.setAttributeNode(recipeTitle);
+        GeneralE.setAttributeNode(recipeServeCount);
+        rootElement.appendChild(GeneralE);
+
+
 
 
         //Adding Ingredients
@@ -289,5 +343,98 @@ public class myServices {
 
 
 
+    //PHOTOS
+
+    public static void uploadProfilePhotoToFirebase(Context context, Uri imageUri){
+        FirebaseAuth fAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = fAuth.getCurrentUser();
+        FirebaseStorage fStorage = FirebaseStorage.getInstance();
+        StorageReference fDownRef = fStorage.getReference("Users").child(currentUser.getUid()).child(MyConstants.PROFILE_PICTURE);
+        fDownRef.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(context, "Photo Uploaded!", Toast.LENGTH_LONG).show();
+
+            }
+        });
+    }
+
+
+    public static void getProfilePhotoFromFirebase(ImageView iv){
+        FirebaseAuth fAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = fAuth.getCurrentUser();
+        FirebaseStorage fStorage = FirebaseStorage.getInstance();
+        StorageReference fDownRef = fStorage.getReference("Users").child(currentUser.getUid()).child(MyConstants.PROFILE_PICTURE);
+        long MAXBYTES = 1024*1024;
+        fDownRef.getBytes(MAXBYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0 , bytes.length);
+                bitmap = getCircularBitmap(bitmap);
+                iv.setImageBitmap(bitmap);
+            }
+        });
+        fDownRef.getBytes(MAXBYTES).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+                iv.setImageResource(R.drawable.default_profile_picture);
+                Bitmap bm = ((BitmapDrawable) iv.getDrawable()).getBitmap();
+                iv.setImageBitmap(myServices.getCircularBitmap(bm));
+            }
+        });
+    }
+
+    //ROUND IMAGE
+    public static Bitmap getCircularBitmap(Bitmap bitmap) {
+        Bitmap output;
+
+        if (bitmap.getWidth() > bitmap.getHeight()) {
+            output = Bitmap.createBitmap(bitmap.getHeight(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        } else {
+            output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getWidth(), Bitmap.Config.ARGB_8888);
+        }
+
+        Canvas canvas = new Canvas(output);
+
+        final int color = 0xff424242;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+
+        float r = 0;
+
+        if (bitmap.getWidth() > bitmap.getHeight()) {
+            r = bitmap.getHeight() / 2;
+        } else {
+            r = bitmap.getWidth() / 2;
+        }
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        canvas.drawCircle(r, r, r, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+        return output;
+    }
+
+
+
+    //NAVIGATING THE HOME MENU
+
+    public static void goToProfilePage(Context context){
+        Intent toProfileScreen = new Intent(context, ProfileScreen.class);
+        context.startActivity(toProfileScreen);
+    }
+
+    public static void goToHomePage(Context context){
+        Intent toHomeScreen = new Intent(context, HomeScreen.class);
+        context.startActivity(toHomeScreen);
+    }
+
+//    public void goToCommunityScreen(Context context){
+//        Intent toCommunityScreen = new Intent(context, CommunityScreen.class);
+//        context.startActivity(toCommunityScreen);
+//    }
 
 }

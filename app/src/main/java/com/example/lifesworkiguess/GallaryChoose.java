@@ -46,7 +46,7 @@ public class GallaryChoose extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallary_choose);
 
-        fStorage = FirebaseStorage.getInstance().getReference("Pictures");
+        fStorage = FirebaseStorage.getInstance().getReference("Profile Pictures");
         SELECT_PICTURE = 1;
         iv = findViewById(R.id.tmuna);
 
@@ -83,6 +83,7 @@ public class GallaryChoose extends AppCompatActivity {
                 if (null != selectedImageUri) {
 
                     imagePicked = true;
+                    iv.setImageURI(selectedImageUri);
                     UploadImage();
 
                 }

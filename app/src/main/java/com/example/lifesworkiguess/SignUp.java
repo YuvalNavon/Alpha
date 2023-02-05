@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -18,6 +19,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class SignUp extends AppCompatActivity {
 
@@ -59,13 +61,10 @@ public class SignUp extends AppCompatActivity {
     }
 
 
-    public boolean emailInFormat(String email){
-        String regex = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
-        return email.matches(regex);
-    }
 
     public void emailNotInUse(String email){
         notInUse = true;
+
 //        ValueEventListener userListener = new ValueEventListener() {
 //            @Override
 //            public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -88,23 +87,23 @@ public class SignUp extends AppCompatActivity {
 //            notInUse = false;
 //            emailSignUpCheck.setText("Email address");
 //        }
-        refUsers.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot data : snapshot.getChildren()){
-                    User checkedUser = data.getValue(User.class);
-                    String checkedEmail = checkedUser.getEmail();
-                    if (email.equals(checkedEmail)){
-                        showErrorEmailUsed();
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+//        refUsers.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                for (DataSnapshot data : snapshot.getChildren()){
+//                    User checkedUser = data.getValue(User.class);
+//                    String checkedEmail = checkedUser.getEmail();
+//                    if (email.equals(checkedEmail)){
+//                        showErrorEmailUsed();
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
 
 //        if (emailSignUpCheck.getText().toString().equals("IN USE")){
 //            notInUse = false;
@@ -119,18 +118,15 @@ public class SignUp extends AppCompatActivity {
         notInUse = false;
     }
 
-    public boolean passwordValid(String password){
-        return password.length()>6;
-    }
 
 
     public void Register(View view){
         email = emailET.getText().toString();
         password = passwordET.getText().toString();
         emailNotInUse(email);
-        if (noFieldsClear() && emailInFormat(email ) && notInUse && passwordValid(password))
+        if (noFieldsClear() && myServices.emailInFormat(email ) && notInUse && myServices.passwordValid(password))
         {
-
+            email = email.toLowerCase(Locale.ROOT);
             Intent usernameScreen = new Intent(SignUp.this, UsernameScreen.class);
             usernameScreen.putExtra("Cooking Style", cookingStyle);
             usernameScreen.putExtra("Experience Level", experienceLevel);
@@ -145,7 +141,7 @@ public class SignUp extends AppCompatActivity {
             if (!noFieldsClear())
                 Toast.makeText(SignUp.this, "Please Fill all fields!", Toast.LENGTH_LONG).show();
 
-            if (!emailInFormat(email))
+            if (!myServices.emailInFormat(email))
                 Toast.makeText(SignUp.this, "Please enter a Valid Email Address", Toast.LENGTH_LONG).show();
 
             if (!notInUse)
@@ -153,7 +149,7 @@ public class SignUp extends AppCompatActivity {
                         Toast.LENGTH_LONG).show();
 
 
-            if (!passwordValid(password))
+            if (!myServices.passwordValid(password))
                 Toast.makeText(SignUp.this, "Please enter a Valid Password (longer than 6 characters)", Toast.LENGTH_LONG).show();
 
 

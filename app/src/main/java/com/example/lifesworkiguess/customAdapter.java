@@ -25,6 +25,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -35,6 +37,7 @@ public class customAdapter extends RecyclerView.Adapter<CustomViewHolder> {
     OnItemClickListener listener;
 
     public customAdapter(Context context, Course selectedCourse, OnItemClickListener listener) {
+
         this.context = context;
         this.listener = listener;
         this.course = selectedCourse;
@@ -61,7 +64,7 @@ public class customAdapter extends RecyclerView.Adapter<CustomViewHolder> {
             @Override
             public void onSuccess(byte[] bytes) {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                bitmap = getCircularBitmap(bitmap);
+                bitmap = myServices.getCircularBitmap(bitmap);
                 holder.logo.setImageBitmap(bitmap);
 
             }
@@ -77,37 +80,7 @@ public class customAdapter extends RecyclerView.Adapter<CustomViewHolder> {
         });
     }
 
-    private Bitmap getCircularBitmap(Bitmap bitmap) {
-        Bitmap output;
 
-        if (bitmap.getWidth() > bitmap.getHeight()) {
-            output = Bitmap.createBitmap(bitmap.getHeight(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-        } else {
-            output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getWidth(), Bitmap.Config.ARGB_8888);
-        }
-
-        Canvas canvas = new Canvas(output);
-
-        final int color = 0xff424242;
-        final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-
-        float r = 0;
-
-        if (bitmap.getWidth() > bitmap.getHeight()) {
-            r = bitmap.getHeight() / 2;
-        } else {
-            r = bitmap.getWidth() / 2;
-        }
-
-        paint.setAntiAlias(true);
-        canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(color);
-        canvas.drawCircle(r, r, r, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, rect, rect, paint);
-        return output;
-    }
 
     @Override
     public int getItemCount() {
