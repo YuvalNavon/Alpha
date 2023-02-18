@@ -14,7 +14,6 @@ public class CompletedCoursesAdapter extends RecyclerView.Adapter<CompletedCours
     User user;
     OnItemClickListener listener;
 
-
     public CompletedCoursesAdapter(Context context, User user, OnItemClickListener listener) {
         this.context = context;
         this.user = user;
@@ -31,28 +30,22 @@ public class CompletedCoursesAdapter extends RecyclerView.Adapter<CompletedCours
     @Override
     public void onBindViewHolder(@NonNull CompletedCoursesViewHolder holder, int position) {
 
+        //As of BETA 2: No inclusion of Current Course Progress bc shits wack.
 
-        if (user.getCompletedCourses().get(MyConstants.COMPLETED_COURSES_PLACEHOLDER_INDEX).equals(MyConstants.COMPLETED_COURSES_PLACEHOLDER)){
+        //User has completed a course
+        String completedCourse =user.getCompletedCourses().get(position);
+        holder.completedCourseTV.setText(completedCourse);
 
-            //User hasnt completed a course yet
-            holder.completedCourseTV.setText("Finish A Course to see Your Progress!");
-        }
-
-        else{
-
-            //User has completed a course
-            String completedCourse =user.getCompletedCourses().get(position);
-            holder.completedCourseTV.setText(completedCourse);
-
-            holder.setOnItemClickListener(new CompletedCoursesViewHolder.OnItemClickListener() {
+        holder.setOnItemClickListener(new CompletedCoursesViewHolder.OnItemClickListener() {
                 @Override
                 public void onItemClick(int position) {
                     if (listener != null) {
                         listener.onItemClick(position);
                     }
                 }
-            });
-        }
+        });
+
+
 
     }
 

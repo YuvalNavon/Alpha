@@ -36,7 +36,7 @@
             android:id="@+id/stepNameTV"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_weight="1.5"
             android:gravity="center"
             android:text="step name"
             android:textColor="@color/orange"
@@ -46,7 +46,7 @@
             android:id="@+id/stepDescriptionTV"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="2"
+            android:layout_weight="2.5"
             android:gravity="center"
             android:text="step description"
             android:textColor="@color/gray"
@@ -67,7 +67,7 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="0.5" />
 
         <LinearLayout
             android:layout_width="match_parent"

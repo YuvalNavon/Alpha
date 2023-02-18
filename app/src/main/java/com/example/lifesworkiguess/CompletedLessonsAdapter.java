@@ -52,44 +52,46 @@ public class CompletedLessonsAdapter extends RecyclerView.Adapter<CompletedLesso
 //     final int position2 = position; //Value Event Listeners (VELs) and its weird requirements made me add this line, prob bc by the time the VEL gets the info
         //for the RatingBar, the user might click on a different lesson
         // nvm this position isnt the click position but the making view position
-        System.out.println("HELL YEAH ON BIND VIEW HOLDER");
 
-        String lessonName = pickedCourse.getLessonsList().get(position).getLessonName();
-        holder.lessonNameTV.setText(lessonName);
-        FirebaseStorage fStorage = FirebaseStorage.getInstance();
-        StorageReference dishPhotoRef = fStorage.getReference("Users").child(currentlyLoggedInUser.getUid()).child("Courses").
-                child(pickedCourse.getCourseName()).child(lessonName);
-        long MAXBYTES = 1024 * 1024;
-        dishPhotoRef.getBytes(MAXBYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                holder.dishIV.setImageBitmap(bitmap);
-                                }
-                });
-        dishPhotoRef.getBytes(MAXBYTES).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                System.out.println("HELL YEAH FAILURE");
-                holder.dishIV.setImageResource(R.drawable.add_dish);
-            }
-        });
-
-        float lessonRating = currentUser.getLessonsRating().get(position);
-        holder.dishRatingRB.setRating(lessonRating);
-        holder.dishRatingRB.setEnabled(false);
-
-
-
-
-        holder.setOnItemClickListener(new CompletedLessonsViewHolder.OnItemClickListener() {
-            @Override
-            public void onItemClick2(int position) {
-                if (listener != null) {
-                    listener.onItemClick2(position);
+        if (currentUser.getLessonsStatus().get(position)==MyConstants.FINISHED_LESSON){
+            String lessonName = pickedCourse.getLessonsList().get(position).getLessonName();
+            holder.lessonNameTV.setText(lessonName);
+            FirebaseStorage fStorage = FirebaseStorage.getInstance();
+            StorageReference dishPhotoRef = fStorage.getReference("Users").child(currentlyLoggedInUser.getUid()).child("Courses").
+                    child(pickedCourse.getCourseName()).child(lessonName);
+            long MAXBYTES = 1024 * 1024;
+            dishPhotoRef.getBytes(MAXBYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                @Override
+                public void onSuccess(byte[] bytes) {
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    holder.dishIV.setImageBitmap(bitmap);
                 }
-            }
-        });
+            });
+            dishPhotoRef.getBytes(MAXBYTES).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    System.out.println("HELL YEAH FAILURE");
+                    holder.dishIV.setImageResource(R.drawable.add_dish);
+                }
+            });
+
+            float lessonRating = currentUser.getLessonsRating().get(position);
+            holder.dishRatingRB.setRating(lessonRating);
+            holder.dishRatingRB.setEnabled(false);
+
+
+
+
+            holder.setOnItemClickListener(new CompletedLessonsViewHolder.OnItemClickListener() {
+                @Override
+                public void onItemClick2(int position) {
+                    if (listener != null) {
+                        listener.onItemClick2(position);
+                    }
+                }
+            });
+        }
+
     }
 
 

@@ -84,7 +84,7 @@ public class LessonIntro extends AppCompatActivity {
                                 Handler handler = new Handler();
                                 handler.postDelayed(new Runnable() {
                                     public void run() {
-                                        // Actions to do after 1 seconds  (Has to be same delay as the delay in the getRecipe method)
+                                        // Actions to do after 2 seconds  (Has to be same delay as the delay in the getRecipe method)
                                         makeRecyclerView();
 
                                         //To make loading smooth 2
@@ -92,7 +92,7 @@ public class LessonIntro extends AppCompatActivity {
                                         startBTN.setEnabled(true);
 
                                     }
-                                }, 1000);
+                                }, 2000);
                             }
 
 
@@ -114,7 +114,7 @@ public class LessonIntro extends AppCompatActivity {
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {
-                // Actions to do after 1 second (Has to be same delay as calling the makeRecyclerView method)
+                // Actions to do after 2 second (Has to be same delay as calling the makeRecyclerView method)
                 recipe = myServices.XMLToRecipe(LessonIntro.this, MyConstants.CURRENTLY_LEARNED_RECIPE);
                 lessonNameTV.setText("Make Some " + recipe.getTitle() + "!");
                 expectedTimeTV.setText(recipe.getTime());
@@ -131,7 +131,7 @@ public class LessonIntro extends AppCompatActivity {
 
 
             }
-        }, 1000);
+        }, 2000);
     }
 
 
