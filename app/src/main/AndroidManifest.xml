@@ -39,6 +39,15 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".newLessonScreen"
+            android:exported="false"
+            android:label="@string/title_activity_new_lesson_screen"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".LessonFinished"
             android:exported="false">
             <meta-data

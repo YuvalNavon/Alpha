@@ -192,7 +192,7 @@ public class LessonIntro extends AppCompatActivity {
 
     public void startLesson(View view){
 
-          Intent toLessonScreen = new Intent(LessonIntro.this, LessonScreen.class);
+          Intent toLessonScreen = new Intent(LessonIntro.this, newLessonScreen.class);
           toLessonScreen.putExtra("Recipe Name", selectedLessonGlobal.getLessonRecipeName()); //RecipeName != Recipe.getTitle() ->
             // RecipeName is used to access the recipe from FB Storage while (Recipe for ___.xml) while Recipe.getTitle() is just ____
           toLessonScreen.putExtra("Lesson Name", selectedLessonGlobal.getLessonName());
