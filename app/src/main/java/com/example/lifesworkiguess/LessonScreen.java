@@ -30,13 +30,9 @@ import com.google.firebase.storage.StorageReference;
 public class LessonScreen extends AppCompatActivity {
 
     String recipeName, lessonName, courseName;
-    int currStepNumber, lessonPosition;
+    int  lessonPosition;
 
-    TextView stepNumberTV, stepNameTV, stepDescriptionTV;
-    ImageView stepImageIV;
-    Button nextBtn;
 
-    Recipe recipe;
 
 
 
@@ -51,15 +47,15 @@ public class LessonScreen extends AppCompatActivity {
 
         Intent getLessonName = getIntent();
         recipeName = getLessonName.getStringExtra("Recipe Name");
-        lessonName = getLessonName.getStringExtra("Lesson Name");
+        lessonName = getLessonName.getStringExtra("PermanentLesson Name");
         courseName = getLessonName.getStringExtra("Course Name");
-        lessonPosition = getLessonName.getIntExtra("Lesson Position in List", MyConstants.NO_LESSON_POSITION);
+        lessonPosition = getLessonName.getIntExtra("PermanentLesson Position in List", MyConstants.NO_LESSON_POSITION);
 
         Bundle intentDataForLessonFrag = new Bundle();
         intentDataForLessonFrag.putString("Recipe Name", recipeName);
-        intentDataForLessonFrag.putString("Lesson Name",lessonName );
+        intentDataForLessonFrag.putString("PermanentLesson Name",lessonName );
         intentDataForLessonFrag.putString("Course Name", courseName);
-        intentDataForLessonFrag.putInt("Lesson Position in List", lessonPosition);
+        intentDataForLessonFrag.putInt("PermanentLesson Position in List", lessonPosition);
 
         LessonScreenFrag lessonScreenFrag = new LessonScreenFrag();
         lessonScreenFrag.setArguments(intentDataForLessonFrag);

@@ -23,12 +23,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+
 public class ProfileScreen extends AppCompatActivity implements CompletedCoursesViewHolder.OnItemClickListener, CompletedLessonsViewHolder.OnItemClickListener {
 
     FirebaseAuth fAuth;
     FirebaseUser loggedInUser;
     FirebaseDatabase FBDB;
-    DatabaseReference refUsers;
+    DatabaseReference refUsers, refLesson;
+    ValueEventListener courseGetter, getLessonName;
     TextView usernameTV, courseTV;
     ImageView profileScreenPFPIV,profileScreenMenuPFPIV ;
     Button changeCourse;
@@ -37,6 +40,7 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
 
     RecyclerView CompletedCoursesView, CompletedLessonsView;
 
+    ArrayList<String> coursesNamesForRV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +74,7 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
         courseTV = findViewById(R.id.profileScreenCourseTV);
         FBDB = FirebaseDatabase.getInstance("https://cookproject-ac2c0-default-rtdb.europe-west1.firebasedatabase.app");
         refUsers=FBDB.getReference("Users").child(loggedInUser.getUid());
-        ValueEventListener courseGetter = new ValueEventListener() {
+        courseGetter = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
@@ -87,6 +91,15 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
                 }
 
                 //Making Completed Courses RV:
+                coursesNamesForRV = new ArrayList<>();
+                coursesNamesForRV.add(loggedInUser.getSelectedCourse());
+                for (String finishedCourseName: loggedInUser.getCompletedCourses()){
+                    if(!finishedCourseName.equals(MyConstants.COMPLETED_COURSES_PLACEHOLDER) && !finishedCourseName.equals(loggedInUser.getSelectedCourse()) ){
+                        //No need to add any code that treats a case where PLACEHOLDER exists in the users completed courses, bc if it does exist
+                        //then the RV should only contain the Currently Selected Course, and if it Doesnt Exist, then there is no need to treat it.
+                        coursesNamesForRV.add(finishedCourseName);
+                    }
+                }
                 makeCompletedCoursesRecyclerView(loggedInUser);
 
 
@@ -105,10 +118,34 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
         refUsers.addValueEventListener(courseGetter);
 
 
-
-
         //To make Loading seem smooth 2
         profileScreen.setVisibility(View.VISIBLE);
+
+    }
+
+    @Override
+    protected void onPause() {
+
+        super.onPause();
+        if (refUsers!=null && courseGetter!=null) refUsers.removeEventListener(courseGetter);
+        if (refLesson!=null && getLessonName!=null) refLesson.removeEventListener(getLessonName);
+
+    }
+
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+        if (refUsers!=null && courseGetter!=null) refUsers.addValueEventListener(courseGetter);
+        if (refLesson!=null && getLessonName!=null) refLesson.addValueEventListener(getLessonName);
+    }
+
+    public void onDestroy() {
+
+        super.onDestroy();
+        if (refUsers!=null && courseGetter!=null) refUsers.removeEventListener(courseGetter);
+        if (refLesson!=null && getLessonName!=null) refLesson.removeEventListener(getLessonName);
 
     }
 
@@ -116,7 +153,7 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
         globalCurrentlyLoggedInUser = currentUser;
 
         // Create an instance of your adapter
-        CompletedCoursesAdapter adapter = new CompletedCoursesAdapter(ProfileScreen.this, currentUser, this::onItemClick);
+        CompletedCoursesAdapter adapter = new CompletedCoursesAdapter(ProfileScreen.this, coursesNamesForRV, this::onItemClick);
 
 
         // Set the layout manager for the RecyclerView
@@ -157,38 +194,25 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
 
 
 
-    public void changeCourse(View view){
-            Intent toChooseCourse = new Intent(this, ChooseCourse.class);
-            toChooseCourse.putExtra(MyConstants.CHOOSE_COURSE_ORIGIN, MyConstants.FROM_PROFILE);
-            startActivity(toChooseCourse);
-    }
 
-    public void editProfile(View view){
-        Intent toEditProfileScreen = new Intent(this, EditProfile.class);
-        startActivity(toEditProfileScreen);
-    }
-
-    public void goToHomePage(View view){
-        myServices.goToHomePage(ProfileScreen.this);
-    }
 
 
     @Override
     public void onItemClick(int position) {
 
-        System.out.println("CLICKED");
+
         FirebaseDatabase FBDB = FirebaseDatabase.getInstance("https://cookproject-ac2c0-default-rtdb.europe-west1.firebasedatabase.app");
-        String pickedCourseName =  globalCurrentlyLoggedInUser.getCompletedCourses().get(position);
-        DatabaseReference refLesson= FBDB.getReference("Courses").child(pickedCourseName);
-        ValueEventListener getLessonName = new ValueEventListener() {
+        String pickedCourseName =  coursesNamesForRV.get(position);
+        refLesson= FBDB.getReference("Courses").child(pickedCourseName);
+        getLessonName = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
 
                     Course pickedCourse = new Course(pickedCourseName);
                 for (DataSnapshot data : snapshot.getChildren()) {
-                    Lesson addedLesson = data.getValue(Lesson.class);
-                    pickedCourse.addLesson(addedLesson);
+                    PermanentLesson addedPermanentLesson = data.getValue(PermanentLesson.class);
+                    pickedCourse.addLesson(addedPermanentLesson);
 
                 }
                 //By default, FB sorts items by ABC, so this is used to sort lessons by predetermined numbers set by me:
@@ -210,5 +234,24 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
     @Override
     public void onItemClick2(int position) {
 
+    }
+
+
+    public void changeCourse(View view){
+        Intent toChooseCourse = new Intent(this, ChooseCourse.class);
+        toChooseCourse.putExtra(MyConstants.CHOOSE_COURSE_ORIGIN, MyConstants.FROM_PROFILE);
+        startActivity(toChooseCourse);
+    }
+
+    public void editProfile(View view){
+        Intent toEditProfileScreen = new Intent(this, EditProfile.class);
+        startActivity(toEditProfileScreen);
+    }
+
+    public void goToHomePage(View view){
+        myServices.goToHomePage(ProfileScreen.this);
+    }
+
+    public void goToCommunityPage(View view){  myServices.goToCommunityPage(ProfileScreen.this);
     }
 }

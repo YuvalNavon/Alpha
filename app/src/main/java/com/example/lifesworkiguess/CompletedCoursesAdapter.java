@@ -8,15 +8,17 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+
 
 public class CompletedCoursesAdapter extends RecyclerView.Adapter<CompletedCoursesViewHolder> {
     Context context;
-    User user;
+    ArrayList<String> coursesNames;
     OnItemClickListener listener;
 
-    public CompletedCoursesAdapter(Context context, User user, OnItemClickListener listener) {
+    public CompletedCoursesAdapter(Context context, ArrayList<String> coursesNames, OnItemClickListener listener) {
         this.context = context;
-        this.user = user;
+        this.coursesNames = coursesNames;
         this.listener = listener;
     }
 
@@ -33,7 +35,7 @@ public class CompletedCoursesAdapter extends RecyclerView.Adapter<CompletedCours
         //As of BETA 2: No inclusion of Current Course Progress bc shits wack.
 
         //User has completed a course
-        String completedCourse =user.getCompletedCourses().get(position);
+        String completedCourse = coursesNames.get(position);
         holder.completedCourseTV.setText(completedCourse);
 
         holder.setOnItemClickListener(new CompletedCoursesViewHolder.OnItemClickListener() {
@@ -51,7 +53,7 @@ public class CompletedCoursesAdapter extends RecyclerView.Adapter<CompletedCours
 
     @Override
     public int getItemCount() {
-        return user.getCompletedCourses().size();
+        return coursesNames.size();
     }
 
     public interface OnItemClickListener {

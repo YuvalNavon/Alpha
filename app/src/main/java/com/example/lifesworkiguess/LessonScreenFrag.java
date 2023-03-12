@@ -24,6 +24,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link LessonScreenFrag#newInstance} factory method to
@@ -39,6 +41,9 @@ public class LessonScreenFrag extends Fragment {
     Button nextBtn;
 
     Recipe recipe;
+
+    ValueEventListener courseGetter;
+    DatabaseReference refUsers;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -80,10 +85,34 @@ public class LessonScreenFrag extends Fragment {
     }
 
     @Override
+    public void onPause() {
+
+        super.onPause();
+        if (refUsers!=null && courseGetter!=null) refUsers.removeEventListener(courseGetter);
+
+    }
+
+
+    @Override
+    public void onResume() {
+
+        super.onResume();
+        if (refUsers!=null && courseGetter!=null) refUsers.addValueEventListener(courseGetter);
+    }
+
+    public void onDestroy() {
+
+        super.onDestroy();
+        if (refUsers!=null && courseGetter!=null) refUsers.removeEventListener(courseGetter);
+
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_lesson_screen, container, false);
+
         stepNumberTV = view.findViewById(R.id.stepNumberTV);
         stepNameTV = view.findViewById(R.id.stepNameTV);
         stepDescriptionTV = view.findViewById(R.id.stepDescriptionTV);
@@ -98,6 +127,8 @@ public class LessonScreenFrag extends Fragment {
 
         Context context = getContext();
         Bundle dataFromIntent =getArguments();
+        lessonPosition = dataFromIntent.getInt("Lesson Position in List");
+        lessonName = dataFromIntent.getString("Lesson Name");
         if (dataFromIntent!= null){
             recipe = myServices.XMLToRecipe(context, MyConstants.CURRENTLY_LEARNED_RECIPE);
 
@@ -189,19 +220,22 @@ public class LessonScreenFrag extends Fragment {
             FirebaseAuth fAuth = FirebaseAuth.getInstance();
             FirebaseUser loggedInUser = fAuth.getCurrentUser();
             FirebaseDatabase FBDB = FirebaseDatabase.getInstance("https://cookproject-ac2c0-default-rtdb.europe-west1.firebasedatabase.app");
-            DatabaseReference refUsers=FBDB.getReference("Users").child(loggedInUser.getUid());
-            ValueEventListener courseGetter = new ValueEventListener() {
+            refUsers=FBDB.getReference("Users").child(loggedInUser.getUid());
+            courseGetter = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                     User currentlyLoggedUser = snapshot.getValue(User.class);
                     currentlyLoggedUser.setLessonFinished(lessonPosition);
+                    currentlyLoggedUser.rateLesson(currentlyLoggedUser.getSelectedCourse(), lessonPosition, MyConstants.NOT_YET_RATED);
+
                     FBDB.getReference("Users/" + loggedInUser.getUid()).setValue(currentlyLoggedUser);
                     Intent toLessonFinishedScreen = new Intent(context, LessonFinished.class);
                     toLessonFinishedScreen.putExtra("Lesson Position in List", lessonPosition);
                     toLessonFinishedScreen.putExtra("Lesson Name", lessonName);
                     toLessonFinishedScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(toLessonFinishedScreen);
+                    context.startActivity(toLessonFinishedScreen);
+
 
 
                 }

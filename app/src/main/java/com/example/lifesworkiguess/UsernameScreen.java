@@ -43,7 +43,8 @@ public class UsernameScreen extends AppCompatActivity {
     String cookingStyle, experienceLevel, weeklyHour, email,password, username;
     EditText usernameET;
     FirebaseDatabase FBDB;
-    DatabaseReference refUsers;
+    DatabaseReference refUsers, refLessons;
+    ValueEventListener lessonLoader;
     FirebaseAuth fAuth;
     TextView signInHere, addPFP;
 
@@ -89,6 +90,29 @@ public class UsernameScreen extends AppCompatActivity {
         imageUploaded = false;
 
         addPFP = findViewById(R.id.addPFPTV);
+
+    }
+
+    @Override
+    protected void onPause() {
+
+        super.onPause();
+        if (refLessons!=null && lessonLoader!=null) refUsers.removeEventListener(lessonLoader);
+
+    }
+
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+        if (refLessons!=null && lessonLoader!=null) refUsers.addValueEventListener(lessonLoader);
+    }
+
+    public void onDestroy() {
+
+        super.onDestroy();
+        if (refLessons!=null && lessonLoader!=null) refUsers.removeEventListener(lessonLoader);
 
     }
 
@@ -177,15 +201,15 @@ public class UsernameScreen extends AppCompatActivity {
                                 Toast.makeText(UsernameScreen.this, "User Created!", Toast.LENGTH_LONG).show();
                                 User newUser = new User(username, email, password, cookingStyle, experienceLevel, weeklyHour, FINISHED_SETUP);
                                 //GETTING LESSON NUMBER
-                                DatabaseReference refLessons = FBDB.getReference("Courses").child(newUser.getSelectedCourse());
-                                ValueEventListener lessonLoader = new ValueEventListener() {
+                                refLessons = FBDB.getReference("Courses").child(newUser.getSelectedCourse());
+                                lessonLoader = new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                         long lessonCount = snapshot.getChildrenCount();
                                         for (int i = 0; i<lessonCount; i++){
 
                                             newUser.getLessonsStatus().add(0);
-                                            newUser.getLessonsRating().add(0F);
+                                            newUser.getLessonsRating().get(0).add("0"); //WE ADD THE FIRST SELECTED COURSE NAME IN THE USER CONSTRUCTOR
 
                                         }
                                         refUsers.child(currentUser.getUid()).setValue(newUser);

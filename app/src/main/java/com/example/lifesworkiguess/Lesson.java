@@ -1,25 +1,37 @@
 package com.example.lifesworkiguess;
 
 public class Lesson {
-
     private String LessonName;
     private String LessonRecipeName;
     private String LogoUri;
-    private int Number;
+    private int ServeCount;
+    private String Time;
+    private String Difficulty;
+    private boolean Kosher;
 
     public Lesson(){
         this.LessonName = "ERROR";
         this.LessonRecipeName = null;
         this.LogoUri = null;
+        this.Time = null;
+        this.Difficulty = null;
     }
 
-    public Lesson(String lessonName, String lessonRecipeName, String logoUri, int number) {
+    public Lesson(String lessonName, String lessonRecipeName, String logoUri) {
         this.LessonName = lessonName;
         this.LessonRecipeName = lessonRecipeName;
         this.LogoUri = logoUri;
-        this.Number = number;
     }
 
+    public Lesson(String lessonName, String lessonRecipeName, String logoUri, int serveCount, String time, String difficulty, boolean kosher) {
+        this.LessonName = lessonName;
+        this.LessonRecipeName = lessonRecipeName;
+        this.LogoUri = logoUri;
+        this.ServeCount = serveCount;
+        this.Time = time;
+        this.Difficulty = difficulty;
+        this.Kosher = kosher;
+    }
 
     public String getLessonName() {
         return LessonName;
@@ -31,10 +43,6 @@ public class Lesson {
 
     public String getLogoUri() {
         return LogoUri;
-    }
-
-    public int getNumber() {
-        return Number;
     }
 
     public void setLessonName(String lessonName) {
@@ -49,7 +57,35 @@ public class Lesson {
         this.LogoUri = logoUri;
     }
 
-    public void setNumber(int number) {
-        Number = number;
+    public int getServeCount() {
+        return ServeCount;
+    }
+
+    public void setServeCount(int serveCount) {
+        ServeCount = serveCount;
+    }
+
+    public String getTime() {
+        return Time;
+    }
+
+    public void setTime(String time) {
+        Time = time;
+    }
+
+    public String getDifficulty() {
+        return Difficulty;
+    }
+
+    public void setDifficulty(String difficulty) {
+        Difficulty = difficulty;
+    }
+
+    public boolean isKosher() {
+        return Kosher;
+    }
+
+    public void setKosher(boolean kosher) {
+        Kosher = kosher;
     }
 }

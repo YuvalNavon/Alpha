@@ -86,16 +86,18 @@ public class myServices {
 
                         if (parser.getName().equals("General")){
                             recipeName = parser.getAttributeValue(0);
-                            String time = parser.getAttributeValue(1);
-                            String difficulty = parser.getAttributeValue(2);
-                            boolean kosher = Boolean.parseBoolean(parser.getAttributeValue(3));
-                            int serveCount = Integer.parseInt(parser.getAttributeValue(4));
-
                             recipe.setTitle(recipeName);
-                            recipe.setTime(time);
-                            recipe.setDifficulty(difficulty);
-                            recipe.setKosher(kosher);
-                            recipe.setServeCount(serveCount);
+
+
+                            //PLACEHOLDER FOR IF I EVER NEED TO BRING THESE PROPERTIES BACK TO RECIPE AND NOT LESSON
+//                            String time = parser.getAttributeValue(1);
+//                            String difficulty = parser.getAttributeValue(2);
+//                            boolean kosher = Boolean.parseBoolean(parser.getAttributeValue(3));
+//                            int serveCount = Integer.parseInt(parser.getAttributeValue(4));
+//                            recipe.setTime(time);
+//                            recipe.setDifficulty(difficulty);
+//                            recipe.setKosher(kosher);
+//                            recipe.setServeCount(serveCount);
 
                         }
                         if (parser.getName().equals("Ingredient")){
@@ -159,21 +161,26 @@ public class myServices {
         Element GeneralE = doc.createElement("General");
         Attr recipeTitle = doc.createAttribute("Title");
         recipeTitle.setValue(recipe.getTitle());
-
-        Attr recipeTime = doc.createAttribute("Time");
-        recipeTime.setValue(recipe.getTime());
-
-        Attr recipeDifficulty = doc.createAttribute("Difficulty");
-        recipeDifficulty.setValue(recipe.getDifficulty());
-
-        Attr recipeKosher = doc.createAttribute("Kosher");
-        recipeKosher.setValue(Boolean.toString(recipe.isKosher()));
-
-        Attr recipeServeCount = doc.createAttribute("Serve_Count");
-        recipeServeCount.setValue(Integer.toString(recipe.getServeCount()));
-
         GeneralE.setAttributeNode(recipeTitle);
-        GeneralE.setAttributeNode(recipeServeCount);
+
+        //PLACEHOLDER FOR IF I EVER NEED TO BRING THESE PROPERTIES BACK TO RECIPE AND NOT LESSON
+//        Attr recipeTime = doc.createAttribute("Time");
+//        recipeTime.setValue(recipe.getTime());
+//        GeneralE.setAttributeNode(recipeTime);
+//
+//        Attr recipeDifficulty = doc.createAttribute("Difficulty");
+//        recipeDifficulty.setValue(recipe.getDifficulty());
+//        GeneralE.setAttributeNode(recipeDifficulty);
+//
+//        Attr recipeKosher = doc.createAttribute("Kosher");
+//        recipeKosher.setValue(Boolean.toString(recipe.isKosher()));
+//        GeneralE.setAttributeNode(recipeKosher);
+//
+//        Attr recipeServeCount = doc.createAttribute("Serve_Count");
+//        recipeServeCount.setValue(Integer.toString(recipe.getServeCount()));
+//        GeneralE.setAttributeNode(recipeServeCount);
+
+
         rootElement.appendChild(GeneralE);
 
 
@@ -422,15 +429,22 @@ public class myServices {
 
     //NAVIGATING THE HOME MENU
 
+    public static void goToHomePage(Context context){
+        Intent toHomeScreen = new Intent(context, HomeScreen.class);
+        context.startActivity(toHomeScreen);
+    }
+
     public static void goToProfilePage(Context context){
         Intent toProfileScreen = new Intent(context, ProfileScreen.class);
         context.startActivity(toProfileScreen);
     }
 
-    public static void goToHomePage(Context context){
-        Intent toHomeScreen = new Intent(context, HomeScreen.class);
-        context.startActivity(toHomeScreen);
+    public static void goToCommunityPage(Context context){
+        Intent toCommunityScreen = new Intent(context, CommunityScreen.class);
+        context.startActivity(toCommunityScreen);
     }
+
+
 
 //    public void goToCommunityScreen(Context context){
 //        Intent toCommunityScreen = new Intent(context, CommunityScreen.class);

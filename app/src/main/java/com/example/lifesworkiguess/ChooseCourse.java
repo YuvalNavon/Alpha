@@ -35,7 +35,9 @@ public class ChooseCourse extends AppCompatActivity implements AdapterView.OnIte
     FirebaseAuth fAuth;
     FirebaseUser currentlyLoggedInUser;
     FirebaseDatabase FBDB;
-    DatabaseReference refUsers;
+    DatabaseReference refUsers, refLessons;
+
+    ValueEventListener changeUsersCourse,  lessonLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,9 +92,31 @@ public class ChooseCourse extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
+    @Override
+    protected void onPause() {
+
+        super.onPause();
+        if (refUsers!=null && changeUsersCourse!=null) refUsers.removeEventListener(changeUsersCourse);
+        if (refLessons!=null && lessonLoader!=null) refUsers.removeEventListener(lessonLoader);
+
+    }
 
 
+    @Override
+    protected void onResume() {
 
+        super.onResume();
+        if (refUsers!=null && changeUsersCourse!=null) refUsers.addValueEventListener(changeUsersCourse);
+        if (refLessons!=null && lessonLoader!=null) refUsers.addValueEventListener(lessonLoader);
+    }
+
+    public void onDestroy() {
+
+        super.onDestroy();
+        if (refUsers!=null && changeUsersCourse!=null) refUsers.removeEventListener(changeUsersCourse);
+        if (refLessons!=null && lessonLoader!=null) refUsers.removeEventListener(lessonLoader);
+
+    }
 
 
 
@@ -111,7 +135,7 @@ public class ChooseCourse extends AppCompatActivity implements AdapterView.OnIte
         else if (getOrigin.getIntExtra("Previous Activity", MyConstants.NO_PREVIOUS_ACTIVITY_ERROR) == MyConstants.FROM_PROFILE){
 
 
-                ValueEventListener changeUsersCourse = new ValueEventListener() {
+                changeUsersCourse = new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         User currentUser = snapshot.getValue(User.class);
@@ -137,6 +161,15 @@ public class ChooseCourse extends AppCompatActivity implements AdapterView.OnIte
                         }
 
                         else{
+                            //For lessonsStatus and lessonsRating initialization:
+                            int latestRatingsListIndex = currentUser.getLessonsRating().size() -1;
+                            if (!currentUser.hasFinishedCourse()){
+                                currentUser.getLessonsRating().remove(latestRatingsListIndex);
+                                //WE DO NOT KEEP RATING OF COURSES THAT THE USER DID NOT FINISH AND CHANGE
+                            }
+                            currentUser.setLessonsStatus(new ArrayList<>());
+
+
                             currentUser.setFinishedCourse(MyConstants.NOT_FINISHED_COURSE);
                             currentUser.setCookingStyle(cookingStyle);
                             currentUser.setExperienceLevel(experienceLevel);
@@ -144,21 +177,31 @@ public class ChooseCourse extends AppCompatActivity implements AdapterView.OnIte
                             currentUser.updateSelectedCourse();
                             refUsers.setValue(currentUser);
 
-                            //For lessonsStatus and lessonsRating initialization:
-                            currentUser.setLessonsRating(new ArrayList<>());
-                            currentUser.setLessonsStatus(new ArrayList<>());
-                            DatabaseReference refLessons = FBDB.getReference("Courses").child(currentUser.getSelectedCourse());
-                            ValueEventListener lessonLoader = new ValueEventListener() {
+
+                            refLessons = FBDB.getReference("Courses").child(currentUser.getSelectedCourse());
+                            lessonLoader = new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                                     long lessonCount = snapshot.getChildrenCount();
+                                    currentUser.getLessonsRating().add(new ArrayList<>());
+                                    int latestRatingsListIndex = currentUser.getLessonsRating().size() -1; //we need to update this variable bc we just added a new list to the list.
+                                    currentUser.getLessonsRating().get(latestRatingsListIndex).add(currentUser.getSelectedCourse());
                                     for (int i = 0; i < lessonCount; i++) {
 
                                         currentUser.getLessonsStatus().add(0);
-                                        currentUser.getLessonsRating().add(0F);
+                                        currentUser.getLessonsRating().get(latestRatingsListIndex).add("0");
 
                                     }
                                     refUsers.setValue(currentUser);
+                                    Toast.makeText(ChooseCourse.this, "Please wait", Toast.LENGTH_SHORT).show();
+                                    Handler handler = new Handler();
+                                    handler.postDelayed(new Runnable() {
+                                        public void run() {
+                                            Intent toHomeScreen = new Intent(ChooseCourse.this, HomeScreen.class);
+                                            toHomeScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(toHomeScreen);
+                                        }
+                                    }, 2000);
                                 }
                                 @Override
                                 public void onCancelled(@NonNull DatabaseError error) {

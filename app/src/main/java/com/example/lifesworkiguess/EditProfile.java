@@ -31,6 +31,7 @@ public class EditProfile extends AppCompatActivity {
 
     FirebaseDatabase FBDB;
     DatabaseReference refUsers;
+    ValueEventListener courseGetter;
     FirebaseAuth fAuth;
     FirebaseUser loggedInUser;
 
@@ -69,7 +70,7 @@ public class EditProfile extends AppCompatActivity {
         passwordET = findViewById(R.id.editProfilePasswordET);
         usernameET = findViewById(R.id.editProfileUsernameET);
 
-        ValueEventListener courseGetter = new ValueEventListener() {
+        courseGetter = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
@@ -98,6 +99,28 @@ public class EditProfile extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onPause() {
+
+        super.onPause();
+        if (refUsers!=null && courseGetter!=null) refUsers.removeEventListener(courseGetter);
+
+    }
+
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+        if (refUsers!=null && courseGetter!=null) refUsers.addValueEventListener(courseGetter);
+    }
+
+    public void onDestroy() {
+
+        super.onDestroy();
+        if (refUsers!=null && courseGetter!=null) refUsers.removeEventListener(courseGetter);
+
+    }
 
 
     public void imageChooser() {
@@ -112,6 +135,7 @@ public class EditProfile extends AppCompatActivity {
         // with the returned requestCode
         startActivityForResult(Intent.createChooser(i, "Select Picture"), SELECT_PICTURE);
     }
+
     // this function is triggered when user
     // selects the image from the imageChooser
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

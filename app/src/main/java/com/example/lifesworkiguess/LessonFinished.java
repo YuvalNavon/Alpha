@@ -37,6 +37,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class LessonFinished extends AppCompatActivity {
@@ -54,6 +55,7 @@ public class LessonFinished extends AppCompatActivity {
     FirebaseUser loggedInUser;
     FirebaseDatabase FBDB;
     DatabaseReference refUsers;
+    ValueEventListener lessonRater;
     StorageReference fDownRef;
 
 
@@ -74,6 +76,30 @@ public class LessonFinished extends AppCompatActivity {
         lessonName = gi.getStringExtra("Lesson Name");
 
 
+
+    }
+
+    @Override
+    protected void onPause() {
+
+        super.onPause();
+        if (refUsers!=null && lessonRater!=null) refUsers.removeEventListener(lessonRater);
+
+    }
+
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+        if (refUsers!=null && lessonRater!=null) refUsers.addValueEventListener(lessonRater);
+
+    }
+
+    public void onDestroy() {
+
+        super.onDestroy();
+        if (refUsers!=null && lessonRater!=null) refUsers.removeEventListener(lessonRater);
 
     }
 
@@ -161,32 +187,45 @@ public class LessonFinished extends AppCompatActivity {
         loggedInUser = fAuth.getCurrentUser();
         FBDB = FirebaseDatabase.getInstance("https://cookproject-ac2c0-default-rtdb.europe-west1.firebasedatabase.app");
         refUsers = FBDB.getReference("Users").child(loggedInUser.getUid());
-        ValueEventListener lessonRater = new ValueEventListener() {
+        lessonRater = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                 User currentlyLoggedInUser = snapshot.getValue(User.class);
-                currentlyLoggedInUser.rateLesson(lessonPosition, ratingBar.getRating());
-                refUsers.setValue(currentlyLoggedInUser);
+                float userRating = ratingBar.getRating();
+                String userRatingSTR = String.valueOf(userRating);
+                currentlyLoggedInUser.rateLesson(currentlyLoggedInUser.getSelectedCourse(), lessonPosition, userRatingSTR);
+                refUsers.setValue(currentlyLoggedInUser, new DatabaseReference.CompletionListener() {
+                    //FIRST AND ONLY USE OF ON COMPLETE LISTENER WHEN UPDATING AN ITEM IN DATABASE, NOT REALLY NECESSARY ANYMORE BUT NO NEED TO CHANGE
+                    @Override
+                    public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                        if (error== null){
+                            if (dishHasPhoto) {
+                                fDownRef = FirebaseStorage.getInstance().getReference().child("Users").child(loggedInUser.getUid()).
+                                        child("Courses").child(currentlyLoggedInUser.getSelectedCourse()).child(lessonName);
+                                fDownRef.putFile(photoURI).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                        Toast.makeText(LessonFinished.this, "Photo Uploaded!", Toast.LENGTH_LONG).show();
 
-                if (dishHasPhoto) {
-                    fDownRef = FirebaseStorage.getInstance().getReference().child("Users").child(loggedInUser.getUid()).
-                            child("Courses").child(currentlyLoggedInUser.getSelectedCourse()).child(lessonName);
-                    fDownRef.putFile(photoURI).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            Toast.makeText(LessonFinished.this, "Photo Uploaded!", Toast.LENGTH_LONG).show();
+                                    }
+                                });
+
+                            }
+
+
+                            Intent toHomeScreen = new Intent(LessonFinished.this, HomeScreen.class);
+                            toHomeScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(toHomeScreen);
+                            finish();
 
                         }
-                    });
+                        else{
+                            Toast.makeText(LessonFinished.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                        }
 
-                }
-
-
-                Intent toHomeScreen = new Intent(LessonFinished.this, HomeScreen.class);
-                toHomeScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(toHomeScreen);
-                finish();
+                    }
+                });
 
 
             }

@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,7 +25,7 @@ public class LessonIntro extends AppCompatActivity {
     String lessonName, courseName;
     int lessonPosition;
     boolean lessonFinal;
-    Lesson selectedLessonGlobal;
+    PermanentLesson selectedPermanentLessonGlobal;
     Recipe recipe;
 
     TextView lessonPositionTV, lessonNameTV, expectedTimeTV, difficultyTV, kosherTV, serveCountTV;
@@ -35,6 +34,7 @@ public class LessonIntro extends AppCompatActivity {
 
     FirebaseDatabase FBDB;
     DatabaseReference refLessons;
+    ValueEventListener lessonGetter;
 
     LinearLayout screen;
     Button startBTN;
@@ -71,15 +71,15 @@ public class LessonIntro extends AppCompatActivity {
 
         FBDB = FirebaseDatabase.getInstance("https://cookproject-ac2c0-default-rtdb.europe-west1.firebasedatabase.app");
         refLessons = FBDB.getReference("Courses").child(courseName);
-        ValueEventListener lessonGetter = new ValueEventListener() {
+        lessonGetter = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot data : snapshot.getChildren()) {
-                   Lesson checkedLesson = data.getValue(Lesson.class);
+                   PermanentLesson checkedPermanentLesson = data.getValue(PermanentLesson.class);
 
-                            if (lessonName.equals(checkedLesson.getLessonName())){
-                                Lesson selectedLesson = checkedLesson;
-                                setGlobalLesson(selectedLesson);
+                            if (lessonName.equals(checkedPermanentLesson.getLessonName())){
+                                PermanentLesson selectedPermanentLesson = checkedPermanentLesson;
+                                setGlobalLesson(selectedPermanentLesson);
                                 getRecipe();
                                 Handler handler = new Handler();
                                 handler.postDelayed(new Runnable() {
@@ -109,17 +109,40 @@ public class LessonIntro extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onPause() {
+
+        super.onPause();
+        if (refLessons!=null && lessonGetter!=null) refLessons.removeEventListener(lessonGetter);
+
+    }
+
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+        if (refLessons!=null && lessonGetter!=null) refLessons.addValueEventListener(lessonGetter);
+    }
+
+    public void onDestroy() {
+
+        super.onDestroy();
+        if (refLessons!=null && lessonGetter!=null) refLessons.removeEventListener(lessonGetter);
+
+    }
+
     public void getRecipe(){
-        myServices.downloadXML(this, selectedLessonGlobal.getLessonRecipeName(), "Courses/" + courseName + "/" + lessonName);
+        myServices.downloadXML(this, selectedPermanentLessonGlobal.getLessonRecipeName(), "Courses/" + courseName + "/" + lessonName);
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {
                 // Actions to do after 2 second (Has to be same delay as calling the makeRecyclerView method)
                 recipe = myServices.XMLToRecipe(LessonIntro.this, MyConstants.CURRENTLY_LEARNED_RECIPE);
                 lessonNameTV.setText("Make Some " + recipe.getTitle() + "!");
-                expectedTimeTV.setText(recipe.getTime());
-                difficultyTV.setText(recipe.getDifficulty());
-                if (recipe.isKosher()) {
+                expectedTimeTV.setText(selectedPermanentLessonGlobal.getTime());
+                difficultyTV.setText(selectedPermanentLessonGlobal.getDifficulty());
+                if (selectedPermanentLessonGlobal.isKosher()) {
                     kosherTV.setText("KOSHER");
                     kosherIV.setImageResource(com.firebase.ui.auth.R.drawable.fui_ic_check_circle_black_128dp);
                 }
@@ -127,7 +150,7 @@ public class LessonIntro extends AppCompatActivity {
                     kosherTV.setText("NOT\nKOSHER");
                     kosherIV.setImageResource(android.R.drawable.ic_delete);
                 }
-                serveCountTV.setText(Integer.toString(recipe.getServeCount()));
+                serveCountTV.setText(Integer.toString(selectedPermanentLessonGlobal.getServeCount()));
 
 
             }
@@ -174,8 +197,8 @@ public class LessonIntro extends AppCompatActivity {
 
 
 
-    public void setGlobalLesson(Lesson lesson){
-        selectedLessonGlobal = lesson;
+    public void setGlobalLesson(PermanentLesson permanentLesson){
+        selectedPermanentLessonGlobal = permanentLesson;
         setPositionTV(lessonPosition);
 
 
@@ -193,11 +216,8 @@ public class LessonIntro extends AppCompatActivity {
     public void startLesson(View view){
 
           Intent toLessonScreen = new Intent(LessonIntro.this, newLessonScreen.class);
-          toLessonScreen.putExtra("Recipe Name", selectedLessonGlobal.getLessonRecipeName()); //RecipeName != Recipe.getTitle() ->
-            // RecipeName is used to access the recipe from FB Storage while (Recipe for ___.xml) while Recipe.getTitle() is just ____
-          toLessonScreen.putExtra("Lesson Name", selectedLessonGlobal.getLessonName());
+          toLessonScreen.putExtra("Lesson Name", selectedPermanentLessonGlobal.getLessonName());
           toLessonScreen.putExtra("Lesson Position in List", lessonPosition);
-          toLessonScreen.putExtra("Course Name", courseName);
           startActivity(toLessonScreen);
 
 

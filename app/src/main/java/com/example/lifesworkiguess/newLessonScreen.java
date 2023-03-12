@@ -6,13 +6,8 @@ import android.os.Bundle;
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
-
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.example.lifesworkiguess.databinding.ActivityNewLessonScreenBinding;
 
@@ -20,14 +15,10 @@ import java.util.ArrayList;
 
 public class newLessonScreen extends AppCompatActivity {
 
-    String recipeName, lessonName, courseName;
-    int currStepNumber, lessonPosition;
+    String lessonName;
+    int lessonPosition;
 
-    TextView stepNumberTV, stepNameTV, stepDescriptionTV;
-    ImageView stepImageIV;
-    Button nextBtn;
 
-    Recipe recipe;
 
     private ActivityNewLessonScreenBinding binding;
 
@@ -39,10 +30,12 @@ public class newLessonScreen extends AppCompatActivity {
         binding = ActivityNewLessonScreenBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        Intent getLessonName = getIntent();
+        lessonName = getLessonName.getStringExtra("Lesson Name");
+        lessonPosition = getLessonName.getIntExtra("Lesson Position in List", MyConstants.NO_LESSON_POSITION);
+
         Bundle intentDataForLessonFrag = new Bundle();
-        intentDataForLessonFrag.putString("Recipe Name", recipeName);
         intentDataForLessonFrag.putString("Lesson Name",lessonName );
-        intentDataForLessonFrag.putString("Course Name", courseName);
         intentDataForLessonFrag.putInt("Lesson Position in List", lessonPosition);
 
         LessonScreenFrag lessonScreenFrag = new LessonScreenFrag();
@@ -64,11 +57,6 @@ public class newLessonScreen extends AppCompatActivity {
         TabLayout tabs = binding.tabs;
         tabs.setupWithViewPager(viewPager);
 
-        Intent getLessonName = getIntent();
-        recipeName = getLessonName.getStringExtra("Recipe Name");
-        lessonName = getLessonName.getStringExtra("Lesson Name");
-        courseName = getLessonName.getStringExtra("Course Name");
-        lessonPosition = getLessonName.getIntExtra("Lesson Position in List", MyConstants.NO_LESSON_POSITION);
 
 
 

@@ -180,7 +180,7 @@ int ingCount, stepCount;
     public void createRecipe(View view){
         if (checkIfFilled(ingCount, stepCount)){
             title = titleET.getText().toString();
-            Recipe recipe = new Recipe(title, 2);
+            Recipe recipe = new Recipe(title);
             for (int i = 0; i<ingCount;i++){
                 ingName = allIngredients.get(i)[0].getText().toString();
                 ingAmount = allIngredients.get(i)[1].getText().toString();

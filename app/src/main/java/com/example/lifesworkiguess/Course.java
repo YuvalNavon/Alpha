@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Course {
 
-    private ArrayList<Lesson> lessonsList;
+    private ArrayList<PermanentLesson> lessonsList;
     private String courseName;
 
 
@@ -17,12 +17,12 @@ public class Course {
         this.courseName = courseName;
     }
 
-    public Course(ArrayList<Lesson> lessonsList, String courseName) {
+    public Course(ArrayList<PermanentLesson> lessonsList, String courseName) {
         this.lessonsList = lessonsList;
         this.courseName = courseName;
     }
 
-    public ArrayList<Lesson> getLessonsList() {
+    public ArrayList<PermanentLesson> getLessonsList() {
         return lessonsList;
     }
 
@@ -30,7 +30,7 @@ public class Course {
         return courseName;
     }
 
-    public void setLessonsList(ArrayList<Lesson> lessonsList) {
+    public void setLessonsList(ArrayList<PermanentLesson> lessonsList) {
         this.lessonsList = lessonsList;
     }
 
@@ -42,12 +42,12 @@ public class Course {
         lessonsList.clear();
     }
 
-    public void addLesson(Lesson addedLesson){
-        lessonsList.add(addedLesson);
+    public void addLesson(PermanentLesson addedPermanentLesson){
+        lessonsList.add(addedPermanentLesson);
     }
 
     public void sortLessonsListByNumber(){  //By default, FB sorts items by ABC, so this is used to sort lessons by predetermined numbers set by me
-        ArrayList<Lesson> sorted =new ArrayList<>();
+        ArrayList<PermanentLesson> sorted =new ArrayList<>();
         int searchedIndex = 0;
         while(sorted.size()!=lessonsList.size()){
             for (int i = 0; i<lessonsList.size();i++ ){

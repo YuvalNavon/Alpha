@@ -1,5 +1,7 @@
 package com.example.lifesworkiguess;
 
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 
 import com.google.firebase.database.DataSnapshot;
@@ -21,7 +23,7 @@ public class User {
     private String Hours;
     private int FinishedSetUp;
     private ArrayList<Integer> LessonsStatus;
-    private ArrayList<Float> LessonsRating;
+    private ArrayList<ArrayList<String>> LessonsRating;
     private ArrayList<String> CompletedCourses;
     private int FinishedCourse;
 
@@ -49,6 +51,9 @@ public class User {
         SelectedCourse = cookingStyle + " " + determineExperienceLevel(experienceLevel) ;
         LessonsStatus = new ArrayList<>();
         LessonsRating = new ArrayList<>();
+        LessonsRating.add(new ArrayList<>());
+        LessonsRating.get(0).add(SelectedCourse); //THE RATINGS THEMSELVES ARE ADDED IN THE USERNAMESCREEN,
+        // AND WHEN A NEW COURSE IS SELECTED, THE COURSE NAME AND THE RATINGS ARE ADDED THERE
         CompletedCourses = new ArrayList<>();
         CompletedCourses.add(MyConstants.COMPLETED_COURSES_PLACEHOLDER); //An arrayList has to have some value in it in order for FB to upload the property so this gets uploaded and then is reset when user
         //completes their first course (see homescreen)
@@ -57,7 +62,22 @@ public class User {
 
     }
 
-
+    public User(String username, String password, String email, String cookingStyle, String experienceLevel, String selectedCourse,
+                String hours, int finishedSetUp,
+                ArrayList<Integer> lessonsStatus, ArrayList<ArrayList<String>> lessonsRating, ArrayList<String> completedCourses, int finishedCourse) {
+        Username = username;
+        Password = password;
+        Email = email;
+        CookingStyle = cookingStyle;
+        ExperienceLevel = experienceLevel;
+        SelectedCourse = selectedCourse;
+        Hours = hours;
+        FinishedSetUp = finishedSetUp;
+        LessonsStatus = lessonsStatus;
+        LessonsRating = lessonsRating;
+        CompletedCourses = completedCourses;
+        FinishedCourse = finishedCourse;
+    }
 
     public String getUsername() {
         return Username;
@@ -95,7 +115,7 @@ public class User {
         return LessonsStatus;
     }
 
-    public ArrayList<Float> getLessonsRating() {
+    public ArrayList<ArrayList<String>> getLessonsRating() {
         return LessonsRating;
     }
 
@@ -146,7 +166,7 @@ public class User {
     }
 
 
-    public void setLessonsRating(ArrayList<Float> lessonsRating) {
+    public void setLessonsRating(ArrayList<ArrayList<String>> lessonsRating) {
         LessonsRating = lessonsRating;
     }
 
@@ -173,8 +193,38 @@ public class User {
     }
 
 
-    public void rateLesson(int lessonNumber, float rating){
-       LessonsRating.set(lessonNumber, rating);
+    public void rateLesson(String courseName, int lessonNumber, String rating){ //Only used for lessons as they are finished.
+        // once as a default value when the user finishes the  LessonScreenFrag (MyConstants.NOT_YET_RATED)
+        // and another  when the user rates the lesson at the LessonFinished activity
+
+        for (int i = 0; i<this.getLessonsRating().size(); i++){
+            ArrayList<String> lessonsRating = this.getLessonsRating().get(i);
+            if (lessonsRating.get(MyConstants.COURSE_NAME_POSITION_IN_LESSONS_RATINGS).equals(courseName))
+            {
+                System.out.println("COURSE: " + lessonsRating.get(MyConstants.COURSE_NAME_POSITION_IN_LESSONS_RATINGS));
+                int coursePosition = i;
+                LessonsRating.get(coursePosition).set(lessonNumber+1, rating); //lessonPosition + 1 Because index 0 is reserved for the course name
+                // and lesson positions start from 0 too
+
+
+            }
+
+        }
+    }
+
+    public float getRatingForHistory(String courseName, int positionofLesson){
+        for (int i = 0; i<this.getLessonsRating().size(); i++){
+            ArrayList<String> lessonsRating = this.getLessonsRating().get(i);
+            if (lessonsRating.get(MyConstants.COURSE_NAME_POSITION_IN_LESSONS_RATINGS).equals(courseName))
+            {
+               return Float.parseFloat(this.getLessonsRating().get(i).get(positionofLesson+1)); //we add 1 to positionOfLesson bc the positionOfLesson
+                // is its position in the lessonsStatus list/picked course LessonsList
+                //those lists contain just the lessons, unlike the lists in lessonRating, which all start with the Course Name and only then have the the lessons themselves
+
+            }
+
+        }
+        return  Float.parseFloat(MyConstants.NOT_YET_RATED); //this return line will never execute bc the for loop always finds the lesson but just in case
     }
 
     public void setLessonFinished(int lessonPosition){

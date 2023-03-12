@@ -6,10 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,7 +21,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class HomeScreen extends AppCompatActivity implements CustomViewHolder.OnItemClickListener {
 
@@ -33,6 +29,7 @@ public class HomeScreen extends AppCompatActivity implements CustomViewHolder.On
     RecyclerView lessonView;
     FirebaseDatabase FBDB;
     DatabaseReference refUsers, refLessons;
+    ValueEventListener courseGetter, lessonLoader;
     FirebaseUser loggedInUser;
     FirebaseAuth fAuth;
 
@@ -59,7 +56,7 @@ public class HomeScreen extends AppCompatActivity implements CustomViewHolder.On
         userEmail = loggedInUser.getEmail();
         FBDB = FirebaseDatabase.getInstance("https://cookproject-ac2c0-default-rtdb.europe-west1.firebasedatabase.app");
         refUsers=FBDB.getReference("Users").child(loggedInUser.getUid());
-        ValueEventListener courseGetter = new ValueEventListener() {
+        courseGetter = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
@@ -67,14 +64,14 @@ public class HomeScreen extends AppCompatActivity implements CustomViewHolder.On
                         selectedCourseName = currentlyLoggedUser.getSelectedCourse();
                         selectedCourseTV.setText(selectedCourseName + " Course");
                         refLessons = FBDB.getReference("Courses").child(selectedCourseName);
-                        ValueEventListener lessonLoader = new ValueEventListener() {
+                        lessonLoader = new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 Course selectedCourse = new Course(selectedCourseName);
                                 selectedCourse.clearLessonsList();
                                 for (DataSnapshot data : snapshot.getChildren()) {
-                                    Lesson addedLesson = data.getValue(Lesson.class);
-                                    selectedCourse.addLesson(addedLesson);
+                                    PermanentLesson addedPermanentLesson = data.getValue(PermanentLesson.class);
+                                    selectedCourse.addLesson(addedPermanentLesson);
 
                                 }
                                 //By default, FB sorts items by ABC, so this is used to sort lessons by predetermined numbers set by me:
@@ -116,13 +113,29 @@ public class HomeScreen extends AppCompatActivity implements CustomViewHolder.On
 
     }
 
-    public void goToProfile(View view){
-       myServices.goToProfilePage(HomeScreen.this);
+    @Override
+    protected void onPause() {
+
+        super.onPause();
+        if (refUsers!=null && courseGetter!=null) refUsers.removeEventListener(courseGetter);
+
     }
 
-//    public void goToCommunityPage(View view){
-//        myServices.goToCommunityPage(HomeScreen.this);
-//    }
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+        if (refUsers!=null && courseGetter!=null) refUsers.addValueEventListener(courseGetter);
+    }
+
+    public void onDestroy() {
+
+        super.onDestroy();
+        if (refUsers!=null && courseGetter!=null) refUsers.removeEventListener(courseGetter);
+
+    }
+
 
     public void makeCourseRecyclerView(Course course){
         lessonView = findViewById(R.id.lessonView);
@@ -142,8 +155,8 @@ public class HomeScreen extends AppCompatActivity implements CustomViewHolder.On
     }
 
     public boolean setLastLesson(Course course, int position){
-        ArrayList<Lesson> lessons = course.getLessonsList();
-        if (position == lessons.size()-1) return true;
+        ArrayList<PermanentLesson> permanentLessons = course.getLessonsList();
+        if (position == permanentLessons.size()-1) return true;
         else return false;
     }
 
@@ -152,12 +165,20 @@ public class HomeScreen extends AppCompatActivity implements CustomViewHolder.On
 
         Toast.makeText(HomeScreen.this,"PRESSED " + selectedCourseGlobal.getLessonsList().get(position).getLessonName() , Toast.LENGTH_LONG ).show();
         Intent toLessonIntro = new Intent(HomeScreen.this, LessonIntro.class);
-        toLessonIntro.putExtra("Lesson Position - 1", position);
+        toLessonIntro.putExtra("Lesson Position - 1", position); // THE MINUS 1 is bc we need the indexes of the lessons in the list,
+        // the first lesson is 0 in the list, the second is 1, and so on
         toLessonIntro.putExtra("Is Lesson Final", setLastLesson(selectedCourseGlobal, position));
         toLessonIntro.putExtra("Course Name", selectedCourseGlobal.getCourseName());
         toLessonIntro.putExtra("Lesson Name", selectedCourseGlobal.getLessonsList().get(position).getLessonName());
         startActivity(toLessonIntro);
 
 
+    }
+
+    public void goToProfile(View view){
+        myServices.goToProfilePage(HomeScreen.this);
+    }
+
+    public void goToCommunityPage(View view){  myServices.goToCommunityPage(HomeScreen.this);
     }
 }
