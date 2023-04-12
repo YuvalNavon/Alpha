@@ -33,6 +33,16 @@ public class Lesson {
         this.Kosher = kosher;
     }
 
+    public Lesson(String lessonName, String lessonRecipeName, int serveCount, String time, String difficulty, boolean kosher) {
+        //For Community lessons, no need to save imageUri bc its saved in the recipe's folder in storage under a constant name.
+        LessonName = lessonName;
+        LessonRecipeName = lessonRecipeName;
+        ServeCount = serveCount;
+        Time = time;
+        Difficulty = difficulty;
+        Kosher = kosher;
+    }
+
     public String getLessonName() {
         return LessonName;
     }

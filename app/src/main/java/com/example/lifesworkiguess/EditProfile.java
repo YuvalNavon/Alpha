@@ -178,89 +178,124 @@ public class EditProfile extends AppCompatActivity {
 
         if (email.equals(originalEmail) && password.equals(originalPassword) &&
                 username.equals(originalUsername) && !PFPChanged ){
+
             Toast.makeText(this, "NO CHANGES", Toast.LENGTH_SHORT).show();
             if (mode==MyConstants.EDIT_PFP_SCREEN_SAVE_MODE){
+
                 Intent toHomeScreen = new Intent(EditProfile.this, HomeScreen.class);
                 startActivity(toHomeScreen);
+
             }
+
             else if (mode==MyConstants.EDIT_PFP_SCREEN_SAVE_AND_CHANGE_COURSE_MODE){
+
                 Intent toChooseCourse = new Intent(EditProfile.this, ChooseCourse.class);
                 toChooseCourse.putExtra(MyConstants.CHOOSE_COURSE_ORIGIN, MyConstants.FROM_PROFILE);
                 startActivity(toChooseCourse);
+
             }
 
         }
+
+
         else{
+
             //Add Check that new Email isn't already used
-            if (noFieldsClear() && myServices.emailInFormat(email) && myServices.passwordValid(password) && myServices.usernameAvailable(username))
-            {
 
-                ValueEventListener courseGetter = new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+            myServices.isUsernameAvailable(username, new OnUsernameCheckListener() {
+                @Override
+                public void onUsernameCheck(boolean isAvailable) {
 
-                        loggedInUser.updateEmail(email);
-                        loggedInUser.updatePassword(password);
-
-                        User currentlyLoggedInUser = snapshot.getValue(User.class);
-                        currentlyLoggedInUser.setEmail(email);
-                        currentlyLoggedInUser.setPassword(password);
-                        currentlyLoggedInUser.setUsername(username);
-                        refUsers.setValue(currentlyLoggedInUser);
-
-                        if (PFPChanged) myServices.uploadProfilePhotoToFirebase(EditProfile.this, selectedImageUri);
+                    if (isAvailable) //Username IS Available
+                    {
+                        if (noFieldsClear() && myServices.emailInFormat(email) && myServices.passwordValid(password))
+                        {
 
 
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            public void run() {
-                                // Actions to do after 1.5 second
-                                if (mode==MyConstants.EDIT_PFP_SCREEN_SAVE_MODE){
-                                    Intent toHomeScreen = new Intent(EditProfile.this, HomeScreen.class);
-                                    startActivity(toHomeScreen);
+                            ValueEventListener courseGetter = new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                                    loggedInUser.updateEmail(email);
+                                    loggedInUser.updatePassword(password);
+
+                                    User currentlyLoggedInUser = snapshot.getValue(User.class);
+                                    currentlyLoggedInUser.setEmail(email);
+                                    currentlyLoggedInUser.setPassword(password);
+                                    currentlyLoggedInUser.setUsername(username);
+                                    refUsers.setValue(currentlyLoggedInUser);
+
+                                    //Keeping Login Info
+                                    SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+                                    SharedPreferences.Editor editor=settings.edit();
+                                    editor.putString(MyConstants.LOGIN_EMAIL, email);
+                                    editor.putString(MyConstants.LOGIN_PASSWORD, password);
+                                    editor.commit();
+
+                                    if (PFPChanged) myServices.uploadProfilePhotoToFirebase(EditProfile.this, selectedImageUri);
+
+
+                                    Handler handler = new Handler();
+                                    handler.postDelayed(new Runnable() {
+                                        public void run() {
+                                            // Actions to do after 1.5 second
+                                            if (mode==MyConstants.EDIT_PFP_SCREEN_SAVE_MODE){
+                                                Intent toHomeScreen = new Intent(EditProfile.this, HomeScreen.class);
+                                                startActivity(toHomeScreen);
+                                            }
+                                            else if (mode==MyConstants.EDIT_PFP_SCREEN_SAVE_AND_CHANGE_COURSE_MODE){
+                                                Intent toChooseCourse = new Intent(EditProfile.this, ChooseCourse.class);
+                                                toChooseCourse.putExtra(MyConstants.CHOOSE_COURSE_ORIGIN, MyConstants.FROM_PROFILE);
+                                                startActivity(toChooseCourse);
+                                            }
+                                        }
+                                    }, 1500);
+
+
+
+
+
+
+
                                 }
-                                else if (mode==MyConstants.EDIT_PFP_SCREEN_SAVE_AND_CHANGE_COURSE_MODE){
-                                    Intent toChooseCourse = new Intent(EditProfile.this, ChooseCourse.class);
-                                    toChooseCourse.putExtra(MyConstants.CHOOSE_COURSE_ORIGIN, MyConstants.FROM_PROFILE);
-                                    startActivity(toChooseCourse);
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
                                 }
-                            }
-                        }, 1500);
+                            };
+                            refUsers.addValueEventListener(courseGetter);
 
 
+                        }
 
+                        else{
+                            if (!noFieldsClear())
+                                Toast.makeText(EditProfile.this, "Please Fill all fields!", Toast.LENGTH_LONG).show();
 
-
-
-
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                };
-                refUsers.addValueEventListener(courseGetter);
-
-
-            }
-
-            else{
-                if (!noFieldsClear())
-                    Toast.makeText(EditProfile.this, "Please Fill all fields!", Toast.LENGTH_LONG).show();
-
-                if (!myServices.emailInFormat(email))
-                    Toast.makeText(EditProfile.this, "Please enter a Valid Email Address", Toast.LENGTH_LONG).show();
+                            if (!myServices.emailInFormat(email))
+                                Toast.makeText(EditProfile.this, "Please enter a Valid Email Address", Toast.LENGTH_LONG).show();
 
 //                    if (!notInUse)
 //                        Toast.makeText(EditProfile.this, "Email Address already in Use! try signing in or entering a different Email Address",
 //                                Toast.LENGTH_LONG).show();
 
 
-                if (!myServices.passwordValid(password))
-                    Toast.makeText(EditProfile.this, "Please enter a Valid Password (longer than 6 characters)", Toast.LENGTH_LONG).show();
+                            if (!myServices.passwordValid(password))
+                                Toast.makeText(EditProfile.this, "Please enter a Valid Password (longer than 6 characters)", Toast.LENGTH_LONG).show();
 
 
-            }
+                        }
+                    }
+
+                    else //Username ISN'T Available
+                    {
+
+                        Toast.makeText(EditProfile.this, "Username not valid", Toast.LENGTH_LONG).show();
+
+                    }
+                }
+            });
+
         }
     }
 
@@ -273,6 +308,8 @@ public class EditProfile extends AppCompatActivity {
     }
 
     public void changeCourse(View view){
+
+
         save(MyConstants.EDIT_PFP_SCREEN_SAVE_AND_CHANGE_COURSE_MODE);
     }
 

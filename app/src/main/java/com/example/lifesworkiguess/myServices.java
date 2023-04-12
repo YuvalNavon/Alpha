@@ -19,8 +19,15 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -39,6 +46,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -63,8 +71,23 @@ public class myServices {
         return password.length()>6;
     }
 
-    public static boolean usernameAvailable(String username){
-        return true;
+    public static void isUsernameAvailable(String username, OnUsernameCheckListener listener) {
+        FirebaseDatabase FDBD = FirebaseDatabase.getInstance("https://cookproject-ac2c0-default-rtdb.europe-west1.firebasedatabase.app");
+        DatabaseReference refUsers = FDBD.getReference("Users");
+
+        Query query = refUsers.orderByChild("username").equalTo(username);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean isAvailable = !dataSnapshot.exists();
+                listener.onUsernameCheck(isAvailable);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onUsernameCheck(false);
+            }
+        });
     }
 
 
@@ -164,6 +187,7 @@ public class myServices {
         GeneralE.setAttributeNode(recipeTitle);
 
         //PLACEHOLDER FOR IF I EVER NEED TO BRING THESE PROPERTIES BACK TO RECIPE AND NOT LESSON
+
 //        Attr recipeTime = doc.createAttribute("Time");
 //        recipeTime.setValue(recipe.getTime());
 //        GeneralE.setAttributeNode(recipeTime);

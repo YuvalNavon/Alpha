@@ -37,7 +37,7 @@ public class customAdapterIngredients  extends RecyclerView.Adapter<CustomViewHo
         String ingredientName = ingredients.get(position).getName();
         String ingredientAmount = ingredients.get(position).getAmount();
         String ingredientUnits = ingredients.get(position).getUnits();
-        holder.ingredientName.setText(ingredientName);
+        holder.ingredientName.setText(position+1 + ". " + ingredientName);
         holder.ingredientAmountandUnits.setText(ingredientAmount + " " + ingredientUnits);
     }
 

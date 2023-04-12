@@ -48,7 +48,7 @@ public class newLessonScreen extends AppCompatActivity {
         fragmentList.add(ingredientsListFrag);
 
         ArrayList<String> fragmentTitleList = new ArrayList<>();
-        fragmentTitleList.add("StepS");
+        fragmentTitleList.add("Steps");
         fragmentTitleList.add("Ingredients");
 
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), fragmentList, fragmentTitleList);

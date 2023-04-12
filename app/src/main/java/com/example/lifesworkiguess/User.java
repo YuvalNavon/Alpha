@@ -1,15 +1,5 @@
 package com.example.lifesworkiguess;
 
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 
 public class User {
@@ -25,6 +15,7 @@ public class User {
     private ArrayList<Integer> LessonsStatus;
     private ArrayList<ArrayList<String>> LessonsRating;
     private ArrayList<String> CompletedCourses;
+    private ArrayList<String> UploadedRecipeNames;
     private int FinishedCourse;
 
 
@@ -58,13 +49,14 @@ public class User {
         CompletedCourses.add(MyConstants.COMPLETED_COURSES_PLACEHOLDER); //An arrayList has to have some value in it in order for FB to upload the property so this gets uploaded and then is reset when user
         //completes their first course (see homescreen)
         FinishedCourse = MyConstants.NOT_FINISHED_COURSE;
+        UploadedRecipeNames = new ArrayList<>();
 
 
     }
 
-    public User(String username, String password, String email, String cookingStyle, String experienceLevel, String selectedCourse,
-                String hours, int finishedSetUp,
-                ArrayList<Integer> lessonsStatus, ArrayList<ArrayList<String>> lessonsRating, ArrayList<String> completedCourses, int finishedCourse) {
+    public User(String username, String password, String email, String cookingStyle, String experienceLevel, String selectedCourse, String hours, int finishedSetUp,
+                ArrayList<Integer> lessonsStatus, ArrayList<ArrayList<String>> lessonsRating, ArrayList<String> completedCourses,
+                int finishedCourse) {
         Username = username;
         Password = password;
         Email = email;
@@ -76,6 +68,25 @@ public class User {
         LessonsStatus = lessonsStatus;
         LessonsRating = lessonsRating;
         CompletedCourses = completedCourses;
+        UploadedRecipeNames = new ArrayList<>();
+        FinishedCourse = finishedCourse;
+    }
+
+    public User(String username, String password, String email, String cookingStyle, String experienceLevel, String selectedCourse, String hours, int finishedSetUp,
+                ArrayList<Integer> lessonsStatus, ArrayList<ArrayList<String>> lessonsRating, ArrayList<String> completedCourses,
+                ArrayList<String> uploadedRecipeNames, int finishedCourse) {
+        Username = username;
+        Password = password;
+        Email = email;
+        CookingStyle = cookingStyle;
+        ExperienceLevel = experienceLevel;
+        SelectedCourse = selectedCourse;
+        Hours = hours;
+        FinishedSetUp = finishedSetUp;
+        LessonsStatus = lessonsStatus;
+        LessonsRating = lessonsRating;
+        CompletedCourses = completedCourses;
+        this.UploadedRecipeNames = uploadedRecipeNames;
         FinishedCourse = finishedCourse;
     }
 
@@ -121,6 +132,10 @@ public class User {
 
     public ArrayList<String> getCompletedCourses() {
         return CompletedCourses;
+    }
+
+    public ArrayList<String> getUploadedRecipeNames() {
+        return UploadedRecipeNames;
     }
 
     public int getFinishedCourse() {
@@ -172,6 +187,10 @@ public class User {
 
     public void setCompletedCourses(ArrayList<String> completedCourses) {
         CompletedCourses = completedCourses;
+    }
+
+    public void setUploadedRecipeNames(ArrayList<String> uploadedRecipeNames) {
+        this.UploadedRecipeNames = uploadedRecipeNames;
     }
 
     public void setFinishedCourse(int finishedCourse) {
@@ -242,6 +261,12 @@ public class User {
     public void updateSelectedCourse(){
         SelectedCourse =  CookingStyle + " " + determineExperienceLevel(ExperienceLevel) ;
 
+    }
+
+    public void addCustomRecipe(String recipeName){
+        if (UploadedRecipeNames== null)  UploadedRecipeNames = new ArrayList<>(); //Supposedly this condition should never be met as we initialize the list for every constructor
+        //except the error one
+        UploadedRecipeNames.add(recipeName);
     }
 
     //INITIALIZATION OF LESSON NUMBERS AND STATUS (LessonsStatus) AND RATINGS (LessonRatings) ONLY OCCURS IN UsernameScreen due to firebase reasons

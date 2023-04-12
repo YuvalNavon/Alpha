@@ -15,7 +15,11 @@ public class Recipe {
         steps = new ArrayList<>();
     }
 
-
+    public Recipe(String title, ArrayList<Ingredient> ingredients, ArrayList<Step> steps) {
+        this.title = title;
+        this.ingredients = ingredients;
+        this.steps = steps;
+    }
 
     public String getTitle() {
         return title;

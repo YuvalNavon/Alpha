@@ -9,4 +9,10 @@
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>
     <string name="title_activity_final_create_recipe">FinalCreateRecipe</string>
+    <string name="title_activity_truly_final_create_recipe_steps_tabbed">
+        TrulyFinalCreateRecipeStepsTabbed
+    </string>
+    <string name="title_activity_truly_final_create_recipe_finish_screen">
+        TrulyFinalCreateRecipeFinishScreen
+    </string>
 </resources>

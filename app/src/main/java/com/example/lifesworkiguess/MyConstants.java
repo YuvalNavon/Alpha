@@ -1,15 +1,22 @@
 package com.example.lifesworkiguess;
 
-import java.util.ArrayList;
+import android.Manifest;
 
 public class MyConstants {
 
+    //For Keeping Log In Info
+    public static final String LOGIN_EMAIL = "Email";
+    public static final String LOGIN_PASSWORD = "Password";
 
+    //For Steps Without Images
+    public static final String NO_IMAGE_FOR_STEP = "No Image/Action";
 
-    //for Downloading Images
+    //for Getting Images from Gallery
     public static final int SELECT_PICTURE = 1;
+    public static final int REQUEST_CODE_OPEN_DOCUMENT = 2;
+    public static final String IMAGE_FILE_NAME = "selected_image.jpg";
 
-    //for Taking Pictures
+    //for Taking Pictures With Camera
     public static final int  CAMERA_PERM_CODE = 101;
     public static final int  CAMERA_REQUEST_CODE = 102;
 
@@ -53,7 +60,7 @@ public class MyConstants {
     public static final String[] WEEKLY_HOURS = new String[]{"1 Hour / a Week", "2 Hours / a Week","4 Hours / a Week"};
 
 
-    //for CompletedCoursed arrayList
+    //for CompletedCourses arrayList
     public static final String COMPLETED_COURSES_PLACEHOLDER = "PLACEHOLDER";
     public static final int COMPLETED_COURSES_PLACEHOLDER_INDEX = 0;
 
@@ -71,9 +78,51 @@ public class MyConstants {
     public static final String[] dishCatagoryLogoNames = new String[]{"com_pasta", "com_chicken", "com_sandwich", "com_fish", "com_salad", "com_schnitzel", "com_omelet", "com_dessert"};
 
 
+    //for Create Recipe Screens -> Intents Constants (Divided into screens: General, Image, and so on
+    public static final String FROM_FINISH_SCREEN = "From Finish Screen";
+    public static final String NOT_FROM_FINISH_SCREEN = "Not From Finish Screen";
+
+            //General
+    public static final String CUSTOM_RECIPE_NAME = "Custom Recipe Name";
+    public static final String CUSTOM_RECIPE_DESCRIPTION = "Custom Recipe Description";
+
+            //Image
+    public static final String CUSTOM_RECIPE_IMAGE_URI_STRING = "Custom Recipe Uri";
+
+            //Ingredients
+    public static final String CUSTOM_RECIPE_INGREDIENTS = "Custom Recipe Ingredients";
+    public static final int STRING_LIST_INGREDIENT_NAME_INDEX = 0;
+    public static final int STRING_LIST_INGREDIENT_AMOUNT_INDEX = 1;
+    public static final int STRING_LIST_INGREDIENT_UNITS_INDEX = 2;
+
+            //Steps
+    public static final String CUSTOM_RECIPE_STEPS = "Custom Recipe Steps";
+    public static final int STRING_LIST_STEP_NAME_INDEX = 0;
+    public static final int STRING_LIST_STEP_DESCRIPTION_INDEX = 1;
+    public static final int STRING_LIST_STEP_TIME_INDEX = 2;
+    public static final int STRING_LIST_STEP_ACTION_INDEX = 3;
+    public static final String CUSTOM_RECIPE_STEPS_VIEW_MODE = "Steps View Mode";
+    public static final String CUSTOM_RECIPE_VIEW_STEPS_FINISH = "Finish";
+    public static final String CUSTOM_RECIPE_VIEW_STEPS_DURING_MAKING = "Making";
 
 
+    //Extra Info
+    public static final String CUSTOM_RECIPE_HOURS_SPINNER_CURR_POS = "Custom Recipe Hours Spinner Curr Pos";
+    public static final String CUSTOM_RECIPE_MINUTES_SPINNER_CURR_POS = "Custom Recipe Minutes Spinner Curr Pos";
+    public static final int CUSTOM_RECIPE_NO_SPINNER_POS_SAVED = -999;
+    public static final String CUSTOM_RECIPE_TIME = "Custom Recipe Time";
+    public static final String CUSTOM_RECIPE_DIFFICULTY_LEVEL = "Custom Recipe Difficulty Level";
+    public static final String CUSTOM_RECIPE_SERVE_COUNT = "Custom Recipe Serve Count";
+    public static final String CUSTOM_RECIPE_KOSHER = "Custom Recipe Kosher";
 
+    public static final String[] CUSTOM_RECIPE_TIME_HOUR_OPTIONS_FOR_SPINNER = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
+    "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"};
+    public static final String[] CUSTOM_RECIPE_TIME_MINUTE_OPTIONS_FOR_SPINNER = new String[]{"0", "5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60" };
+    public static final String CUSTOM_RECIPE_NO_TIME_INPUTTED = "Recipe has no Time";
+
+    public static String CUSTOM_RECIPE_DIFFICULTY_EASY = "Easy";
+    public static String CUSTOM_RECIPE_DIFFICULTY_STANDARD = "Standard";
+    public static String CUSTOM_RECIPE_DIFFICULTY_HARD = "Hard";
 
 
 }

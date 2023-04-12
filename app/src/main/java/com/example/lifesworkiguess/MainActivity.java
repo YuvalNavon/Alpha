@@ -32,8 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
         fAuth = FirebaseAuth.getInstance();
         SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
-        String email = settings.getString("Email", null);
-        String password = settings.getString("Password", null);
+        String email = settings.getString(MyConstants.LOGIN_EMAIL, null);
+        String password = settings.getString(MyConstants.LOGIN_PASSWORD, null);
         if ( email!=null && email.length()!=0 && password!=null && password.length()!=0){
             fAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(new OnCompleteListener<AuthResult>() {

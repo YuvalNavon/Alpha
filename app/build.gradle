@@ -66,6 +66,8 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:20.3.0'
     //xmlStuff
     implementation 'com.android.support:multidex:1.0.3'
+    //Gson (for keeping array list of array lists of string in shared pref
+    implementation 'com.google.code.gson:gson:2.8.9'
 
 
 }

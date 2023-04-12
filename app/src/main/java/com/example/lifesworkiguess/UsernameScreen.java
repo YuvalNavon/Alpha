@@ -169,82 +169,93 @@ public class UsernameScreen extends AppCompatActivity {
 
     public void finishSignUp(View view){
         username = usernameET.getText().toString();
-        if (myServices.usernameAvailable(username)){
-            fAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()){
+
+        myServices.isUsernameAvailable(username, new OnUsernameCheckListener() {
+            @Override
+            public void onUsernameCheck(boolean isAvailable) {
+
+                if (isAvailable) //Username IS Available
+                {
+                    fAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()){
 
 
-                        //Keeping Login Info
-                        SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
-                        SharedPreferences.Editor editor=settings.edit();
-                        editor.putString("Email", email);
-                        editor.putString("Password", password);
-                        editor.commit();
+                                //Keeping Login Info
+                                SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+                                SharedPreferences.Editor editor=settings.edit();
+                                editor.putString(MyConstants.LOGIN_EMAIL, email);
+                                editor.putString(MyConstants.LOGIN_PASSWORD, password);
+                                editor.commit();
 
-                        //Logging in
-                        fAuth.signInWithEmailAndPassword(email, password);
-                        FirebaseUser currentUser = fAuth.getCurrentUser();
+                                //Logging in
+                                fAuth.signInWithEmailAndPassword(email, password);
+                                FirebaseUser currentUser = fAuth.getCurrentUser();
 
-                        //Checking if User Uploaded a PFP (ADD DIALOG BOX ALERTING USER TO UPLOAD HIS OWN PROFILE PICTURE)
-                        if (selectedImageUri==null){
-                            int defaultPFPResourceId = getResources().getIdentifier("default_profile_picture", "drawable", getPackageName());
-                            selectedImageUri = Uri.parse("android.resource://" + getPackageName() + "/" + defaultPFPResourceId);
-                        }
-                        FirebaseStorage fStorage = FirebaseStorage.getInstance();
-                        StorageReference fDownRef = fStorage.getReference("Users").child(currentUser.getUid()).child(MyConstants.PROFILE_PICTURE);
-                        fDownRef.putFile(selectedImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                Toast.makeText(UsernameScreen.this, "Photo Uploaded!", Toast.LENGTH_LONG).show();
-                                Toast.makeText(UsernameScreen.this, "User Created!", Toast.LENGTH_LONG).show();
-                                User newUser = new User(username, email, password, cookingStyle, experienceLevel, weeklyHour, FINISHED_SETUP);
-                                //GETTING LESSON NUMBER
-                                refLessons = FBDB.getReference("Courses").child(newUser.getSelectedCourse());
-                                lessonLoader = new ValueEventListener() {
+                                //Checking if User Uploaded a PFP (ADD DIALOG BOX ALERTING USER TO UPLOAD HIS OWN PROFILE PICTURE)
+                                if (selectedImageUri==null){
+                                    int defaultPFPResourceId = getResources().getIdentifier("default_profile_picture", "drawable", getPackageName());
+                                    selectedImageUri = Uri.parse("android.resource://" + getPackageName() + "/" + defaultPFPResourceId);
+                                }
+                                FirebaseStorage fStorage = FirebaseStorage.getInstance();
+                                StorageReference fDownRef = fStorage.getReference("Users").child(currentUser.getUid()).child(MyConstants.PROFILE_PICTURE);
+                                fDownRef.putFile(selectedImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        long lessonCount = snapshot.getChildrenCount();
-                                        for (int i = 0; i<lessonCount; i++){
+                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                        Toast.makeText(UsernameScreen.this, "Photo Uploaded!", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(UsernameScreen.this, "User Created!", Toast.LENGTH_LONG).show();
+                                        User newUser = new User(username, email, password, cookingStyle, experienceLevel, weeklyHour, FINISHED_SETUP);
+                                        //GETTING LESSON NUMBER
+                                        refLessons = FBDB.getReference("Courses").child(newUser.getSelectedCourse());
+                                        lessonLoader = new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                long lessonCount = snapshot.getChildrenCount();
+                                                for (int i = 0; i<lessonCount; i++){
 
-                                            newUser.getLessonsStatus().add(0);
-                                            newUser.getLessonsRating().get(0).add("0"); //WE ADD THE FIRST SELECTED COURSE NAME IN THE USER CONSTRUCTOR
+                                                    newUser.getLessonsStatus().add(0);
+                                                    newUser.getLessonsRating().get(0).add("0"); //WE ADD THE FIRST SELECTED COURSE NAME IN THE USER CONSTRUCTOR
 
-                                        }
-                                        refUsers.child(currentUser.getUid()).setValue(newUser);
-                                        Intent courseScreen = new Intent(UsernameScreen.this, HomeScreen.class );
-                                        courseScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        startActivity(courseScreen);
+                                                }
+                                                refUsers.child(currentUser.getUid()).setValue(newUser);
+                                                Intent courseScreen = new Intent(UsernameScreen.this, HomeScreen.class );
+                                                courseScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                startActivity(courseScreen);
+
+                                            }
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+
+                                            }
+                                        };
+                                        refLessons.addValueEventListener(lessonLoader);
 
                                     }
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
+                                });
 
-                                    }
-                                };
-                                refLessons.addValueEventListener(lessonLoader);
 
                             }
-                        });
+                            else if(!task.isSuccessful()){
+                                String errorMessage = task.getException().toString();
+                                Toast.makeText(UsernameScreen.this,
+                                        ""+ errorMessage.substring(errorMessage.indexOf(":")+2),
+                                        Toast.LENGTH_LONG).show();
 
+                            }
 
-                    }
-                    else if(!task.isSuccessful()){
-                        String errorMessage = task.getException().toString();
-                        Toast.makeText(UsernameScreen.this,
-                                ""+ errorMessage.substring(errorMessage.indexOf(":")+2),
-                                Toast.LENGTH_LONG).show();
-
-                    }
-
+                        }
+                    });
                 }
-            });
-        }
-        else{
-            Toast.makeText(UsernameScreen.this, "Username not valid", Toast.LENGTH_LONG).show();
 
-        }
+                else //Username ISN'T Available
+                {
+                    Toast.makeText(UsernameScreen.this, "Username not valid", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+
     }
 
     public void toLogIn(View view){

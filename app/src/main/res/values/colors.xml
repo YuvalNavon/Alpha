@@ -9,5 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gold">#ffd700</color>
     <color name="darkGold">#ccac00</color>
+    <color name="lightBlue">#ADD8E6</color>
+
 
 </resources>
