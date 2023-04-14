@@ -127,6 +127,8 @@ public class HomeScreen extends AppCompatActivity implements CustomViewHolder.On
 
         super.onResume();
         if (refUsers!=null && courseGetter!=null) refUsers.addValueEventListener(courseGetter);
+        myServices.getProfilePhotoFromFirebase(iv);
+
     }
 
     public void onDestroy() {

@@ -62,6 +62,25 @@ public class myServices {
 
 
     //SIGN UP INFO VALIDATION
+
+    public static void isEmailAvailable(String email, OnEmailCheckListener listener) {
+        FirebaseDatabase FDBD = FirebaseDatabase.getInstance("https://cookproject-ac2c0-default-rtdb.europe-west1.firebasedatabase.app");
+        DatabaseReference refUsers = FDBD.getReference("Users");
+        Query query = refUsers.orderByChild("email").equalTo(email);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                boolean isAvailable = !snapshot.exists();
+                listener.onEmailCheck(isAvailable);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle error
+            }
+        });
+    }
+
     public static boolean emailInFormat(String email){
         String regex = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
         return email.matches(regex);

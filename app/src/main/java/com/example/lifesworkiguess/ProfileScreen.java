@@ -1,11 +1,14 @@
 package com.example.lifesworkiguess;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -15,6 +18,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -31,7 +37,7 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
     FirebaseUser loggedInUser;
     FirebaseDatabase FBDB;
     DatabaseReference refUsers, refLesson;
-    ValueEventListener courseGetter, getLessonName;
+    ValueEventListener userAndCourseGetter, getLessonName;
     TextView usernameTV, courseTV;
     ImageView profileScreenPFPIV,profileScreenMenuPFPIV ;
     Button changeCourse;
@@ -55,12 +61,51 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
 
         changeCourse = findViewById(R.id.PFPScreenChangeCourseBTN);
 
+
+        //Loading User's Info
+        loadCurrentUserData();
+
+
+
+
+    }
+
+    @Override
+    protected void onPause() {
+
+        super.onPause();
+        if (refUsers!=null && userAndCourseGetter !=null) refUsers.removeEventListener(userAndCourseGetter);
+        if (refLesson!=null && getLessonName!=null) refLesson.removeEventListener(getLessonName);
+
+    }
+
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+        if (refUsers!=null && userAndCourseGetter !=null) refUsers.addValueEventListener(userAndCourseGetter);
+        if (refLesson!=null && getLessonName!=null) refLesson.addValueEventListener(getLessonName);
+        loadCurrentUserData();
+    }
+
+    public void onDestroy() {
+
+        super.onDestroy();
+        if (refUsers!=null && userAndCourseGetter !=null) refUsers.removeEventListener(userAndCourseGetter);
+        if (refLesson!=null && getLessonName!=null) refLesson.removeEventListener(getLessonName);
+
+    }
+
+    public void loadCurrentUserData()
+    {
         fAuth = FirebaseAuth.getInstance();
         loggedInUser = fAuth.getCurrentUser();
 
         //To make Loading seem smooth 1
         profileScreen = findViewById(R.id.profileScreen);
         profileScreen.setVisibility(View.INVISIBLE);
+
 
         //Loading PFP's
         profileScreenPFPIV = findViewById(R.id.profileScreenPFPIV);
@@ -72,9 +117,10 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
         //Loading User Data
         usernameTV = findViewById(R.id.profileScreenUsernameIV);
         courseTV = findViewById(R.id.profileScreenCourseTV);
+
         FBDB = FirebaseDatabase.getInstance("https://cookproject-ac2c0-default-rtdb.europe-west1.firebasedatabase.app");
         refUsers=FBDB.getReference("Users").child(loggedInUser.getUid());
-        courseGetter = new ValueEventListener() {
+        userAndCourseGetter = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
@@ -102,6 +148,9 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
                 }
                 makeCompletedCoursesRecyclerView(loggedInUser);
 
+                //To make Loading seem smooth 2
+                profileScreen.setVisibility(View.VISIBLE);
+
 
 
 
@@ -115,37 +164,7 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
 
             }
         };
-        refUsers.addValueEventListener(courseGetter);
-
-
-        //To make Loading seem smooth 2
-        profileScreen.setVisibility(View.VISIBLE);
-
-    }
-
-    @Override
-    protected void onPause() {
-
-        super.onPause();
-        if (refUsers!=null && courseGetter!=null) refUsers.removeEventListener(courseGetter);
-        if (refLesson!=null && getLessonName!=null) refLesson.removeEventListener(getLessonName);
-
-    }
-
-
-    @Override
-    protected void onResume() {
-
-        super.onResume();
-        if (refUsers!=null && courseGetter!=null) refUsers.addValueEventListener(courseGetter);
-        if (refLesson!=null && getLessonName!=null) refLesson.addValueEventListener(getLessonName);
-    }
-
-    public void onDestroy() {
-
-        super.onDestroy();
-        if (refUsers!=null && courseGetter!=null) refUsers.removeEventListener(courseGetter);
-        if (refLesson!=null && getLessonName!=null) refLesson.removeEventListener(getLessonName);
+        refUsers.addValueEventListener(userAndCourseGetter);
 
     }
 
@@ -238,9 +257,30 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
 
 
     public void changeCourse(View view){
-        Intent toChooseCourse = new Intent(this, ChooseCourse.class);
-        toChooseCourse.putExtra(MyConstants.CHOOSE_COURSE_ORIGIN, MyConstants.FROM_PROFILE);
-        startActivity(toChooseCourse);
+
+        //Setting up Alert Dialogs
+        AlertDialog.Builder changeCourseDialogBuilder = new AlertDialog.Builder(ProfileScreen.this);
+        changeCourseDialogBuilder.setTitle("Are you Sure?");
+        changeCourseDialogBuilder.setMessage(
+                    "Because You Finished this Course, its Progress will be Saved" +
+                            " in your History tab in the Profile screen.\n\nAre you Sure you Want to Change Course?");
+
+
+        changeCourseDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // Handle click here
+            }
+        });
+
+
+        changeCourseDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                Intent toChooseCourse = new Intent(ProfileScreen.this, ChooseCourse.class);
+                toChooseCourse.putExtra(MyConstants.CHOOSE_COURSE_ORIGIN, MyConstants.FROM_PROFILE);
+                startActivity(toChooseCourse);
+            }
+        });
+
     }
 
     public void editProfile(View view){

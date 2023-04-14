@@ -46,7 +46,7 @@ public class UsernameScreen extends AppCompatActivity {
     DatabaseReference refUsers, refLessons;
     ValueEventListener lessonLoader;
     FirebaseAuth fAuth;
-    TextView signInHere, addPFP;
+    TextView signInHere, addPFP, usernameErrorTV;
 
     ImageView iv;
     StorageReference fStorage;
@@ -90,6 +90,44 @@ public class UsernameScreen extends AppCompatActivity {
         imageUploaded = false;
 
         addPFP = findViewById(R.id.addPFPTV);
+
+
+        //For Error Checks
+        usernameErrorTV = findViewById(R.id.UsernameScreen_UsernameError);
+        usernameErrorTV.setVisibility(View.INVISIBLE);
+
+        usernameET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+
+                if (!hasFocus)
+                {
+                    // The user has exited the EditText
+                    String username = usernameET.getText().toString();
+
+
+                        myServices. isUsernameAvailable(username, new OnUsernameCheckListener() {
+                            @Override
+                            public void onUsernameCheck(boolean isAvailable) {
+
+                                if (isAvailable)  //Username IS Available
+                                {
+                                    usernameErrorTV.setVisibility(View.INVISIBLE);
+                                }
+
+                                else   //Username ISN'T Available
+                                {
+                                    usernameErrorTV.setVisibility(View.VISIBLE);
+                                    usernameErrorTV.setText(MyConstants.USERNAME_ERROR_MESSAGE);
+
+                                }
+                            }
+                        });
+                    }
+
+            }
+        });
+
 
     }
 
@@ -250,7 +288,7 @@ public class UsernameScreen extends AppCompatActivity {
 
                 else //Username ISN'T Available
                 {
-                    Toast.makeText(UsernameScreen.this, "Username not valid", Toast.LENGTH_LONG).show();
+                    Toast.makeText(UsernameScreen.this, USERNAME_ERROR_MESSAGE, Toast.LENGTH_LONG).show();
                 }
             }
         });

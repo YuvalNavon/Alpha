@@ -26,16 +26,16 @@
         android:id="@+id/textView16"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"
+        android:layout_weight="3"
         android:gravity="center"
         android:text="Making a profile will allow you to Save your progress, Connect with friends, and keep you up to date with all future News and Updates!"
         android:textColor="#9F9E9E"
-        android:textSize="16sp" />
+        android:textSize="22sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="5"
+        android:layout_weight="7.5"
         android:orientation="horizontal">
 
         <Space
@@ -55,13 +55,14 @@
                 android:layout_weight="0.1" />
 
             <TextView
-                android:id="@+id/emailSignUpCheck"
+                android:id="@+id/textView14"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.5"
+                android:layout_weight="0.4"
                 android:gravity="bottom"
-                android:text="Email address"
-                android:textColor="#000000"
+                android:padding="5dp"
+                android:text="Email Address"
+                android:textColor="@color/black"
                 android:textSize="16sp" />
 
             <EditText
@@ -70,8 +71,24 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:ems="10"
-                android:hint="Email address"
+                android:gravity="center|left"
+                android:hint="Enter Email "
+                android:padding="16dp"
+                android:background="@drawable/edit_text_box"
+                android:textColorHint="#8E8888"
                 android:inputType="textEmailAddress" />
+
+            <TextView
+                android:id="@+id/SignUpEmailError"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.4"
+                android:gravity="top"
+                android:paddingStart="5dp"
+                android:text="Email errors"
+                android:textColor="@color/red"
+                android:textSize="16sp"
+                android:visibility="visible" />
 
             <Space
                 android:layout_width="match_parent"
@@ -79,13 +96,14 @@
                 android:layout_weight="0.1" />
 
             <TextView
-                android:id="@+id/textView14"
+                android:id="@+id/textView65"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.5"
+                android:layout_weight="0.4"
                 android:gravity="bottom"
+                android:padding="5dp"
                 android:text="Password"
-                android:textColor="#000000"
+                android:textColor="@color/black"
                 android:textSize="16sp" />
 
             <EditText
@@ -93,9 +111,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:background="@drawable/edit_text_box"
                 android:ems="10"
-                android:hint="Password"
-                android:inputType="textPassword" />
+                android:hint="Enter Password"
+                android:inputType="textPassword"
+                android:padding="16dp"
+                android:textColorHint="#8E8888" />
+
+            <TextView
+                android:id="@+id/SignUpPasswordError"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.4"
+                android:gravity="top"
+                android:paddingStart="5dp"
+                android:text="Password Errors"
+                android:textColor="@color/red"
+                android:textSize="16sp"
+                android:visibility="visible" />
 
         </LinearLayout>
 
@@ -113,7 +146,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="1.4"
         android:orientation="horizontal">
 
         <Space
@@ -129,7 +162,8 @@
             android:backgroundTint="@color/orange"
             android:onClick="Register"
             android:shadowColor="@color/gray"
-            android:text="Next" />
+            android:text="Next"
+            android:textColor="@color/white" />
 
         <Space
             android:layout_width="0dp"
@@ -140,12 +174,12 @@
     <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.5" />
+        android:layout_weight="0.3" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.5"
+        android:layout_weight="0.8"
         android:orientation="horizontal">
 
         <TextView

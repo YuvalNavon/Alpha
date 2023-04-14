@@ -8,6 +8,13 @@ public class MyConstants {
     public static final String LOGIN_EMAIL = "Email";
     public static final String LOGIN_PASSWORD = "Password";
 
+    //Error Messages for User Info Input
+
+    public static final String USED_EMAIL_ERROR_MESSAGE = "Email Address Already Used";
+    public static final String INVALID_FORMAT_EMAIL_ERROR_MESSAGE = "Please Enter a Valid Email Address";
+    public static final String PASSWORD_ERROR_MESSAGE = "Password must be Longer than 6 characters";
+    public static final String USERNAME_ERROR_MESSAGE = "Username is Taken";
+
     //For Steps Without Images
     public static final String NO_IMAGE_FOR_STEP = "No Image/Action";
 

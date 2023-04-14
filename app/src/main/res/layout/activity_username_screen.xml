@@ -47,7 +47,7 @@
                 android:layout_weight="0.5"
                 android:gravity="center"
                 android:text="Choose Your Profile Picture!"
-                android:textColor="@color/gray"
+                android:textColor="@color/black"
                 android:textSize="16sp" />
 
             <ImageView
@@ -66,6 +66,7 @@
                 android:gravity="bottom"
                 android:text="Username"
                 android:textColor="#000000"
+                android:padding="5dp"
                 android:textSize="18sp" />
 
             <EditText
@@ -75,7 +76,21 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:hint="Enter your Username"
+                android:padding="16dp"
+                android:background="@drawable/edit_text_box"
+                android:textColorHint="#8E8888"
                 android:inputType="textPersonName" />
+
+            <TextView
+                android:id="@+id/UsernameScreen_UsernameError"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.5"
+                android:gravity="top"
+                android:paddingStart="5dp"
+                android:text="Username Errors"
+                android:textColor="@color/red"
+                android:textSize="18sp" />
 
         </LinearLayout>
 

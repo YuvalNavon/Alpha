@@ -60,7 +60,8 @@
             android:backgroundTint="@color/orange"
             android:onClick="getStarted"
             android:shadowColor="@color/gray"
-            android:text="Get Started!" />
+            android:text="Get Started!"
+            android:textColor="@color/white" />
 
         <Space
             android:layout_width="0dp"
