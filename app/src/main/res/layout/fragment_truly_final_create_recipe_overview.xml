@@ -28,7 +28,7 @@
                 android:layout_weight="0.1" />
 
             <TextView
-                android:id="@+id/textView71"
+                android:id="@+id/OverviewMessageTV"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -38,7 +38,7 @@
                 android:textSize="34sp" />
 
             <TextView
-                android:id="@+id/textView72"
+                android:id="@+id/OverviewLessonPositionOrCreatorNameTV"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.5"
@@ -52,28 +52,28 @@
                 android:layout_height="0dp"
                 android:layout_weight="0.4" />
 
-            <ImageView
-                android:id="@+id/CR_Finish_ImageIV"
+            <TextView
+                android:id="@+id/CR_Finish_NameTV"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="2"
-                tools:src="@tools:sample/avatars" />
+                android:layout_weight="1.3"
+                android:gravity="center"
+                android:text="TextView"
+                android:textColor="@color/orange"
+                android:textColorHighlight="@color/black"
+                android:textSize="30sp" />
 
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.3" />
 
-            <TextView
-                android:id="@+id/CR_Finish_NameTV"
+            <ImageView
+                android:id="@+id/CR_Finish_ImageIV"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.7"
-                android:gravity="center"
-                android:text="TextView"
-                android:textColor="@color/orange"
-                android:textColorHighlight="@color/black"
-                android:textSize="30sp" />
+                android:layout_weight="2"
+                tools:src="@tools:sample/avatars" />
 
             <Space
                 android:layout_width="match_parent"

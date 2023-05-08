@@ -280,6 +280,9 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
                 startActivity(toChooseCourse);
             }
         });
+        // Create and show the AlertDialog
+        AlertDialog changeCourseDialog = changeCourseDialogBuilder.create();
+        changeCourseDialog.show();
 
     }
 

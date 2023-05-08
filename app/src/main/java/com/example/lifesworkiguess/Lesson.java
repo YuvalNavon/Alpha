@@ -41,6 +41,7 @@ public class Lesson {
         Time = time;
         Difficulty = difficulty;
         Kosher = kosher;
+        this.LogoUri = null;
     }
 
     public String getLessonName() {

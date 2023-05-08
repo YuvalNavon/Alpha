@@ -22,10 +22,21 @@ import com.google.firebase.database.ValueEventListener;
 
 public class LessonIntro extends AppCompatActivity {
 
-    String lessonName, courseName;
+    Intent getLessonData;
+
+    //For PermanentLessonSetup
+    String courseName;
+
+    //For CommunityLessonSetup
+    String creatorUsername, creatorID;
+
+    //For Both
+    String lessonName;
+
     int lessonPosition;
     boolean lessonFinal;
     PermanentLesson selectedPermanentLessonGlobal;
+    CommunityLesson selectedCommunityLessonGlobal;
     Recipe recipe;
 
     TextView lessonPositionTV, lessonNameTV, expectedTimeTV, difficultyTV, kosherTV, serveCountTV;
@@ -44,13 +55,6 @@ public class LessonIntro extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lesson_intro);
 
-        Intent getLessonData = getIntent();
-        lessonName = getLessonData.getStringExtra("Lesson Name");
-        courseName = getLessonData.getStringExtra("Course Name");
-        lessonPosition = getLessonData.getIntExtra("Lesson Position - 1", MyConstants.NO_LESSON_POSITION);
-        lessonFinal = getLessonData.getBooleanExtra("Is Lesson Final", false);
-
-
         //To make loading smooth 1
         screen = findViewById(R.id.lessonIntroScreen);
         startBTN = findViewById(R.id.startLessonBTN);
@@ -65,46 +69,20 @@ public class LessonIntro extends AppCompatActivity {
         kosherIV = findViewById(R.id.kosherIV);
         serveCountTV = findViewById(R.id.lessonIntroScreenServeCountTV);
 
-        upArrowIV = findViewById(R.id.upArrowIV);
-        downArrowIV = findViewById(R.id.downArrowIV);
-
 
         FBDB = FirebaseDatabase.getInstance("https://cookproject-ac2c0-default-rtdb.europe-west1.firebasedatabase.app");
-        refLessons = FBDB.getReference("Courses").child(courseName);
-        lessonGetter = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot data : snapshot.getChildren()) {
-                   PermanentLesson checkedPermanentLesson = data.getValue(PermanentLesson.class);
 
-                            if (lessonName.equals(checkedPermanentLesson.getLessonName())){
-                                PermanentLesson selectedPermanentLesson = checkedPermanentLesson;
-                                setGlobalLesson(selectedPermanentLesson);
-                                getRecipe();
-                                Handler handler = new Handler();
-                                handler.postDelayed(new Runnable() {
-                                    public void run() {
-                                        // Actions to do after 2 seconds  (Has to be same delay as the delay in the getRecipe method)
-                                        makeRecyclerView();
+        getLessonData = getIntent();
+        int fromHomeOrCommunity = getLessonData.getIntExtra(MyConstants.LESSON_INTRO_MODE_KEY, MyConstants.LESSON_INTRO_MODE_ERROR);
 
-                                        //To make loading smooth 2
-                                        screen.setVisibility(View.VISIBLE);
-                                        startBTN.setEnabled(true);
+        if (fromHomeOrCommunity==MyConstants.PERMENANT_LESSON_INTRO){
+            permanentLessonSetup();
+        }
 
-                                    }
-                                }, 2000);
-                            }
-
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        };
-        refLessons.addValueEventListener(lessonGetter);
+        else if (fromHomeOrCommunity==MyConstants.COMMUNITY_LESSON_INTRO)
+        {
+            communityLessonSetup();
+        }
 
 
     }
@@ -132,77 +110,193 @@ public class LessonIntro extends AppCompatActivity {
 
     }
 
-    public void getRecipe(){
-        myServices.downloadXML(this, selectedPermanentLessonGlobal.getLessonRecipeName(), "Courses/" + courseName + "/" + lessonName);
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                // Actions to do after 2 second (Has to be same delay as calling the makeRecyclerView method)
-                recipe = myServices.XMLToRecipe(LessonIntro.this, MyConstants.CURRENTLY_LEARNED_RECIPE);
-                lessonNameTV.setText("Make Some " + recipe.getTitle() + "!");
-                expectedTimeTV.setText(selectedPermanentLessonGlobal.getTime());
-                difficultyTV.setText(selectedPermanentLessonGlobal.getDifficulty());
-                if (selectedPermanentLessonGlobal.isKosher()) {
-                    kosherTV.setText("KOSHER");
-                    kosherIV.setImageResource(com.firebase.ui.auth.R.drawable.fui_ic_check_circle_black_128dp);
-                }
-                else {
-                    kosherTV.setText("NOT\nKOSHER");
-                    kosherIV.setImageResource(android.R.drawable.ic_delete);
-                }
-                serveCountTV.setText(Integer.toString(selectedPermanentLessonGlobal.getServeCount()));
+//    public void getRecipe(int mode){
+//        if (mode==MyConstants.PERMENANT_LESSON_INTRO)
+//            myServices.downloadXML(this, selectedPermanentLessonGlobal.getLessonRecipeName(), "Courses/" + courseName + "/" + lessonName);
+//
+//        else if (mode==MyConstants.COMMUNITY_LESSON_INTRO)
+//            myServices.downloadXML(this, MyConstants.UPLOADED_RECIPE_STORAGE_NAME,
+//                    "Community Recipes/" + creatorID + "/" + selectedCommunityLessonGlobal.getLessonRecipeName() + "/" );
+//        Handler handler = new Handler();
+//        handler.postDelayed(new Runnable() {
+//            public void run() {
+//                // Actions to do after 2 second (Has to be same delay as calling the makeRecyclerView method)
+//                recipe = myServices.XMLToRecipe(LessonIntro.this, MyConstants.CURRENTLY_LEARNED_RECIPE);
+//                lessonNameTV.setText("Make Some " + recipe.getTitle() + "!");
+//                expectedTimeTV.setText(selectedPermanentLessonGlobal.getTime());
+//                difficultyTV.setText(selectedPermanentLessonGlobal.getDifficulty());
+//                if (selectedPermanentLessonGlobal.isKosher()) {
+//                    kosherTV.setText("KOSHER");
+//                    kosherIV.setImageResource(com.firebase.ui.auth.R.drawable.fui_ic_check_circle_black_128dp);
+//                }
+//                else {
+//                    kosherTV.setText("NOT\nKOSHER");
+//                    kosherIV.setImageResource(android.R.drawable.ic_delete);
+//                }
+//                serveCountTV.setText(Integer.toString(selectedPermanentLessonGlobal.getServeCount()));
+//
+//
+//            }
+//        }, 2000);
+//    }
 
+
+//    public void makeRecyclerView(){
+//        ingredientsRV = findViewById(R.id.ingredientsRecyclerView);
+//
+//        // Create an instance of your adapter
+//        customAdapterIngredients adapter = new customAdapterIngredients(LessonIntro.this, recipe.getIngredients());
+//
+//
+//        // Set the layout manager for the RecyclerView
+//        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(LessonIntro.this);
+//        linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
+//        ingredientsRV.setLayoutManager(linearLayoutManager);
+//
+//        // Set the adapter for the RecyclerView
+//        ingredientsRV.setAdapter(adapter);
+//
+//        //To make loading smooth 2
+//        screen.setVisibility(View.VISIBLE);
+//        startBTN.setEnabled(true);
+//
+//        ingredientsRV.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//                if (!recyclerView.canScrollVertically(-1)) {
+//                    // Cannot scroll up
+//                    upArrowIV.setVisibility(View.INVISIBLE);
+//                } else {
+//                    // Can scroll up
+//                    upArrowIV.setVisibility(View.VISIBLE);
+//                }
+//                if (!recyclerView.canScrollVertically(1)) {
+//                    // Cannot scroll down
+//                    downArrowIV.setVisibility(View.INVISIBLE);
+//                } else {
+//                    // Can scroll down
+//                    downArrowIV.setVisibility(View.VISIBLE);
+//                }
+//            }
+//        });
+//
+//    }
+
+    public void permanentLessonSetup(){
+        lessonName = getLessonData.getStringExtra("Lesson Name");
+        courseName = getLessonData.getStringExtra("Course Name");
+        lessonPosition = getLessonData.getIntExtra("Lesson Position - 1", MyConstants.NO_LESSON_POSITION);
+        lessonFinal = getLessonData.getBooleanExtra("Is Lesson Final", false);
+
+
+        refLessons = FBDB.getReference("Courses").child(courseName);
+        lessonGetter = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot data : snapshot.getChildren()) {
+                    PermanentLesson checkedPermanentLesson = data.getValue(PermanentLesson.class);
+
+                    if (lessonName.equals(checkedPermanentLesson.getLessonName())){
+                        PermanentLesson selectedPermanentLesson = checkedPermanentLesson;
+                        setGlobalLesson(selectedPermanentLesson);
+
+                        myServices.downloadXML(LessonIntro.this, selectedPermanentLessonGlobal.getLessonRecipeName(), "Courses/" + courseName + "/" + lessonName);
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            public void run() {
+                                // Actions to do after 2 second (Has to be same delay as calling the makeRecyclerView method)
+                                recipe = myServices.XMLToRecipe(LessonIntro.this, MyConstants.CURRENTLY_LEARNED_RECIPE);
+                                lessonNameTV.setText("Make Some " + recipe.getTitle() + "!");
+                                expectedTimeTV.setText(selectedPermanentLessonGlobal.getTime());
+                                difficultyTV.setText(selectedPermanentLessonGlobal.getDifficulty());
+                                if (selectedPermanentLessonGlobal.isKosher()) {
+                                    kosherTV.setText("KOSHER");
+                                    kosherIV.setImageResource(com.firebase.ui.auth.R.drawable.fui_ic_check_circle_black_128dp);
+                                }
+                                else {
+                                    kosherTV.setText("NOT\nKOSHER");
+                                    kosherIV.setImageResource(android.R.drawable.ic_delete);
+                                }
+                                serveCountTV.setText(Integer.toString(selectedPermanentLessonGlobal.getServeCount()));
+
+//                                makeRecyclerView();
+
+
+                            }
+                        }, 2000);
+
+
+
+                    }
+
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        }, 2000);
+        };
+        refLessons.addValueEventListener(lessonGetter);
+
     }
 
-
-    public void makeRecyclerView(){
-        ingredientsRV = findViewById(R.id.ingredientsRecyclerView);
-
-        // Create an instance of your adapter
-        customAdapterIngredients adapter = new customAdapterIngredients(LessonIntro.this, recipe.getIngredients());
+    public void communityLessonSetup(){
+        lessonName = getLessonData.getStringExtra(MyConstants.LESSON_NAME_KEY);
+        creatorUsername = getLessonData.getStringExtra(MyConstants.LESSON_CREATOR_USERNAME_KEY);
+        creatorID = getLessonData.getStringExtra(MyConstants.LESSON_CREATOR_ID_KEY);
 
 
-        // Set the layout manager for the RecyclerView
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(LessonIntro.this);
-        linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
-        ingredientsRV.setLayoutManager(linearLayoutManager);
-
-        // Set the adapter for the RecyclerView
-        ingredientsRV.setAdapter(adapter);
-        ingredientsRV.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        refLessons = FBDB.getReference("Community Lessons").child(lessonName + " , " + creatorID);
+        lessonGetter = new ValueEventListener() {
             @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if (!recyclerView.canScrollVertically(-1)) {
-                    // Cannot scroll up
-                    upArrowIV.setVisibility(View.INVISIBLE);
-                } else {
-                    // Can scroll up
-                    upArrowIV.setVisibility(View.VISIBLE);
-                }
-                if (!recyclerView.canScrollVertically(1)) {
-                    // Cannot scroll down
-                    downArrowIV.setVisibility(View.INVISIBLE);
-                } else {
-                    // Can scroll down
-                    downArrowIV.setVisibility(View.VISIBLE);
-                }
-            }
-        });
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                selectedCommunityLessonGlobal = snapshot.getValue(CommunityLesson.class);
 
+                myServices.downloadXML(LessonIntro.this, MyConstants.RECIPE_STORAGE_NAME,
+                        "Community Recipes/" + creatorID + "/" + selectedCommunityLessonGlobal.getLessonRecipeName());
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        // Actions to do after 2 second (Has to be same delay as calling the makeRecyclerView method)
+                        recipe = myServices.XMLToRecipe(LessonIntro.this, MyConstants.CURRENTLY_LEARNED_RECIPE);
+                        lessonPositionTV.setText(creatorUsername + "'s Recipe" );
+                        lessonNameTV.setText(recipe.getTitle());
+                        expectedTimeTV.setText(selectedCommunityLessonGlobal.getTime());
+                        difficultyTV.setText(selectedCommunityLessonGlobal.getDifficulty());
+                        if (selectedCommunityLessonGlobal.isKosher()) {
+                            kosherTV.setText("KOSHER");
+                            kosherIV.setImageResource(com.firebase.ui.auth.R.drawable.fui_ic_check_circle_black_128dp);
+                        }
+                        else {
+                            kosherTV.setText("NOT\nKOSHER");
+                            kosherIV.setImageResource(android.R.drawable.ic_delete);
+                        }
+                        serveCountTV.setText(Integer.toString(selectedCommunityLessonGlobal.getServeCount()));
+
+//                        makeRecyclerView();
+
+
+                    }
+                }, 2000);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        refLessons.addListenerForSingleValueEvent(lessonGetter);
     }
 
 
 
     public void setGlobalLesson(PermanentLesson permanentLesson){
+
         selectedPermanentLessonGlobal = permanentLesson;
         setPositionTV(lessonPosition);
-
-
-
 
     }
 
@@ -216,9 +310,12 @@ public class LessonIntro extends AppCompatActivity {
     public void startLesson(View view){
 
           Intent toLessonScreen = new Intent(LessonIntro.this, newLessonScreen.class);
+
           toLessonScreen.putExtra("Lesson Name", selectedPermanentLessonGlobal.getLessonName());
           toLessonScreen.putExtra("Lesson Position in List", lessonPosition);
+
           startActivity(toLessonScreen);
+          finish();
 
 
 

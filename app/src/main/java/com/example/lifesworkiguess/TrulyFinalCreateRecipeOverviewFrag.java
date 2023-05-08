@@ -1,5 +1,10 @@
 package com.example.lifesworkiguess;
 
+import static com.example.lifesworkiguess.myServices.recipeToXML;
+import static com.example.lifesworkiguess.myServices.uploadXML;
+
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -16,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -23,6 +29,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -52,7 +61,7 @@ public class TrulyFinalCreateRecipeOverviewFrag extends Fragment {
 
     FirebaseDatabase FBDB;
     DatabaseReference refUsers, refCommunityLessons;
-    ValueEventListener userRecipeAdder, communityLessonAdder;
+    ValueEventListener userRecipeAdder;
     FirebaseUser loggedInUser;
     FirebaseAuth fAuth;
 
@@ -83,6 +92,8 @@ public class TrulyFinalCreateRecipeOverviewFrag extends Fragment {
             jsonofSteps = getArguments().getString(MyConstants.CUSTOM_RECIPE_STEPS);
         }
     }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -143,7 +154,33 @@ public class TrulyFinalCreateRecipeOverviewFrag extends Fragment {
         return view;
     }
 
-    public void StringListsToIngredients(){  //I use this method in a bunch of different activities but it feels like it should be like this for possible changes
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (refUsers!=null && userRecipeAdder!=null) refUsers.removeEventListener(userRecipeAdder);
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (refUsers!=null && userRecipeAdder!=null) refUsers.addValueEventListener(userRecipeAdder);
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (refUsers!=null && userRecipeAdder!=null) refUsers.removeEventListener(userRecipeAdder);
+
+    }
+
+
+        public void StringListsToIngredients(){  //I use this method in a bunch of different activities but it feels like it should be like this for possible changes
         //depending on each activity, instead of putting it in myServices
 
         ingredientsList = new ArrayList<>();
@@ -181,6 +218,8 @@ public class TrulyFinalCreateRecipeOverviewFrag extends Fragment {
 
         //Adding the Recipe to the LoggedInUser List of made recipes
 
+        Context context = getContext();
+
         fAuth = FirebaseAuth.getInstance();
         loggedInUser = fAuth.getCurrentUser();
         FBDB = FirebaseDatabase.getInstance("https://cookproject-ac2c0-default-rtdb.europe-west1.firebasedatabase.app");
@@ -191,6 +230,63 @@ public class TrulyFinalCreateRecipeOverviewFrag extends Fragment {
                 User currentUser = snapshot.getValue(User.class);
                 currentUser.addCustomRecipe(recipeName);
                 refUsers.setValue(currentUser);
+
+                //Adding the Recipe to the CompletedLessons branch of the Database
+                CommunityLesson  addedLesson = new CommunityLesson(recipeName, recipeName, recipeServeCount, recipeTime,
+                        recipeDifficultyLevel, recipeKosher, loggedInUser.getUid(), recipeDescription );
+
+                //Checking if the lesson has a photo
+                File selectedRecipeImageFile = new File(getContext().getFilesDir(), MyConstants.IMAGE_FILE_NAME);
+                Uri selectedRecipeImageFileURI;
+                if (myServices.isFileExists(context, MyConstants.IMAGE_FILE_NAME))
+                {
+                    selectedRecipeImageFileURI = Uri.fromFile(selectedRecipeImageFile);
+                    if (selectedRecipeImageFileURI!=null)
+                    {
+                        addedLesson = new CommunityLesson(recipeName, recipeName, recipeServeCount, recipeTime,
+                                recipeDifficultyLevel, recipeKosher, loggedInUser.getUid(), recipeDescription);
+                    }
+                }
+
+
+
+                refCommunityLessons =FBDB.getReference("Community Lessons");
+                refCommunityLessons.child( loggedInUser.getUid() + " , " + Integer.toString(currentUser.getUploadedRecipeNames().size()-1)).setValue(addedLesson);
+
+
+                //Adding the Recipe to the FirebaseStorage
+                Recipe addedRecipe = new Recipe(recipeName, ingredientsList, stepsList);
+                recipeToXML(context, addedRecipe, MyConstants.DOWNLOADED_RECIPE_NAME);
+                uploadXML(context,  recipeName);
+
+                //Uploading the RecipeImage to the FirebaseStorage
+                if (myServices.isFileExists(context , MyConstants.IMAGE_FILE_NAME))
+                {
+                    FirebaseAuth fAuth = FirebaseAuth.getInstance();
+                    FirebaseUser currentlyLoggedInUser = fAuth.getCurrentUser();
+                    selectedRecipeImageFileURI = Uri.fromFile(selectedRecipeImageFile);
+                    StorageReference fStorage = FirebaseStorage.getInstance().getReference("Community Recipes").child(currentlyLoggedInUser.getUid()).child(recipeName);
+                    if (selectedRecipeImageFileURI!=null){
+                        StorageReference fRef = fStorage.child(MyConstants.RECIPE_IMAGE_STORAGE_NAME);
+
+                        fRef.putFile(selectedRecipeImageFileURI).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                Toast.makeText(context, "Image Uploaded!", Toast.LENGTH_LONG).show();
+
+                            }
+                        });
+                    }
+                    else
+                    {
+                        Toast.makeText(context, "Error, File was not Uploaded", Toast.LENGTH_LONG).show();
+                    }
+                }
+
+
+                Intent toCommunityScreen = new Intent(getContext(), CommunityScreen.class);
+                toCommunityScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(toCommunityScreen);
 
             }
 
@@ -203,11 +299,9 @@ public class TrulyFinalCreateRecipeOverviewFrag extends Fragment {
 
 
 
-        CommunityLesson addedLesson = new CommunityLesson(recipeName, recipeName, recipeServeCount, recipeTime,
-                recipeDifficultyLevel, recipeKosher, loggedInUser.getUid(), recipeDescription );
 
-        refCommunityLessons =FBDB.getReference("Community Lessons");
-        refCommunityLessons.child(recipeName + " , " + loggedInUser.getUid() ).setValue(addedLesson);
+
+
 
     }
 }

@@ -33,6 +33,7 @@ public class TrulyFinalCreateRecipeViewStepsFrag extends Fragment implements Add
 
 
     String mode; //For deciding if this is opened in the make steps screen of create recipe, or the finish screen
+    boolean isIntro; //For deciding if this frag is opened in the intro screen;
 
     //for making steps screen
     StepsViewModel stepsViewModel;
@@ -52,7 +53,7 @@ public class TrulyFinalCreateRecipeViewStepsFrag extends Fragment implements Add
     }
 
 
-    public static TrulyFinalCreateRecipeViewStepsFrag newInstance(String param1, String param2) {
+    public static TrulyFinalCreateRecipeViewStepsFrag newInstance() {
         TrulyFinalCreateRecipeViewStepsFrag fragment = new TrulyFinalCreateRecipeViewStepsFrag();
         Bundle args = new Bundle();
         fragment.setArguments(args);

@@ -123,7 +123,8 @@
             android:backgroundTint="@color/orange"
             android:onClick="signIn"
             android:shadowColor="@color/gray"
-            android:text="Sign in" />
+            android:text="Sign in"
+            android:textColor="@color/white" />
 
         <Space
             android:layout_width="0dp"

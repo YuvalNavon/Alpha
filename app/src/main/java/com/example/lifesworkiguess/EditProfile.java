@@ -11,18 +11,20 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,6 +33,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 public class EditProfile extends AppCompatActivity {
 
@@ -43,6 +48,7 @@ public class EditProfile extends AppCompatActivity {
     EditText emailET,passwordET,usernameET;
     TextView emailErrorTV, passwordErrorTV, usernameErrorTV;
     ImageView PFPIV;
+    LinearLayout layout;
 
     Uri selectedImageUri;
 
@@ -57,8 +63,6 @@ public class EditProfile extends AppCompatActivity {
 
 
         FBDB = FirebaseDatabase.getInstance("https://cookproject-ac2c0-default-rtdb.europe-west1.firebasedatabase.app");
-
-
 
         fAuth = FirebaseAuth.getInstance();
         loggedInUser = fAuth.getCurrentUser();
@@ -383,6 +387,31 @@ public class EditProfile extends AppCompatActivity {
 
     }
 
+    public void disableClickableViews(View view) {
+        if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                View child = viewGroup.getChildAt(i);
+                disableClickableViews(child);
+            }
+        } else {
+            view.setEnabled(false);
+        }
+    }
+
+    public void enableClickableViews(View view) {
+        if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                View child = viewGroup.getChildAt(i);
+                enableClickableViews(child);
+            }
+        } else {
+            view.setEnabled(true);
+        }
+    }
+
+
     public void save(int mode){
         String email = emailET.getText().toString();
         String password = passwordET.getText().toString();
@@ -529,6 +558,10 @@ public class EditProfile extends AppCompatActivity {
     }
 
     public void save2(int mode){
+
+        View rootView = findViewById(R.id.EditProfileLL);
+        disableClickableViews(rootView);
+
         String email = emailET.getText().toString();
         String password = passwordET.getText().toString();
         String username = usernameET.getText().toString();
@@ -584,31 +617,54 @@ public class EditProfile extends AppCompatActivity {
                                                                         editor.commit();
 
 
-                                                                        if (PFPChanged) myServices.uploadProfilePhotoToFirebase(EditProfile.this, selectedImageUri);
+                                                                        if (PFPChanged) //This is myServices.uploadProfilePhotoToFirebase but i didnt use it bc
+                                                                            //i want the screen to change as soon as the image is uploaded
+                                                                        {
+                                                                            FirebaseStorage fStorage = FirebaseStorage.getInstance();
+                                                                            StorageReference fDownRef = fStorage.getReference("Users")
+                                                                                    .child(loggedInUser.getUid()).child(MyConstants.PROFILE_PICTURE);
+                                                                            fDownRef.putFile(selectedImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                                                @Override
+                                                                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                                                    Toast.makeText(EditProfile.this, "Photo Uploaded!", Toast.LENGTH_LONG).show();
+                                                                                    if (mode==MyConstants.EDIT_PFP_SCREEN_SAVE_MODE)
+                                                                                    {
+                                                                                        finish();
+                                                                                    }
 
+                                                                                    else if(mode==MyConstants.EDIT_PFP_SCREEN_SAVE_AND_CHANGE_COURSE_MODE)
+                                                                                    {
+                                                                                        makeCourseChangeDialog();
+                                                                                    }
+                                                                                }
 
-                                                                        Handler handler = new Handler();
-                                                                        handler.postDelayed(new Runnable() {
-                                                                            public void run() {
-                                                                                // Actions to do after 1.5 second
-                                                                               if (mode==MyConstants.EDIT_PFP_SCREEN_SAVE_MODE)
-                                                                               {
-                                                                                   finish();
-                                                                               }
+                                                                            });
+                                                                        }
 
-                                                                               else if(mode==MyConstants.EDIT_PFP_SCREEN_SAVE_AND_CHANGE_COURSE_MODE)
-                                                                               {
-                                                                                   makeCourseChangeDialog();
-                                                                               }
+                                                                        else
+                                                                        {
+                                                                            if (mode==MyConstants.EDIT_PFP_SCREEN_SAVE_MODE)
+                                                                            {
+                                                                                finish();
                                                                             }
-                                                                        }, 1500);
+
+                                                                            else if(mode==MyConstants.EDIT_PFP_SCREEN_SAVE_AND_CHANGE_COURSE_MODE)
+                                                                            {
+                                                                                makeCourseChangeDialog();
+                                                                            }
+                                                                        }
+
+
 
 
                                                                     }
 
                                                                     else
                                                                     {
-                                                                        Toast.makeText(EditProfile.this, "PASSWORD", Toast.LENGTH_SHORT).show();
+
+                                                                        View rootView = findViewById(R.id.EditProfileLL);
+                                                                        enableClickableViews(rootView);
+                                                                        Toast.makeText(EditProfile.this, task.getException().toString().substring(120), Toast.LENGTH_SHORT).show();
                                                                     }
                                                                 }
                                                             });
@@ -616,6 +672,9 @@ public class EditProfile extends AppCompatActivity {
 
                                                         else
                                                         {
+
+                                                            View rootView = findViewById(R.id.EditProfileLL);
+                                                            enableClickableViews(rootView);
                                                             Toast.makeText(EditProfile.this, "EMAIL", Toast.LENGTH_SHORT).show();
 
                                                         }
@@ -638,6 +697,10 @@ public class EditProfile extends AppCompatActivity {
 
                                     else
                                     {
+
+                                        View rootView = findViewById(R.id.EditProfileLL);
+                                        enableClickableViews(rootView);
+
                                         if (!noFieldsClear())
                                             Toast.makeText(EditProfile.this, "Please Fill all fields!", Toast.LENGTH_LONG).show();
 
@@ -654,6 +717,8 @@ public class EditProfile extends AppCompatActivity {
                                 else //Username ISN'T Available
                                 {
 
+                                    View rootView = findViewById(R.id.EditProfileLL);
+                                    enableClickableViews(rootView);
                                     Toast.makeText(EditProfile.this, USERNAME_ERROR_MESSAGE, Toast.LENGTH_LONG).show();
 
                                 }
@@ -664,6 +729,9 @@ public class EditProfile extends AppCompatActivity {
 
                     else  // Email ISN'T available
                     {
+
+                        View rootView = findViewById(R.id.EditProfileLL);
+                        enableClickableViews(rootView);
                         Toast.makeText(EditProfile.this, MyConstants.USED_EMAIL_ERROR_MESSAGE, Toast.LENGTH_SHORT).show();
 
                     }

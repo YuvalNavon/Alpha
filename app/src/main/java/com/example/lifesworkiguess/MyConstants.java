@@ -71,14 +71,41 @@ public class MyConstants {
     public static final String COMPLETED_COURSES_PLACEHOLDER = "PLACEHOLDER";
     public static final int COMPLETED_COURSES_PLACEHOLDER_INDEX = 0;
 
+    //For Intro Screen General
+    public static final String LESSON_INTRO_MODE_KEY = "Lesson Intro Key"; //THIS IS USED FOR ALL LESSON SCREENS!!
+    public static final int LESSON_INTRO_MODE_ERROR = 900;
+    public static final int PERMENANT_LESSON_INTRO = 1;
+    public static final int COMMUNITY_LESSON_INTRO = 2;
+
+    public static final String LESSON_TIME_KEY = "Lesson Time";
+    public static final String LESSON_DIFFICULTY_KEY = "Lesson Difficulty";
+    public static final String LESSON_KOSHER_KEY = "Lesson Kosher";
+    public static final String LESSON_SERVE_COUNT_KEY = "Lesson Serve Count";
+    public static final int NO_SERVE_COUNT_ERROR = 999;
+
+
     //for Intro Screen of PermanentLesson
     public static final int NO_LESSON_POSITION = -999;
     public static final String[] LESSON_POSITIONS = new String[]{"First", "Second", "Third", "Fourth","Fifth"};
+    public static final String PERMENANT_LESSON_RECIPE_TITLE_KEY = "Lesson Recipe Title";
+    public static final String PERMENANT_LESSON_RECIPE_IMAGE_URI_KEY = "Lesson Recipe Image Uri";
+
+    //for Intro Screen of CommunityLesson
+    public static final String LESSON_CREATOR_ID_KEY = "Creator ID";
+    public static final String LESSON_CREATOR_USERNAME_KEY = "Creator Username";
+    public static final String LESSON_NAME_KEY = "Lesson Name";
+    public static final String COMMUNITY_LESSON_DESCRIPTION_KEY = "Lesson Description";
+    public static final String COMMUNITY_LESSON_NUMBER_KEY = "Lesson Number";
+    public static final int NO_COMMUNITY_LESSON_NUMBER_ERROR = 999;
 
 
     //for Actual LessonScreen
     public static final String CURRENTLY_LEARNED_RECIPE = "Current Recipe.xml";
 
+    //For LessonFinished Screen
+        //For CommunityLesson
+    public static final String NO_RATING_FOR_COMMUNITY_LESSON = "No Rating";
+    public static final String NO_REVIEW_FOR_COMMUNITY_LESSON = "No Review";
 
     //Community Dishes Options
     public static final String[] dishCatagoryNames = new String[]{"Pasta", "Chicken", "Sandwich", "Fish", "Salad", "Schnitzel", "Omelet", "Dessert"};
@@ -127,9 +154,16 @@ public class MyConstants {
     public static final String[] CUSTOM_RECIPE_TIME_MINUTE_OPTIONS_FOR_SPINNER = new String[]{"0", "5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60" };
     public static final String CUSTOM_RECIPE_NO_TIME_INPUTTED = "Recipe has no Time";
 
-    public static String CUSTOM_RECIPE_DIFFICULTY_EASY = "Easy";
-    public static String CUSTOM_RECIPE_DIFFICULTY_STANDARD = "Standard";
-    public static String CUSTOM_RECIPE_DIFFICULTY_HARD = "Hard";
+    public static final String CUSTOM_RECIPE_DIFFICULTY_EASY = "Easy";
+    public static final String CUSTOM_RECIPE_DIFFICULTY_STANDARD = "Standard";
+    public static final String CUSTOM_RECIPE_DIFFICULTY_HARD = "Hard";
 
+
+    // For Saving Recipe as XML on device (in preparation to upload) and File Name for Downloaded Recipes from Storage (Not their name in storage tho, thats the next string)
+    public static final String DOWNLOADED_RECIPE_NAME = "Downloaded Recipe.xml"; //This goes after the getFilesDir.getPath
+
+    //For Accessing Recipe from Storage
+    public static final String RECIPE_STORAGE_NAME = "Recipe";
+    public static final String RECIPE_IMAGE_STORAGE_NAME = "Recipe Image.jpg";
 
 }

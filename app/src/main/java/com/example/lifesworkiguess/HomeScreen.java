@@ -166,12 +166,16 @@ public class HomeScreen extends AppCompatActivity implements CustomViewHolder.On
     public void onItemClick(int position) {
 
         Toast.makeText(HomeScreen.this,"PRESSED " + selectedCourseGlobal.getLessonsList().get(position).getLessonName() , Toast.LENGTH_LONG ).show();
-        Intent toLessonIntro = new Intent(HomeScreen.this, LessonIntro.class);
+        Intent toLessonIntro = new Intent(HomeScreen.this, NewLessonIntro.class);
+
+        Lesson pickedLesson = selectedCourseGlobal.getLessonsList().get(position);
+        toLessonIntro.putExtra(MyConstants.LESSON_INTRO_MODE_KEY, MyConstants.PERMENANT_LESSON_INTRO);
         toLessonIntro.putExtra("Lesson Position - 1", position); // THE MINUS 1 is bc we need the indexes of the lessons in the list,
         // the first lesson is 0 in the list, the second is 1, and so on
         toLessonIntro.putExtra("Is Lesson Final", setLastLesson(selectedCourseGlobal, position));
         toLessonIntro.putExtra("Course Name", selectedCourseGlobal.getCourseName());
-        toLessonIntro.putExtra("Lesson Name", selectedCourseGlobal.getLessonsList().get(position).getLessonName());
+        toLessonIntro.putExtra("Lesson Name", pickedLesson.getLessonName());
+        toLessonIntro.putExtra(MyConstants.PERMENANT_LESSON_RECIPE_IMAGE_URI_KEY, pickedLesson.getLogoUri());
         startActivity(toLessonIntro);
 
 

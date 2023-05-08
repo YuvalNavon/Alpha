@@ -117,7 +117,7 @@ public class myServices {
         ArrayList<Ingredient> ingsList = new ArrayList<>();
         ArrayList<Step> stepsList = new ArrayList<>();
         if (isFileExists(context, fileName)) {
-            File file = new File(context.getExternalFilesDir("MyDir"), fileName);
+            File file = new File(context.getFilesDir(), fileName);
             try {
                 FileInputStream fis = new FileInputStream(file);
                 XmlPullParser parser = XmlPullParserFactory.newInstance().newPullParser();
@@ -284,7 +284,7 @@ public class myServices {
 
         // write dom document to a file
         try (FileOutputStream output =
-                     new FileOutputStream(context.getFilesDir().getPath() + "/"  + fileName + ".xml")) {
+                     new FileOutputStream(context.getFilesDir().getPath() + "/"  + MyConstants.DOWNLOADED_RECIPE_NAME)) {
             writeXml(doc, output);
         } catch (IOException e) {
             e.printStackTrace();
@@ -317,14 +317,16 @@ public class myServices {
 
     public static void uploadXML(Context context, String fileName){
 
-        StorageReference fStorage = FirebaseStorage.getInstance().getReference("Community Recipes");
+        FirebaseAuth fAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = fAuth.getCurrentUser();
+        StorageReference fStorage = FirebaseStorage.getInstance().getReference("Community Recipes").child(currentUser.getUid()).child(fileName);
         String filesDir = context.getFilesDir().getPath();
-        String XMLFilePath = filesDir + "/" + fileName + ".xml";
+        String XMLFilePath = filesDir + "/" + MyConstants.DOWNLOADED_RECIPE_NAME;
         File XMLFile = new File(XMLFilePath);
         Uri XMLUri = Uri.fromFile(XMLFile);
         if (XMLUri!=null){
 
-            StorageReference fRef = fStorage.child("Recipe For " + fileName + ".xml");
+            StorageReference fRef = fStorage.child(MyConstants.RECIPE_STORAGE_NAME);
 
             fRef.putFile(XMLUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -343,23 +345,38 @@ public class myServices {
 
 
     public static  void downloadXML(Context context, String fileName, String path){
-        //fileName MUST BE WITH THE EXTENSION
+
+        if (isFileExists(context, MyConstants.DOWNLOADED_RECIPE_NAME))
+        {
+            deleteFile(context, MyConstants.DOWNLOADED_RECIPE_NAME);
+        }
+        File downloadedRecipe = new File(context.getFilesDir(), MyConstants.DOWNLOADED_RECIPE_NAME);
+
+        //For NONE CUSTOM LESSONS, fileName MUST BE WITH THE EXTENSION
         StorageReference fStorage = FirebaseStorage.getInstance().getReference(path);
         StorageReference fileRef = fStorage.child(fileName);
-        fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                String strUrl = uri.toString();
-                Toast.makeText(context, "Downloading...", Toast.LENGTH_LONG).show();
-                downloadFiles(context, MyConstants.CURRENTLY_LEARNED_RECIPE,"MyDir" , strUrl);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(context, "Recipe Not Found!", Toast.LENGTH_LONG).show();
 
-            }
-        });
+        fileRef.getFile(downloadedRecipe)
+                .addOnSuccessListener(taskSnapshot -> {
+                })
+                .addOnFailureListener(exception -> {
+                    // File download failed
+                });
+//        fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//            @Override
+//            public void onSuccess(Uri uri) {
+//                String strUrl = uri.toString();
+////                downloadFiles(context, MyConstants.CURRENTLY_LEARNED_RECIPE,"MyDir" , strUrl);
+//
+//
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Toast.makeText(context, "Recipe Not Found!", Toast.LENGTH_LONG).show();
+//
+//            }
+//        });
     }
 
     public static void downloadFiles(Context context, String fileName, String destinationDirectory, String url){
@@ -380,14 +397,16 @@ public class myServices {
     public static boolean isFileExists(Context context, String filename){
 
 
-        File folder1 = new File(context.getExternalFilesDir("MyDir"), filename);
+//        File folder1 = new File(context.getExternalFilesDir("MyDir"), filename);
+        File folder1 = new File(context.getFilesDir(), filename);
         return folder1.exists();
 
     }
 
     public static boolean deleteFile(Context context, String filename) {
 
-        File folder1 = new File(context.getExternalFilesDir("MyDir"), filename);
+//        File folder1 = new File(context.getExternalFilesDir("MyDir"), filename);
+        File folder1 = new File(context.getFilesDir(), filename);
         return folder1.delete();
     }
 

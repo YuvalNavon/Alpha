@@ -125,7 +125,8 @@
             android:backgroundTint="@color/orange"
             android:onClick="finishSignUp"
             android:shadowColor="@color/gray"
-            android:text="Finish" />
+            android:text="Finish"
+            android:textColor="@color/white" />
 
         <Space
             android:layout_width="0dp"

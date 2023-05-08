@@ -48,6 +48,42 @@
             android:layout_height="0dp"
             android:layout_weight="0.3" />
 
+        <ImageView
+            android:id="@+id/LessonIntroRecipeIV"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ScrollView
+            android:id="@+id/LessonIntroDescriptionSV"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/LessonIntroDescriptionTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="TextView" />
+            </LinearLayout>
+        </ScrollView>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -179,41 +215,6 @@
             android:layout_height="0dp"
             android:layout_weight="0.1" />
 
-        <TextView
-            android:id="@+id/textView13"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text=" Ingredients"
-            android:textColor="@color/orange"
-            android:textSize="24sp" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.5" />
-
-        <ImageView
-            android:id="@+id/upArrowIV"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.5"
-            app:srcCompat="@android:drawable/arrow_up_float" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/ingredientsRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="7" />
-
-        <ImageView
-            android:id="@+id/downArrowIV"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.5"
-            app:srcCompat="@android:drawable/arrow_down_float" />
-
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -238,7 +239,8 @@
                 android:backgroundTint="@color/orange"
                 android:onClick="startLesson"
                 android:shadowColor="@color/gray"
-                android:text="Let's Go!" />
+                android:text="Let's Go!"
+                android:textColor="@color/white" />
 
             <Space
                 android:layout_width="0dp"

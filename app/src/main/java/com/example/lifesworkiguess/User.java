@@ -16,6 +16,7 @@ public class User {
     private ArrayList<ArrayList<String>> LessonsRating;
     private ArrayList<String> CompletedCourses;
     private ArrayList<String> UploadedRecipeNames;
+    private ArrayList<ArrayList<String>> FinishedCommunityLessons;
     private int FinishedCourse;
 
 
@@ -50,6 +51,8 @@ public class User {
         //completes their first course (see homescreen)
         FinishedCourse = MyConstants.NOT_FINISHED_COURSE;
         UploadedRecipeNames = new ArrayList<>();
+        this.FinishedCommunityLessons = new ArrayList<>();
+
 
 
     }
@@ -70,6 +73,8 @@ public class User {
         CompletedCourses = completedCourses;
         UploadedRecipeNames = new ArrayList<>();
         FinishedCourse = finishedCourse;
+        this.FinishedCommunityLessons = new ArrayList<>();
+
     }
 
     public User(String username, String password, String email, String cookingStyle, String experienceLevel, String selectedCourse, String hours, int finishedSetUp,
@@ -87,6 +92,26 @@ public class User {
         LessonsRating = lessonsRating;
         CompletedCourses = completedCourses;
         this.UploadedRecipeNames = uploadedRecipeNames;
+        FinishedCourse = finishedCourse;
+        this.FinishedCommunityLessons = new ArrayList<>();
+    }
+
+    public User(String username, String password, String email, String cookingStyle, String experienceLevel, String selectedCourse, String hours, int finishedSetUp,
+                ArrayList<Integer> lessonsStatus, ArrayList<ArrayList<String>> lessonsRating, ArrayList<String> completedCourses,
+                ArrayList<String> uploadedRecipeNames, ArrayList<ArrayList<String>> finishedCommunityLessons, int finishedCourse) {
+        Username = username;
+        Password = password;
+        Email = email;
+        CookingStyle = cookingStyle;
+        ExperienceLevel = experienceLevel;
+        SelectedCourse = selectedCourse;
+        Hours = hours;
+        FinishedSetUp = finishedSetUp;
+        LessonsStatus = lessonsStatus;
+        LessonsRating = lessonsRating;
+        CompletedCourses = completedCourses;
+        UploadedRecipeNames = uploadedRecipeNames;
+        FinishedCommunityLessons = finishedCommunityLessons;
         FinishedCourse = finishedCourse;
     }
 
@@ -136,6 +161,10 @@ public class User {
 
     public ArrayList<String> getUploadedRecipeNames() {
         return UploadedRecipeNames;
+    }
+
+    public ArrayList<ArrayList<String>> getFinishedCommunityLessons() {
+        return FinishedCommunityLessons;
     }
 
     public int getFinishedCourse() {
@@ -193,6 +222,10 @@ public class User {
         this.UploadedRecipeNames = uploadedRecipeNames;
     }
 
+    public void setFinishedCommunityLessons(ArrayList<ArrayList<String>> finishedCommunityLessons) {
+        FinishedCommunityLessons = finishedCommunityLessons;
+    }
+
     public void setFinishedCourse(int finishedCourse) {
         FinishedCourse = finishedCourse;
     }
@@ -212,15 +245,15 @@ public class User {
     }
 
 
-    public void rateLesson(String courseName, int lessonNumber, String rating){ //Only used for lessons as they are finished.
+    public void ratePermenantLesson(String courseName, int lessonNumber, String rating){ //Only used for lessons as they are finished.
         // once as a default value when the user finishes the  LessonScreenFrag (MyConstants.NOT_YET_RATED)
+        //NVM THE ABOVE LINE IS NO LONGER TRUE, I DONT DO IT ANYMORE
         // and another  when the user rates the lesson at the LessonFinished activity
 
         for (int i = 0; i<this.getLessonsRating().size(); i++){
             ArrayList<String> lessonsRating = this.getLessonsRating().get(i);
             if (lessonsRating.get(MyConstants.COURSE_NAME_POSITION_IN_LESSONS_RATINGS).equals(courseName))
             {
-                System.out.println("COURSE: " + lessonsRating.get(MyConstants.COURSE_NAME_POSITION_IN_LESSONS_RATINGS));
                 int coursePosition = i;
                 LessonsRating.get(coursePosition).set(lessonNumber+1, rating); //lessonPosition + 1 Because index 0 is reserved for the course name
                 // and lesson positions start from 0 too
@@ -229,6 +262,17 @@ public class User {
             }
 
         }
+    }
+
+
+    //The next 2 methods are for keeping the user's rating of the community lessons they completed,
+    // but they arent responsible for keeping the ratings on the lessons themselves in the firebase!
+    public void rateCommunityLesson(String creatorID, String lessonName, String rating){
+
+    }
+
+    public void rateCommunityLesson(String creatorID, String lessonName, String rating, String Review){
+
     }
 
     public float getRatingForHistory(String courseName, int positionofLesson){
@@ -267,6 +311,55 @@ public class User {
         if (UploadedRecipeNames== null)  UploadedRecipeNames = new ArrayList<>(); //Supposedly this condition should never be met as we initialize the list for every constructor
         //except the error one
         UploadedRecipeNames.add(recipeName);
+    }
+
+    public void addFinishedCommunityLesson(String creatorID, int lessonNumber){
+
+        //addedFinishedLesson FORMAT: [CREATOR ID, LESSON NUMBER (IN STRING), LESSON RATING, LESSON REVIEW]
+
+        //BY DEFAULT, NO RATING AND REVIEWS ARE RECEIVED HERE, THEY ARE SET IN THE ADD FINISHED COMMUNITY LESSON REVIEW METHOD
+        if (FinishedCommunityLessons == null) FinishedCommunityLessons = new ArrayList<>();
+
+        ArrayList<String>  addedFinishedLesson = new ArrayList<>();
+        addedFinishedLesson.add(creatorID);
+        addedFinishedLesson.add(Integer.toString(lessonNumber));
+        addedFinishedLesson.add(MyConstants.NO_RATING_FOR_COMMUNITY_LESSON);
+        addedFinishedLesson.add(MyConstants.NO_REVIEW_FOR_COMMUNITY_LESSON);
+        boolean finishedLessonBefore = false;
+        for (ArrayList<String> checkedFinishedLesson : FinishedCommunityLessons)
+        {
+            if (checkedFinishedLesson.get(0).equals(creatorID) && checkedFinishedLesson.get(1).equals(Integer.toString(lessonNumber)))
+                finishedLessonBefore = true;
+        }
+
+        if (!finishedLessonBefore)
+            FinishedCommunityLessons.add(addedFinishedLesson);
+    }
+
+    public void addFinishedCommunityLessonReview(ArrayList<String> reviewList)
+    {
+        //REVIEW LIST IS SAME FORMAT AS ADDED FINISHED LESSON:  [CREATOR ID, LESSON NUMBER (IN STRING), LESSON RATING, LESSON REVIEW]
+
+        //IF IM NOT MISTAKED - THIS METHOD COULD BE USED TO UPDATE REVIEWS FOR LESSONS PREVIOUSLY COMPLETED OR REVIEWS
+
+        if (FinishedCommunityLessons==null) FinishedCommunityLessons = new ArrayList<>();
+
+        boolean finishedLessonBefore = false;
+        int pos = 0;
+        for (ArrayList<String> checkedFinishedLesson : FinishedCommunityLessons)
+        {
+            if (checkedFinishedLesson.get(0).equals(reviewList.get(0)) && checkedFinishedLesson.get(1).equals(reviewList.get(1)))
+            {
+                finishedLessonBefore = true;
+                FinishedCommunityLessons.set(pos, reviewList); //EDITING REVIEW!!
+            }
+            pos+=1;
+
+        }
+
+        if (!finishedLessonBefore)
+            FinishedCommunityLessons.add(reviewList);
+
     }
 
     //INITIALIZATION OF LESSON NUMBERS AND STATUS (LessonsStatus) AND RATINGS (LessonRatings) ONLY OCCURS IN UsernameScreen due to firebase reasons

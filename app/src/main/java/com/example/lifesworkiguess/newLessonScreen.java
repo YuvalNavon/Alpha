@@ -15,8 +15,14 @@ import java.util.ArrayList;
 
 public class newLessonScreen extends AppCompatActivity {
 
-    String lessonName;
+    //For Permenant Lesson
     int lessonPosition;
+
+    //For Community Lesson
+    String creatorID, creatorUsername;
+
+    //For Both
+    String lessonName;
 
 
 
@@ -30,13 +36,31 @@ public class newLessonScreen extends AppCompatActivity {
         binding = ActivityNewLessonScreenBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        Intent getLessonName = getIntent();
-        lessonName = getLessonName.getStringExtra("Lesson Name");
-        lessonPosition = getLessonName.getIntExtra("Lesson Position in List", MyConstants.NO_LESSON_POSITION);
+        Intent getLessonDetails = getIntent();
 
+        int mode = getLessonDetails.getIntExtra(MyConstants.LESSON_INTRO_MODE_KEY, MyConstants.LESSON_INTRO_MODE_ERROR);
         Bundle intentDataForLessonFrag = new Bundle();
-        intentDataForLessonFrag.putString("Lesson Name",lessonName );
-        intentDataForLessonFrag.putInt("Lesson Position in List", lessonPosition);
+        intentDataForLessonFrag.putInt(MyConstants.LESSON_INTRO_MODE_KEY, mode);
+
+        if (mode == MyConstants.PERMENANT_LESSON_INTRO)
+        {
+            lessonName = getLessonDetails.getStringExtra("Lesson Name");
+            lessonPosition = getLessonDetails.getIntExtra("Lesson Position in List", MyConstants.NO_LESSON_POSITION);
+
+            intentDataForLessonFrag.putString("Lesson Name",lessonName );
+            intentDataForLessonFrag.putInt("Lesson Position in List", lessonPosition);
+        }
+
+        else if (mode == MyConstants.COMMUNITY_LESSON_INTRO)
+        {
+            lessonName = getLessonDetails.getStringExtra(MyConstants.LESSON_NAME_KEY);
+            creatorUsername = getLessonDetails.getStringExtra(MyConstants.LESSON_CREATOR_USERNAME_KEY);
+            creatorID = getLessonDetails.getStringExtra(MyConstants.LESSON_CREATOR_ID_KEY);
+
+            intentDataForLessonFrag.putString(MyConstants.LESSON_NAME_KEY, lessonName);
+            intentDataForLessonFrag.putString(MyConstants.LESSON_CREATOR_USERNAME_KEY, creatorUsername);
+            intentDataForLessonFrag.putString(MyConstants.LESSON_CREATOR_ID_KEY, creatorID);
+        }
 
         LessonScreenFrag lessonScreenFrag = new LessonScreenFrag();
         lessonScreenFrag.setArguments(intentDataForLessonFrag);

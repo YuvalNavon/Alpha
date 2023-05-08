@@ -26,7 +26,7 @@
             android:id="@+id/textView42"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.2"
+            android:layout_weight="1"
             android:gravity="center|left"
             android:text="Enjoy the menu!"
             android:textSize="20sp" />
@@ -35,12 +35,18 @@
             android:id="@+id/catagoryDishesRV"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="2" />
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="0.3" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/CommunityLessonsRV"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="5" />
 
         <Button
             android:id="@+id/button27"

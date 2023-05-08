@@ -15,4 +15,5 @@
     <string name="title_activity_truly_final_create_recipe_finish_screen">
         TrulyFinalCreateRecipeFinishScreen
     </string>
+    <string name="title_activity_new_lesson_intro">NewLessonIntro</string>
 </resources>

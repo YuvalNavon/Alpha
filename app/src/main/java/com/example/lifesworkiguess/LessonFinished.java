@@ -18,8 +18,12 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.widget.ScrollView;
+import android.widget.Space;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -45,11 +49,27 @@ public class LessonFinished extends AppCompatActivity {
     Uri photoURI;
     ImageView dishPhotoIV;
     RatingBar ratingBar;
+    TextView reviewTV, ratingMessageTV;
+    ScrollView reviewSV;
+    EditText reviewET;
+    Space reviewSpace;
 
-    String currentPhotoPath, lessonName;
+    String currentPhotoPath;
     boolean dishHasPhoto;
 
+    //For Permanent Lesson
     int lessonPosition;
+
+    //For Community Lesson
+    String creatorID;
+    int lessonNumber;
+    DatabaseReference refCommunityLessons;
+    ValueEventListener communityLessonGetter;
+
+    //For Both
+    int mode;
+    String lessonName;
+
 
     FirebaseAuth fAuth;
     FirebaseUser loggedInUser;
@@ -67,13 +87,46 @@ public class LessonFinished extends AppCompatActivity {
         dishHasPhoto = false;
 
         dishPhotoIV = findViewById(R.id.dishPhotoIV);
+
+        ratingMessageTV = findViewById(R.id.LessonFinishedRatingMessageTV);
         ratingBar = findViewById(R.id.ratingBar);
         ratingBar.setNumStars(5);
         ratingBar.setRating(3);
 
+        reviewTV = findViewById(R.id.LessonFinishedReviewTV);
+        reviewSV = findViewById(R.id.LessonFinishedReviewSV);
+        reviewET = findViewById(R.id.LessonFinishedReviewET);
+        reviewET.setMinLines(1);
+        reviewET.setMaxLines(Integer.MAX_VALUE);
+        reviewSpace = findViewById(R.id.LessonFinishedReviewSpace1);
+
+
+
         Intent gi = getIntent();
-        lessonPosition = gi.getIntExtra("Lesson Position in List", MyConstants.NO_LESSON_POSITION);
-        lessonName = gi.getStringExtra("Lesson Name");
+
+        mode = gi.getIntExtra(MyConstants.LESSON_INTRO_MODE_KEY, MyConstants.LESSON_INTRO_MODE_ERROR);
+
+        if (mode == MyConstants.PERMENANT_LESSON_INTRO)
+        {
+            lessonPosition = gi.getIntExtra("Lesson Position in List", MyConstants.NO_LESSON_POSITION);
+            lessonName = gi.getStringExtra("Lesson Name");
+            ratingMessageTV.setText("Rate how your Dish turned out!");
+            reviewTV.setVisibility(View.GONE);
+            reviewSV.setVisibility(View.GONE);
+            reviewSpace.setVisibility(View.GONE);
+        }
+
+        else if (mode == MyConstants.COMMUNITY_LESSON_INTRO)
+        {
+
+            lessonName = gi.getStringExtra(MyConstants.LESSON_NAME_KEY);
+            creatorID = gi.getStringExtra(MyConstants.LESSON_CREATOR_ID_KEY);
+            lessonNumber = gi.getIntExtra(MyConstants.COMMUNITY_LESSON_NUMBER_KEY, MyConstants.NO_COMMUNITY_LESSON_NUMBER_ERROR);
+            ratingMessageTV.setText("Rate This Recipe!");
+
+
+        }
+
 
 
 
@@ -84,6 +137,7 @@ public class LessonFinished extends AppCompatActivity {
 
         super.onPause();
         if (refUsers!=null && lessonRater!=null) refUsers.removeEventListener(lessonRater);
+        if (refCommunityLessons!=null && communityLessonGetter!=null) refCommunityLessons.removeEventListener(communityLessonGetter);
 
     }
 
@@ -92,7 +146,9 @@ public class LessonFinished extends AppCompatActivity {
     protected void onResume() {
 
         super.onResume();
-        if (refUsers!=null && lessonRater!=null) refUsers.addValueEventListener(lessonRater);
+        if (refUsers!=null && lessonRater!=null) refUsers.addListenerForSingleValueEvent(lessonRater);
+        if (refCommunityLessons!=null && communityLessonGetter!=null) refCommunityLessons.addListenerForSingleValueEvent(communityLessonGetter);
+
 
     }
 
@@ -100,6 +156,8 @@ public class LessonFinished extends AppCompatActivity {
 
         super.onDestroy();
         if (refUsers!=null && lessonRater!=null) refUsers.removeEventListener(lessonRater);
+        if (refCommunityLessons!=null && communityLessonGetter!=null) refCommunityLessons.removeEventListener(communityLessonGetter);
+
 
     }
 
@@ -194,38 +252,136 @@ public class LessonFinished extends AppCompatActivity {
                 User currentlyLoggedInUser = snapshot.getValue(User.class);
                 float userRating = ratingBar.getRating();
                 String userRatingSTR = String.valueOf(userRating);
-                currentlyLoggedInUser.rateLesson(currentlyLoggedInUser.getSelectedCourse(), lessonPosition, userRatingSTR);
-                refUsers.setValue(currentlyLoggedInUser, new DatabaseReference.CompletionListener() {
-                    //FIRST AND ONLY USE OF ON COMPLETE LISTENER WHEN UPDATING AN ITEM IN DATABASE, NOT REALLY NECESSARY ANYMORE BUT NO NEED TO CHANGE
-                    @Override
-                    public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
-                        if (error== null){
-                            if (dishHasPhoto) {
-                                fDownRef = FirebaseStorage.getInstance().getReference().child("Users").child(loggedInUser.getUid()).
-                                        child("Courses").child(currentlyLoggedInUser.getSelectedCourse()).child(lessonName);
-                                fDownRef.putFile(photoURI).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                        Toast.makeText(LessonFinished.this, "Photo Uploaded!", Toast.LENGTH_LONG).show();
+                if (mode == MyConstants.PERMENANT_LESSON_INTRO)
+                {
+                    currentlyLoggedInUser.ratePermenantLesson(currentlyLoggedInUser.getSelectedCourse(), lessonPosition, userRatingSTR);
+                    refUsers.setValue(currentlyLoggedInUser, new DatabaseReference.CompletionListener() {
+                        //FIRST AND ONLY USE OF ON COMPLETE LISTENER WHEN UPDATING AN ITEM IN DATABASE, NOT REALLY NECESSARY ANYMORE BUT NO NEED TO CHANGE
+                        @Override
+                        public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                            if (error== null){
+                                if (dishHasPhoto) {
+                                    fDownRef = FirebaseStorage.getInstance().getReference().child("Users").child(loggedInUser.getUid()).
+                                            child("Courses").child(currentlyLoggedInUser.getSelectedCourse()).child(lessonName);
+                                    fDownRef.putFile(photoURI).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                            Toast.makeText(LessonFinished.this, "Photo Uploaded!", Toast.LENGTH_LONG).show();
 
-                                    }
-                                });
+                                        }
+                                    });
+
+                                }
+
+
+                                Intent toHomeScreen = new Intent(LessonFinished.this, HomeScreen.class);
+                                toHomeScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(toHomeScreen);
+                                finish();
 
                             }
-
-
-                            Intent toHomeScreen = new Intent(LessonFinished.this, HomeScreen.class);
-                            toHomeScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(toHomeScreen);
-                            finish();
+                            else{
+                                Toast.makeText(LessonFinished.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                            }
 
                         }
-                        else{
-                            Toast.makeText(LessonFinished.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                    });
+                }
+
+                else if (mode == MyConstants.COMMUNITY_LESSON_INTRO)
+                {
+
+                    String review = reviewET.getText().toString();
+                    float rating = ratingBar.getRating();
+
+                    //Adding the rating to the Community lesson itself
+                    ArrayList<String> reviewListForLesson= new ArrayList<>();
+
+                    reviewListForLesson.add(loggedInUser.getUid());
+
+                    if (rating!=0) reviewListForLesson.add(Float.toString(rating));
+                    else reviewListForLesson.add(MyConstants.NO_RATING_FOR_COMMUNITY_LESSON);
+
+                    if (review!=null && !review.isEmpty())  reviewListForLesson.add(review);
+                    else reviewListForLesson.add(MyConstants.NO_REVIEW_FOR_COMMUNITY_LESSON);
+
+                    refCommunityLessons = FBDB.getReference("Community Lessons").child(creatorID + " , " + lessonNumber);
+                    communityLessonGetter = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                            CommunityLesson finishedLesson = snapshot.getValue(CommunityLesson.class);
+
+                            finishedLesson.addReview(reviewListForLesson);
+                            refCommunityLessons.setValue(finishedLesson).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+
+                                    //Adding the Review to the User's finished lessons Review;
+
+                                    ArrayList<String> reviewListForUser = new ArrayList<>();
+
+                                    reviewListForUser.add(creatorID);
+
+                                    reviewListForUser.add(Integer.toString(lessonNumber));
+
+                                    if (rating!=0) reviewListForUser.add(Float.toString(rating));
+                                    else reviewListForUser.add(MyConstants.NO_RATING_FOR_COMMUNITY_LESSON);
+
+                                    if (review!=null && !review.isEmpty())  reviewListForUser.add(review);
+                                    else reviewListForUser.add(MyConstants.NO_REVIEW_FOR_COMMUNITY_LESSON);
+
+                                    currentlyLoggedInUser.addFinishedCommunityLessonReview(reviewListForUser);
+                                    refUsers.setValue(currentlyLoggedInUser, new DatabaseReference.CompletionListener() {
+                                        //FIRST AND ONLY USE OF ON COMPLETE LISTENER WHEN UPDATING AN ITEM IN DATABASE, NOT REALLY NECESSARY ANYMORE BUT NO NEED TO CHANGE
+                                        @Override
+                                        public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                                            if (error== null){
+                                                if (dishHasPhoto) {
+                                                    fDownRef = FirebaseStorage.getInstance().getReference().child("Users").child(loggedInUser.getUid()).
+                                                            child("Community Lessons").child(creatorID).child(Integer.toString(lessonNumber));
+                                                    fDownRef.putFile(photoURI).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                        @Override
+                                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                            Toast.makeText(LessonFinished.this, "Photo Uploaded!", Toast.LENGTH_LONG).show();
+
+                                                        }
+                                                    });
+
+                                                }
+
+
+                                                Intent toHomeScreen = new Intent(LessonFinished.this, CommunityScreen.class);
+                                                toHomeScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                startActivity(toHomeScreen);
+                                                finish();
+
+                                            }
+                                            else{
+                                                Toast.makeText(LessonFinished.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                                            }
+
+                                        }
+                                    });
+                                }
+                            });
+
+
+
                         }
 
-                    }
-                });
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    };
+                    refCommunityLessons.addListenerForSingleValueEvent(communityLessonGetter);
+
+
+
+
+                }
+
 
 
             }

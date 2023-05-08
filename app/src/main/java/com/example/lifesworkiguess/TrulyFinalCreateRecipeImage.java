@@ -139,6 +139,8 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
         intent.setType("image/*");
         startActivityForResult(intent, MyConstants.REQUEST_CODE_OPEN_DOCUMENT);
     }
+
+
     // this function is triggered when user
     // selects the image from the imageChooser
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -154,9 +156,27 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
             recipeImageUri = data.getData();
             if (null != recipeImageUri) {
 
-                    recipeImage.setImageURI(recipeImageUri);
+                recipeImage.setImageURI(recipeImageUri);
 
-                }
+//                try
+//                {
+//                    if (myServices.isFileExists(this, MyConstants.IMAGE_FILE_NAME))
+//                        myServices.deleteFile(this, MyConstants.IMAGE_FILE_NAME);
+//
+//                    Bitmap imageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), recipeImageUri);
+//                    File file = new File(getFilesDir(), MyConstants.IMAGE_FILE_NAME);
+//                    FileOutputStream out = new FileOutputStream(file);
+//                    imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+//                    out.flush();
+//                    out.close();
+//                }
+//
+//                catch (Exception e)
+//                {
+//                    e.printStackTrace();
+//                }
+
+            }
             else Toast.makeText(this, "Error, File was not selected", Toast.LENGTH_LONG).show();
 
 
@@ -173,6 +193,20 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
 
                 File f = new File(currentPhotoPath);
                 recipeImage.setImageURI(Uri.fromFile(f));
+
+//                Bundle extras = data.getExtras();
+//                Bitmap imageBitmap = (Bitmap) extras.get("data");
+//                try {
+//                    if (myServices.isFileExists(this, MyConstants.IMAGE_FILE_NAME))
+//                        myServices.deleteFile(this, MyConstants.IMAGE_FILE_NAME);
+//                    File file = new File(getFilesDir(), MyConstants.IMAGE_FILE_NAME);
+//                    FileOutputStream out = new FileOutputStream(file);
+//                    imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+//                    out.flush();
+//                    out.close();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
             }
         }
     }
@@ -244,8 +278,17 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
         }
     }
 
+
+
     //BACK TO NORMAL
     public void next(View view){
+
+        if (recipeImageUri !=null){
+
+            saveRecipeImage();
+
+        }
+
         Intent toAddRecipeIngredients = new Intent(this, TrulyFinalCreateRecipeIngredients.class);
         toAddRecipeIngredients.putExtra("Previous Activity", MyConstants.NOT_FROM_FINISH_SCREEN);
 
