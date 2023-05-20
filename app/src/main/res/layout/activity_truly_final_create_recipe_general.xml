@@ -79,7 +79,7 @@
             android:ems="10"
             android:gravity="center|left"
             android:hint="Description"
-            android:inputType="textPersonName" />
+            android:inputType="textMultiLine" />
 
         <Space
             android:layout_width="match_parent"

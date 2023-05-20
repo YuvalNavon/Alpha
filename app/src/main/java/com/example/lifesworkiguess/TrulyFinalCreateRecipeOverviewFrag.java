@@ -233,21 +233,7 @@ public class TrulyFinalCreateRecipeOverviewFrag extends Fragment {
 
                 //Adding the Recipe to the CompletedLessons branch of the Database
                 CommunityLesson  addedLesson = new CommunityLesson(recipeName, recipeName, recipeServeCount, recipeTime,
-                        recipeDifficultyLevel, recipeKosher, loggedInUser.getUid(), recipeDescription );
-
-                //Checking if the lesson has a photo
-                File selectedRecipeImageFile = new File(getContext().getFilesDir(), MyConstants.IMAGE_FILE_NAME);
-                Uri selectedRecipeImageFileURI;
-                if (myServices.isFileExists(context, MyConstants.IMAGE_FILE_NAME))
-                {
-                    selectedRecipeImageFileURI = Uri.fromFile(selectedRecipeImageFile);
-                    if (selectedRecipeImageFileURI!=null)
-                    {
-                        addedLesson = new CommunityLesson(recipeName, recipeName, recipeServeCount, recipeTime,
-                                recipeDifficultyLevel, recipeKosher, loggedInUser.getUid(), recipeDescription);
-                    }
-                }
-
+                        recipeDifficultyLevel, recipeKosher, loggedInUser.getUid(), recipeDescription, currentUser.getUploadedRecipeNames().size()-1 );
 
 
                 refCommunityLessons =FBDB.getReference("Community Lessons");
@@ -258,6 +244,15 @@ public class TrulyFinalCreateRecipeOverviewFrag extends Fragment {
                 Recipe addedRecipe = new Recipe(recipeName, ingredientsList, stepsList);
                 recipeToXML(context, addedRecipe, MyConstants.DOWNLOADED_RECIPE_NAME);
                 uploadXML(context,  recipeName);
+
+
+                //Checking if the lesson has a photo
+                File selectedRecipeImageFile = new File(getContext().getFilesDir(), MyConstants.IMAGE_FILE_NAME);
+
+                //Default no Photo
+                int resourceId = getResources().getIdentifier("add_dish_photo", "drawable", getContext().getPackageName());
+                Uri selectedRecipeImageFileURI = Uri.parse("android.resource://" + getContext().getPackageName() + "/" + resourceId);
+
 
                 //Uploading the RecipeImage to the FirebaseStorage
                 if (myServices.isFileExists(context , MyConstants.IMAGE_FILE_NAME))

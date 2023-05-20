@@ -22,6 +22,7 @@ public class MyConstants {
     public static final int SELECT_PICTURE = 1;
     public static final int REQUEST_CODE_OPEN_DOCUMENT = 2;
     public static final String IMAGE_FILE_NAME = "selected_image.jpg";
+    public static final String NO_IMAGE_FILE_NAME = "no image.jpg";
 
     //for Taking Pictures With Camera
     public static final int  CAMERA_PERM_CODE = 101;
@@ -101,6 +102,9 @@ public class MyConstants {
 
     //for Actual LessonScreen
     public static final String CURRENTLY_LEARNED_RECIPE = "Current Recipe.xml";
+    public static final String VIEW_STEP_MODE_KEY = "View Step Mode";
+    public static final String FROM_CREATING_RECIPE = "From Creating Recipe";
+    public static final String FROM_LESSON_INTRO = "From Lesson Intro";
 
     //For LessonFinished Screen
         //For CommunityLesson
@@ -138,6 +142,11 @@ public class MyConstants {
     public static final String CUSTOM_RECIPE_STEPS_VIEW_MODE = "Steps View Mode";
     public static final String CUSTOM_RECIPE_VIEW_STEPS_FINISH = "Finish";
     public static final String CUSTOM_RECIPE_VIEW_STEPS_DURING_MAKING = "Making";
+    public static final String STEP_NUMBER_KEY = "Step Number";
+    public static final String STEP_NAME_KEY = "Step Name";
+    public static final String STEP_DESCRIPTION_KEY = "Step Description";
+    public static final String STEP_TIME_KEY = "Step Time";
+
 
 
     //Extra Info

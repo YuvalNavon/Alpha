@@ -74,6 +74,11 @@ public class CommunityScreen extends AppCompatActivity implements CommunityDishe
             recipeImageFile.delete();
         }
 
+        File recipeNoImageFile = new File(getFilesDir(), MyConstants.NO_IMAGE_FILE_NAME);
+        if (recipeNoImageFile.exists()) {
+            recipeNoImageFile.delete();
+        }
+
         //Ingredients, Steps and Extra Info
         SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
         SharedPreferences.Editor editor=settings.edit();

@@ -62,7 +62,6 @@ public class NewLessonIntro extends AppCompatActivity {
         overviewBundle = new Bundle();
         ingredientsBundle = new Bundle();
         stepsBundle = new Bundle();
-        stepsBundle.putString(MyConstants.CUSTOM_RECIPE_STEPS_VIEW_MODE, MyConstants.CUSTOM_RECIPE_VIEW_STEPS_FINISH);
 
         getLessonData = getIntent();
         int fromHomeOrCommunity = getLessonData.getIntExtra(MyConstants.LESSON_INTRO_MODE_KEY, MyConstants.LESSON_INTRO_MODE_ERROR);
@@ -100,9 +99,7 @@ public class NewLessonIntro extends AppCompatActivity {
         overviewFrag.setArguments(overviewBundle);
 
         //Ingredients
-        TrulyFinalCreateRecipeViewIngredientsFrag viewIngredientsFrag = new TrulyFinalCreateRecipeViewIngredientsFrag();
-        viewIngredientsFrag.setArguments(ingredientsBundle);
-
+        IngredientsListFrag viewIngredientsFrag = new IngredientsListFrag();
 
         ArrayList<Fragment> fragmentList = new ArrayList<>();
         fragmentList.add(overviewFrag);
@@ -291,6 +288,7 @@ public class NewLessonIntro extends AppCompatActivity {
 
         Gson gson = new Gson();
         String jsonOfSteps = gson.toJson(stepsInStringLists);
+        stepsBundle.putString(MyConstants.CUSTOM_RECIPE_STEPS_VIEW_MODE, MyConstants.CUSTOM_RECIPE_VIEW_STEPS_FINISH);
         stepsBundle.putString(MyConstants.CUSTOM_RECIPE_STEPS, jsonOfSteps);
     }
 

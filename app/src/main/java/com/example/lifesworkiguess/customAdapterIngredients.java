@@ -41,6 +41,12 @@ public class customAdapterIngredients  extends RecyclerView.Adapter<CustomViewHo
         holder.ingredientAmountandUnits.setText(ingredientAmount + " " + ingredientUnits);
     }
 
+    public void removeItem(int position) {
+        ingredients.remove(position);
+        notifyItemRemoved(position);
+    }
+
+
     @Override
     public int getItemCount() {
         return ingredients.size();

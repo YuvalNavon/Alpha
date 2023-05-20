@@ -38,7 +38,22 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
-        android:windowSoftInputMode="adjustNothing">
+        android:windowSoftInputMode="adjustPan">
+        <activity
+            android:name=".SingleStepScreen"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".MadeCommunityLessonsList"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
         <activity
             android:name=".NewLessonIntro"
             android:exported="false"
@@ -60,7 +75,7 @@
         <activity
             android:name=".TrulyFinalCreateRecipeExtraInfo"
             android:exported="false"
-            android:windowSoftInputMode="adjustNothing">
+            android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -132,8 +147,8 @@
         </activity>
         <activity
             android:name=".LessonFinished"
-            android:windowSoftInputMode="adjustPan"
-            android:exported="false">
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -13,8 +14,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ScrollView;
+import android.widget.Space;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -48,6 +51,7 @@ public class NewLessonIntroOverviewFrag extends Fragment {
     ImageView recipeIV, kosherIV;
     Button startBTN;
     ScrollView descriptionSV;
+    Space spaceBetweenRecipeIVAndDescription;
 
     public NewLessonIntroOverviewFrag() {
         // Required empty public constructor
@@ -115,6 +119,8 @@ public class NewLessonIntroOverviewFrag extends Fragment {
         descriptionSV = view.findViewById(R.id.LessonIntroDescriptionSV);
         descriptionTV = view.findViewById(R.id.LessonIntroDescriptionTV);
         startBTN = view.findViewById(R.id.startLessonBTN);
+        spaceBetweenRecipeIVAndDescription = view.findViewById(R.id.LessonIntro_Space);
+
 
 
         if (mode == MyConstants.PERMENANT_LESSON_INTRO)
@@ -165,9 +171,15 @@ public class NewLessonIntroOverviewFrag extends Fragment {
 
             }
         });
+        fDownRef.getBytes(MAXBYTES).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                recipeIV.setImageResource(R.drawable.add_dish_photo);
 
-        descriptionTV.setVisibility(View.GONE);
+            }
+        });
         descriptionSV.setVisibility(View.GONE);
+        spaceBetweenRecipeIVAndDescription.setVisibility(View.GONE);
 
     }
 
@@ -209,6 +221,7 @@ public class NewLessonIntroOverviewFrag extends Fragment {
         Intent toLessonScreen = new Intent(getContext(), newLessonScreen.class);
 
         toLessonScreen.putExtra(MyConstants.LESSON_INTRO_MODE_KEY, mode);
+        toLessonScreen.putExtra(MyConstants.VIEW_STEP_MODE_KEY, MyConstants.FROM_LESSON_INTRO);
 
         if (mode == MyConstants.PERMENANT_LESSON_INTRO)
         {

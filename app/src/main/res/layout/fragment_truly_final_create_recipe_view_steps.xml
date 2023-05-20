@@ -38,7 +38,7 @@
                 android:textSize="34sp" />
 
             <TextView
-                android:id="@+id/textView61"
+                android:id="@+id/ViewStepsFrag_MessageTV"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"

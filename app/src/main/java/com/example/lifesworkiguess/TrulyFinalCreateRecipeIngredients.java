@@ -1,16 +1,23 @@
 package com.example.lifesworkiguess;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -35,6 +42,8 @@ public class TrulyFinalCreateRecipeIngredients extends AppCompatActivity {
     ArrayList<Ingredient> ingredientsList;
     ArrayList<String[]> ingredientsInStringLists;
     RecyclerView ingredientsRV;
+    ImageView upArrowIV, downArrowIV;
+
 
 
     @Override
@@ -49,6 +58,11 @@ public class TrulyFinalCreateRecipeIngredients extends AppCompatActivity {
         ingredientUnitsET = findViewById(R.id.ingredientUnitsCreateRecipe);
         ingredientsRV = findViewById(R.id.ingredientsRVCreateRecipeIngredients);
 
+        upArrowIV = findViewById(R.id.CR_ING_UpArrowIV);
+        downArrowIV = findViewById(R.id.CR_ING_DownArrowIV);
+        upArrowIV.setVisibility(View.INVISIBLE);
+        downArrowIV.setVisibility(View.INVISIBLE);
+
         ingredientsList = new ArrayList<>();
         ingredientsInStringLists = new ArrayList<>();
 
@@ -56,6 +70,8 @@ public class TrulyFinalCreateRecipeIngredients extends AppCompatActivity {
         SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
         String jsonOfIngredients = settings.getString(MyConstants.CUSTOM_RECIPE_INGREDIENTS, null);
         if (jsonOfIngredients!=null){
+            upArrowIV.setVisibility(View.VISIBLE);
+            downArrowIV.setVisibility(View.VISIBLE);
             Gson gson = new Gson();
             Type type = new TypeToken<ArrayList<String[]>>(){}.getType();
             ingredientsInStringLists = gson.fromJson(jsonOfIngredients, type);
@@ -90,6 +106,7 @@ public class TrulyFinalCreateRecipeIngredients extends AppCompatActivity {
     public void onDestroy() {
 
         super.onDestroy();
+        ingredientsListToStringLists(ingredientsList); //Updating ingredientsInStringLists if the user swiped items
         //The added Ingredients ArrayLists of String are deleted when the user finishes the recipe, either by uploading it or by going back to the community screen
         if (!ingredientsInStringLists.isEmpty()){
 
@@ -103,6 +120,7 @@ public class TrulyFinalCreateRecipeIngredients extends AppCompatActivity {
     public void saveCurrentlyAddedIngredients(){
 
         //The added Ingredients ArrayLists of String are deleted when the user finishes the recipe, either by uploading it or by going back to the community screen
+
 
         Gson gson = new Gson();
         String jsonOfIngredients = gson.toJson(ingredientsInStringLists);
@@ -129,23 +147,55 @@ public class TrulyFinalCreateRecipeIngredients extends AppCompatActivity {
 
             makeRecyclerView();
 
+            ingredientNameET.setText("");
+            ingredientAmountET.setText("");
+            ingredientUnitsET.setText("");
+
         }
+
+        else
+        {
+            Toast.makeText(this, "Please fill ALL fields!", Toast.LENGTH_SHORT).show();
+        }
+
+        //Removing Keyboard
+        View focusedView = getCurrentFocus();
+        if (focusedView != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(focusedView.getWindowToken(), InputMethodManager.SHOW_FORCED);
+            focusedView.clearFocus();
+        }
+
+
     }
 
     public void addIngredientToStringLists(Ingredient ingredient){
-//        ArrayList<String> addedIngredientList = new ArrayList<>();
-//        addedIngredientList.add(ingredient.getName());
-//        addedIngredientList.add(ingredient.getAmount());
-//        addedIngredientList.add(ingredient.getUnits());
 
         String[] addedIngredientList = new String[]{ingredient.getName(), ingredient.getAmount(), ingredient.getUnits()};
 
         ingredientsInStringLists.add(addedIngredientList);
     }
 
+    public void ingredientsListToStringLists(ArrayList<Ingredient> ingredients){
+
+        ingredientsInStringLists = new ArrayList<>();
+
+        for (Ingredient ingredient: ingredients)
+        {
+            String[] addedIngredientList = new String[]{ingredient.getName(), ingredient.getAmount(), ingredient.getUnits()};
+            ingredientsInStringLists.add(addedIngredientList);
+
+        }
+    }
+
+
+
 
 
     public void makeRecyclerView(){
+
+        upArrowIV.setVisibility(View.VISIBLE);
+        downArrowIV.setVisibility(View.VISIBLE);
 
         // Create an instance of your adapter
         customAdapterIngredients adapter = new customAdapterIngredients(this, ingredientsList);
@@ -157,6 +207,30 @@ public class TrulyFinalCreateRecipeIngredients extends AppCompatActivity {
 
         // Set the adapter for the RecyclerView
         ingredientsRV.setAdapter(adapter);
+        ingredientsRV.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (!recyclerView.canScrollVertically(-1)) {
+                    // Cannot scroll up
+                    upArrowIV.setVisibility(View.INVISIBLE);
+                } else {
+                    // Can scroll up
+                    upArrowIV.setVisibility(View.VISIBLE);
+                }
+                if (!recyclerView.canScrollVertically(1)) {
+                    // Cannot scroll down
+                    downArrowIV.setVisibility(View.INVISIBLE);
+                } else {
+                    // Can scroll down
+                    downArrowIV.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        ItemTouchHelper.Callback callback = new AddedIngredientsSwipeCallback(adapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(ingredientsRV);
     }
 
     public void makeRecyclerViewForReopen(ArrayList<String[]> ingredientsInLists){
@@ -179,22 +253,95 @@ public class TrulyFinalCreateRecipeIngredients extends AppCompatActivity {
     }
 
     public void next(View view){
-        Intent toAddRecipeSteps = new Intent(this, TrulyFinalCreateRecipeStepsTabbed.class);
-        toAddRecipeSteps.putExtra("Previous Activity", MyConstants.NOT_FROM_FINISH_SCREEN);
 
-        //From General
-        toAddRecipeSteps.putExtra(MyConstants.CUSTOM_RECIPE_NAME, recipeName);
-        toAddRecipeSteps.putExtra(MyConstants.CUSTOM_RECIPE_DESCRIPTION, recipeDescription);
+        if (!ingredientsList.isEmpty())
+        {
+            ingredientName = ingredientNameET.getText().toString();
+            ingredientAmount = ingredientAmountET.getText().toString();
+            ingredientUnits = ingredientUnitsET.getText().toString();
+
+            if (!ingredientName.isEmpty() || !ingredientAmount.isEmpty() || !ingredientUnits.isEmpty())
+            {
+                AlertDialog.Builder midIngredientAddingDialogBuilder = new AlertDialog.Builder(TrulyFinalCreateRecipeIngredients.this);
+
+                midIngredientAddingDialogBuilder.setTitle("Ingredient Not Added");
+                midIngredientAddingDialogBuilder.setMessage("Would You like to Continue without Adding The Ingredient You're currently Writing?");
 
 
-        //From Image - Nothing
+                midIngredientAddingDialogBuilder.setNegativeButton("Back", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
 
-        //From This
-        Gson gson = new Gson();
-        String jsonOfIngredients = gson.toJson(ingredientsInStringLists);
-        toAddRecipeSteps.putExtra(MyConstants.CUSTOM_RECIPE_INGREDIENTS, jsonOfIngredients);
+                    }
+                });
 
-        startActivity(toAddRecipeSteps);
+                midIngredientAddingDialogBuilder.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent toAddRecipeSteps = new Intent(TrulyFinalCreateRecipeIngredients.this, TrulyFinalCreateRecipeStepsTabbed.class);
+                        toAddRecipeSteps.putExtra("Previous Activity", MyConstants.NOT_FROM_FINISH_SCREEN);
+
+                        //From General
+                        toAddRecipeSteps.putExtra(MyConstants.CUSTOM_RECIPE_NAME, recipeName);
+                        toAddRecipeSteps.putExtra(MyConstants.CUSTOM_RECIPE_DESCRIPTION, recipeDescription);
+
+
+                        //From Image - Nothing
+
+                        //From This
+                        Gson gson = new Gson();
+                        String jsonOfIngredients = gson.toJson(ingredientsInStringLists);
+                        toAddRecipeSteps.putExtra(MyConstants.CUSTOM_RECIPE_INGREDIENTS, jsonOfIngredients);
+
+                        startActivity(toAddRecipeSteps);
+                    }
+                });
+
+
+                AlertDialog midIngredientAddingDialog = midIngredientAddingDialogBuilder.create();
+                midIngredientAddingDialog.show();
+            }
+
+            else
+            {
+                Intent toAddRecipeSteps = new Intent(this, TrulyFinalCreateRecipeStepsTabbed.class);
+                toAddRecipeSteps.putExtra("Previous Activity", MyConstants.NOT_FROM_FINISH_SCREEN);
+
+                //From General
+                toAddRecipeSteps.putExtra(MyConstants.CUSTOM_RECIPE_NAME, recipeName);
+                toAddRecipeSteps.putExtra(MyConstants.CUSTOM_RECIPE_DESCRIPTION, recipeDescription);
+
+
+                //From Image - Nothing
+
+                //From This
+                Gson gson = new Gson();
+                String jsonOfIngredients = gson.toJson(ingredientsInStringLists);
+                toAddRecipeSteps.putExtra(MyConstants.CUSTOM_RECIPE_INGREDIENTS, jsonOfIngredients);
+
+                startActivity(toAddRecipeSteps);
+            }
+
+        }
+
+        else //No Ingredients added
+        {
+            AlertDialog.Builder noIngredientsDialogBuilder = new AlertDialog.Builder(TrulyFinalCreateRecipeIngredients.this);
+
+            noIngredientsDialogBuilder.setTitle("No Ingredients");
+            noIngredientsDialogBuilder.setMessage("Please Add at least 1 Ingredient to Your Recipe!");
+
+
+            noIngredientsDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                }
+            });
+
+
+            AlertDialog noIngredientsDialog = noIngredientsDialogBuilder.create();
+            noIngredientsDialog.show();
+        }
+
     }
 
     public void back(View view){

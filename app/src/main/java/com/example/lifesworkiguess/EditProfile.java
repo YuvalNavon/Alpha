@@ -105,12 +105,6 @@ public class EditProfile extends AppCompatActivity {
         refUsers.addListenerForSingleValueEvent(userInfo);
 
 
-
-
-
-
-
-
         //Setting up Input Error Listeners
 
         emailErrorTV = findViewById(R.id.EditProfile_EmailError);
@@ -238,11 +232,6 @@ public class EditProfile extends AppCompatActivity {
         });
 
 
-
-
-
-
-
     }
 
     @Override
@@ -260,8 +249,8 @@ public class EditProfile extends AppCompatActivity {
     protected void onResume() {
 
         super.onResume();
-        if (refUsers!=null && userInfo !=null) refUsers.addValueEventListener(userInfo);
-        if (refUsers!=null && courseCompletionStatus !=null) refUsers.addValueEventListener(courseCompletionStatus);
+        if (refUsers!=null && userInfo !=null) refUsers.addListenerForSingleValueEvent(userInfo);
+        if (refUsers!=null && courseCompletionStatus !=null) refUsers.addListenerForSingleValueEvent(courseCompletionStatus);
 
     }
 

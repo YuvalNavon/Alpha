@@ -1,13 +1,14 @@
 package com.example.lifesworkiguess;
 
-import android.content.Context;
+import static android.content.Context.MODE_PRIVATE;
+
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,14 +16,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -46,6 +46,7 @@ public class TrulyFinalCreateRecipeViewStepsFrag extends Fragment implements Add
 
     //for both
     RecyclerView stepsRV;
+    TextView editMessage;
 
 
     public TrulyFinalCreateRecipeViewStepsFrag() {
@@ -72,14 +73,46 @@ public class TrulyFinalCreateRecipeViewStepsFrag extends Fragment implements Add
     }
 
     @Override
+    public void onResume(){
+        super.onResume();
+
+
+
+
+        SharedPreferences settings= getContext().getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+        int changedStepNumber = settings.getInt(MyConstants.STEP_NUMBER_KEY, -999);
+        String changedStepName = settings.getString(MyConstants.STEP_NAME_KEY, null);
+        String changedStepDescription = settings.getString(MyConstants.STEP_DESCRIPTION_KEY, null);
+        String changedStepTime = settings.getString(MyConstants.STEP_TIME_KEY, null);
+
+        if (changedStepNumber!=-999 && changedStepName!=null && changedStepDescription!=null && changedStepTime!=null
+            && !changedStepName.isEmpty() && !changedStepDescription.isEmpty() && !changedStepTime.isEmpty() )
+        {
+            Step changedStep = new Step(changedStepName, changedStepDescription, changedStepTime, changedStepNumber);
+            ArrayList<Step> changedStepsList = stepsViewModel.getStepsList().getValue();
+            changedStepsList.set(changedStepNumber, changedStep);
+            stepsViewModel.setStepsList(changedStepsList);
+        }
+
+        SharedPreferences.Editor editor=settings.edit();
+        editor.putInt(MyConstants.STEP_NUMBER_KEY, -999 );
+        editor.putString(MyConstants.STEP_NAME_KEY, null);
+        editor.putString(MyConstants.STEP_DESCRIPTION_KEY, null);
+        editor.putString(MyConstants.STEP_TIME_KEY, null);
+        editor.commit();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_truly_final_create_recipe_view_steps, container, false);
 
         stepsRV = view.findViewById(R.id.viewStepsRV);
+        editMessage = view.findViewById(R.id.ViewStepsFrag_MessageTV);
 
         if (mode.equals(MyConstants.CUSTOM_RECIPE_VIEW_STEPS_FINISH)){
+            editMessage.setVisibility(View.GONE);
             if (jsonofSteps!=null){
                 Gson gson = new Gson();
                 Type type = new TypeToken<ArrayList<String[]>>(){}.getType();
@@ -149,81 +182,40 @@ public class TrulyFinalCreateRecipeViewStepsFrag extends Fragment implements Add
 
 
 
-        RVAdapter = new AddedStepsCustomAdapter(getContext(), stepsViewModel.getStepsList().getValue(), this::onItemClick);
+        RVAdapter = new AddedStepsCustomAdapter(getContext(), stepsViewModel, this::onItemClick);
         stepsRV.setAdapter(RVAdapter);
 
-//        //really cool
-//        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
-//        stepsRV.addItemDecoration(dividerItemDecoration);
-
-        // (from YT vid "Drag and drop Reorder in Recycler View | Android"
-        // set up item touch helper to handle drag and swipe
-//        ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN |
-//                ItemTouchHelper.START | ItemTouchHelper.END, 0) {
-//            @Override
-//            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-//
-//                int fromPos = viewHolder.getAdapterPosition();
-//                int toPos = target.getAdapterPosition();
-//
-//                Collections.swap(stepsViewModel.getStepsList().getValue(), fromPos, toPos);
-//                updateStepNumbers();
-//                stepsRV.getAdapter().notifyItemMoved(fromPos, toPos);
-//
-//                return true;
-//
-//            }
-//
-//            @Override
-//            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-//
-//            }
-//        };
-
-        ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
-            @Override
-            public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-                return makeMovementFlags(ItemTouchHelper.UP | ItemTouchHelper.DOWN |
-                ItemTouchHelper.START | ItemTouchHelper.END, 0);
-            }
-
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                int fromPos = viewHolder.getAdapterPosition();
-                int toPos = target.getAdapterPosition();
-
-                Collections.swap(stepsViewModel.getStepsList().getValue(), fromPos, toPos);
-                updateStepNumbers();
-                stepsRV.getAdapter().notifyItemMoved(fromPos, toPos);
-
-                return true;
-            }
-
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                stepsViewModel.getStepsList().getValue().remove(viewHolder.getAdapterPosition());
-                updateStepNumbers();
-                stepsRV.getAdapter().notifyItemRemoved(viewHolder.getAdapterPosition());
-
-            }
-        });
-
-        helper.attachToRecyclerView(stepsRV);
+        ItemTouchHelper.Callback callback = new ItemMoveCallback(RVAdapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(stepsRV);
 
 
     }
 
-    private void updateStepNumbers() {
-        ArrayList<Step> stepsList = stepsViewModel.getStepsList().getValue();
-        for (int i = 0; i < stepsList.size(); i++) {
-            Step step = stepsList.get(i);
-            step.setNumber(i);
-        }
-    }
+
 
     @Override
     public void onItemClick(int position) {
 
+        if (mode.equals(MyConstants.CUSTOM_RECIPE_VIEW_STEPS_DURING_MAKING))
+        {
+            Step pickedStep = stepsViewModel.getStepsList().getValue().get(position);
+            String stepName = pickedStep.getName();
+            String stepDescription = pickedStep.getDescription();
+            String stepTime = pickedStep.getTime();
+            String stepAction = pickedStep.getAction();
+            int stepNumber = pickedStep.getNumber();
+
+            Intent toSingleStepScreen = new Intent(getContext(), SingleStepScreen.class);
+
+            toSingleStepScreen.putExtra("Step Number", stepNumber);
+            toSingleStepScreen.putExtra("Step Name", stepName);
+            toSingleStepScreen.putExtra("Step Description", stepDescription);
+            toSingleStepScreen.putExtra("Step Time", stepTime);
+            toSingleStepScreen.putExtra("Step Action", stepAction);
+
+            getContext().startActivity(toSingleStepScreen);
+        }
     }
 
 

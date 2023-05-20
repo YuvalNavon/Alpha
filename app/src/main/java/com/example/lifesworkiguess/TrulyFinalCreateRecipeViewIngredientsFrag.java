@@ -29,7 +29,7 @@ public class TrulyFinalCreateRecipeViewIngredientsFrag extends Fragment {
     }
 
 
-    public static TrulyFinalCreateRecipeViewIngredientsFrag newInstance(String param1, String param2) {
+    public static TrulyFinalCreateRecipeViewIngredientsFrag newInstance() {
         TrulyFinalCreateRecipeViewIngredientsFrag fragment = new TrulyFinalCreateRecipeViewIngredientsFrag();
         Bundle args = new Bundle();
         fragment.setArguments(args);

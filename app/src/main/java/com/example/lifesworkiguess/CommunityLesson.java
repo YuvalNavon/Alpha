@@ -37,6 +37,20 @@ public class CommunityLesson  extends  Lesson {
         this.active = true;
     }
 
+    public CommunityLesson(String lessonName, String lessonRecipeName, int serveCount, String time,
+                           String difficulty, boolean kosher, String userID, String description, int lessonNumber) {
+        //For this, lessonName doesnt really exist so its just recipeName
+        //no need to save imageUri bc its saved in the recipe's folder in storage under a constant name.
+
+        super(lessonName, lessonRecipeName, serveCount, time, difficulty, kosher);
+        this.ratings = new ArrayList<>();
+        this.userID = userID;
+        this.Description = description;
+        this.completedUsersList = new ArrayList<>();
+        this.active = true;
+        this.number = lessonNumber;
+    }
+
     public CommunityLesson(String lessonName, String lessonRecipeName, String logoUri, int serveCount, String time,
                            String difficulty, boolean kosher, String userID, String description) {
 
@@ -151,6 +165,7 @@ public class CommunityLesson  extends  Lesson {
             }
             pos+=1;
         }
-        ratings.add(reviewList);
+        if (!userReviewedBefore) ratings.add(reviewList);
+
     }
 }

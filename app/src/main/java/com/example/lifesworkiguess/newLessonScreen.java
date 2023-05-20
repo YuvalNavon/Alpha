@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public class newLessonScreen extends AppCompatActivity {
 
-    //For Permenant Lesson
+    //For Permanent Lesson
     int lessonPosition;
 
     //For Community Lesson
@@ -24,6 +24,10 @@ public class newLessonScreen extends AppCompatActivity {
     //For Both
     String lessonName;
 
+    Intent getLessonDetails;
+    String fromIntroOrFromDuringCreatingRecipe;
+    ArrayList<Fragment> fragmentList;
+    ArrayList<String> fragmentTitleList;
 
 
     private ActivityNewLessonScreenBinding binding;
@@ -36,13 +40,38 @@ public class newLessonScreen extends AppCompatActivity {
         binding = ActivityNewLessonScreenBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        Intent getLessonDetails = getIntent();
 
-        int mode = getLessonDetails.getIntExtra(MyConstants.LESSON_INTRO_MODE_KEY, MyConstants.LESSON_INTRO_MODE_ERROR);
+        getLessonDetails = getIntent();
+
+        fromIntroOrFromDuringCreatingRecipe = getLessonDetails.getStringExtra(MyConstants.VIEW_STEP_MODE_KEY);
+
+        if (fromIntroOrFromDuringCreatingRecipe.equals(MyConstants.FROM_LESSON_INTRO))
+        {
+            lessonIntroSetUp();
+        }
+
+//        else if (fromIntroOrFromDuringCreatingRecipe.equals(MyConstants.FROM_CREATING_RECIPE))
+//        {
+//            viewSingleStepSetUp();
+//        }
+
+
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), fragmentList, fragmentTitleList);
+        ViewPager viewPager = binding.viewPager;
+        viewPager.setAdapter(viewPagerAdapter);
+        TabLayout tabs = binding.tabs;
+        tabs.setupWithViewPager(viewPager);
+
+
+
+    }
+
+    public void lessonIntroSetUp(){
+        int permanentOrCommunity = getLessonDetails.getIntExtra(MyConstants.LESSON_INTRO_MODE_KEY, MyConstants.LESSON_INTRO_MODE_ERROR);
         Bundle intentDataForLessonFrag = new Bundle();
-        intentDataForLessonFrag.putInt(MyConstants.LESSON_INTRO_MODE_KEY, mode);
-
-        if (mode == MyConstants.PERMENANT_LESSON_INTRO)
+        intentDataForLessonFrag.putInt(MyConstants.LESSON_INTRO_MODE_KEY, permanentOrCommunity);
+        intentDataForLessonFrag.putString(MyConstants.VIEW_STEP_MODE_KEY, MyConstants.FROM_LESSON_INTRO);
+        if (permanentOrCommunity == MyConstants.PERMENANT_LESSON_INTRO)
         {
             lessonName = getLessonDetails.getStringExtra("Lesson Name");
             lessonPosition = getLessonDetails.getIntExtra("Lesson Position in List", MyConstants.NO_LESSON_POSITION);
@@ -51,7 +80,7 @@ public class newLessonScreen extends AppCompatActivity {
             intentDataForLessonFrag.putInt("Lesson Position in List", lessonPosition);
         }
 
-        else if (mode == MyConstants.COMMUNITY_LESSON_INTRO)
+        else if (permanentOrCommunity == MyConstants.COMMUNITY_LESSON_INTRO)
         {
             lessonName = getLessonDetails.getStringExtra(MyConstants.LESSON_NAME_KEY);
             creatorUsername = getLessonDetails.getStringExtra(MyConstants.LESSON_CREATOR_USERNAME_KEY);
@@ -67,23 +96,41 @@ public class newLessonScreen extends AppCompatActivity {
 
         IngredientsListFrag ingredientsListFrag = new IngredientsListFrag();
 
-        ArrayList<Fragment> fragmentList = new ArrayList<>();
+        fragmentList = new ArrayList<>();
         fragmentList.add(lessonScreenFrag);
         fragmentList.add(ingredientsListFrag);
 
-        ArrayList<String> fragmentTitleList = new ArrayList<>();
+        fragmentTitleList = new ArrayList<>();
         fragmentTitleList.add("Steps");
         fragmentTitleList.add("Ingredients");
 
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), fragmentList, fragmentTitleList);
-        ViewPager viewPager = binding.viewPager;
-        viewPager.setAdapter(viewPagerAdapter);
-        TabLayout tabs = binding.tabs;
-        tabs.setupWithViewPager(viewPager);
 
 
+    }
 
+    public void viewSingleStepSetUp(){
 
+        String stepName = getLessonDetails.getStringExtra("Step Name");
+        String stepDescription = getLessonDetails.getStringExtra("Step Description");
+
+        //Currently no implementation for Step Action and Step Time
+
+        int stepNumber = getLessonDetails.getIntExtra("Step Number", 0);
+
+        Bundle stepDetails = new Bundle();
+        stepDetails.putString(MyConstants.VIEW_STEP_MODE_KEY, MyConstants.FROM_CREATING_RECIPE);
+        stepDetails.putString("Step Name", stepName);
+        stepDetails.putString("Step Description", stepDescription);
+        stepDetails.putInt("Step Number", stepNumber);
+
+        LessonScreenFrag lessonScreenForOneStepFrag = new LessonScreenFrag();
+        lessonScreenForOneStepFrag.setArguments(stepDetails);
+
+        fragmentList = new ArrayList<>();
+        fragmentList.add(lessonScreenForOneStepFrag);
+
+        fragmentTitleList = new ArrayList<>();
+        fragmentTitleList.add("Step");
 
     }
 }

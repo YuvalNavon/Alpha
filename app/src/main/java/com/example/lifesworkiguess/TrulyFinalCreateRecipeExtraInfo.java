@@ -139,9 +139,6 @@ public class TrulyFinalCreateRecipeExtraInfo extends AppCompatActivity implement
         recipeKosher = settings.getBoolean(MyConstants.CUSTOM_RECIPE_KOSHER, false);
         recipeKosherCB.setChecked(recipeKosher);
 
-
-
-
         Intent gi = getIntent();
 
         //We check if the user got to this activity from the finish screen or from the activity before this one
@@ -164,7 +161,10 @@ public class TrulyFinalCreateRecipeExtraInfo extends AppCompatActivity implement
             //From Steps
             jsonOfSteps = gi.getStringExtra(MyConstants.CUSTOM_RECIPE_STEPS);
 
+
         }
+
+
 
     }
 
@@ -187,6 +187,8 @@ public class TrulyFinalCreateRecipeExtraInfo extends AppCompatActivity implement
         editor.putBoolean(MyConstants.CUSTOM_RECIPE_KOSHER, recipeKosher);
         editor.commit();
     }
+
+
 
     public void makeHoursSpinner(){
 

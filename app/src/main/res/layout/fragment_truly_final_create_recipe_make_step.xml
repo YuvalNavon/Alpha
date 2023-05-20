@@ -45,7 +45,7 @@
                 android:gravity="center"
                 android:text="View the Steps you added in the &quot;Added Steps&quot; Tab!\nWe recommend making Each Step as Simple as possible!"
                 android:textColor="@color/gray"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/stepNameCR"
@@ -54,21 +54,24 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:hint="Step Name (Ex. &quot;Stir the Bowl&quot;)"
-                android:inputType="textPersonName" />
+                android:inputType="textPersonName"
+                android:textColor="@color/black" />
 
             <EditText
                 android:id="@+id/stepDescriptionCR"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="2"
+                android:layout_weight="1.5"
                 android:ems="10"
+                android:gravity="center_vertical"
                 android:hint="Step Description (Ex. Stir in Round Motions\nuntil everything is Mixed&quot;)"
-                android:inputType="textPersonName" />
+                android:inputType="textMultiLine"
+                android:textColor="@color/black" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1.5"
+                android:layout_weight="1.2"
                 android:orientation="horizontal">
 
                 <EditText
@@ -78,7 +81,8 @@
                     android:layout_weight="1.7"
                     android:ems="10"
                     android:hint="How Long does this Step Take?"
-                    android:inputType="number" />
+                    android:inputType="number"
+                    android:textColor="@color/black" />
 
                 <Space
                     android:layout_width="0dp"
@@ -109,13 +113,15 @@
                 android:layout_weight="0.5"
                 android:gravity="center"
                 android:text="Add a Picture/GIF of the Step"
-                android:textColor="@color/gray" />
+                android:textColor="@color/gray"
+                android:visibility="gone" />
 
             <ImageView
                 android:id="@+id/stepImageIVCR"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1.5"
+                android:visibility="gone"
                 tools:srcCompat="@drawable/plus" />
 
             <Space

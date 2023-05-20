@@ -2,6 +2,7 @@ package com.example.lifesworkiguess;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -10,19 +11,23 @@ import androidx.core.content.FileProvider;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -47,7 +52,10 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
     String recipeName, recipeDescription;
 
     //From this
+    boolean userSelectedImage;
+
     ImageView recipeImage;
+    Button imageButton;
     Uri recipeImageUri;
     String currentPhotoPath;
 
@@ -58,12 +66,14 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
         setContentView(R.layout.activity_truly_final_create_recipe_image);
 
         recipeImage = findViewById(R.id.IVCreateRecipe);
+        imageButton = findViewById(R.id.CR_ImageButton);
+        imageButton.setVisibility(View.INVISIBLE);
+        imageButton.setEnabled(false);
+
+        userSelectedImage = false;
 
         //getting saved image
-
         getSavedImage();
-
-
 
 
         Intent gi = getIntent();
@@ -107,28 +117,69 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
             FileOutputStream fos = openFileOutput(MyConstants.IMAGE_FILE_NAME, Context.MODE_PRIVATE);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.close();
+
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
 
+
+
     public void getSavedImage(){
         // Check if the image file already exists in the app's internal storage directory
         File SelectedImageFile = new File(getFilesDir(), MyConstants.IMAGE_FILE_NAME);
         if (SelectedImageFile.exists()) {
             Bitmap bitmap = BitmapFactory.decodeFile(SelectedImageFile.getAbsolutePath());
-            recipeImage.setImageBitmap(bitmap);        }
+
+            recipeImage.setImageBitmap(bitmap);
+
+            //TO make sure image isnt DISPLAYED HORIZONTALLY (FROM CHATGPT)
+            try
+            {
+                // Check the orientation of the image using its EXIF metadata
+                ExifInterface exif = new ExifInterface(SelectedImageFile.getAbsolutePath());
+                int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+
+                // Rotate the image if necessary
+                Matrix matrix = new Matrix();
+                switch (orientation)
+                {
+                    case ExifInterface.ORIENTATION_ROTATE_90:
+                        matrix.postRotate(90);
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_180:
+                        matrix.postRotate(180);
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_270:
+                        matrix.postRotate(270);
+                        break;
+                    default:
+                        break;
+                }
+
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            }
+
+            catch (IOException e)
+            {
+
+            }
+            recipeImage.setImageBitmap(bitmap);
+            recipeImageUri = Uri.fromFile(SelectedImageFile);
+            imageButton.setVisibility(View.VISIBLE);
+            imageButton.setEnabled(true);
+
+
+
+            userSelectedImage = true;
+        }
     }
 
 
-    //GALLERY
 
-    public void PickPhoto(View view){
-        imageChooser();
-
-
-    }
 
     void imageChooser() {
 
@@ -158,24 +209,9 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
 
                 recipeImage.setImageURI(recipeImageUri);
 
-//                try
-//                {
-//                    if (myServices.isFileExists(this, MyConstants.IMAGE_FILE_NAME))
-//                        myServices.deleteFile(this, MyConstants.IMAGE_FILE_NAME);
-//
-//                    Bitmap imageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), recipeImageUri);
-//                    File file = new File(getFilesDir(), MyConstants.IMAGE_FILE_NAME);
-//                    FileOutputStream out = new FileOutputStream(file);
-//                    imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-//                    out.flush();
-//                    out.close();
-//                }
-//
-//                catch (Exception e)
-//                {
-//                    e.printStackTrace();
-//                }
-
+                imageButton.setVisibility(View.VISIBLE);
+                imageButton.setEnabled(true);
+                userSelectedImage = true;
             }
             else Toast.makeText(this, "Error, File was not selected", Toast.LENGTH_LONG).show();
 
@@ -192,34 +228,17 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
             if(resultCode == Activity.RESULT_OK){
 
                 File f = new File(currentPhotoPath);
-                recipeImage.setImageURI(Uri.fromFile(f));
+                recipeImageUri = Uri.fromFile(f);
+                recipeImage.setImageURI(recipeImageUri);
+                imageButton.setVisibility(View.VISIBLE);
+                imageButton.setEnabled(true);
+                userSelectedImage = true;
 
-//                Bundle extras = data.getExtras();
-//                Bitmap imageBitmap = (Bitmap) extras.get("data");
-//                try {
-//                    if (myServices.isFileExists(this, MyConstants.IMAGE_FILE_NAME))
-//                        myServices.deleteFile(this, MyConstants.IMAGE_FILE_NAME);
-//                    File file = new File(getFilesDir(), MyConstants.IMAGE_FILE_NAME);
-//                    FileOutputStream out = new FileOutputStream(file);
-//                    imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-//                    out.flush();
-//                    out.close();
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
             }
         }
+
+
     }
-
-
-
-    //CAMERA
-
-    public void takePhoto(View view){
-        askCameraPermissions();
-    }
-
-
 
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -278,29 +297,122 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
         }
     }
 
+    public void selectPicture(View view){
+
+
+        AlertDialog.Builder selectPictureDialogBuilder = new AlertDialog.Builder(TrulyFinalCreateRecipeImage.this);
+
+        selectPictureDialogBuilder.setTitle("Choose Photo");
+
+
+        selectPictureDialogBuilder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            }
+        });
+
+
+        selectPictureDialogBuilder.setNegativeButton("Use Camera", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                askCameraPermissions();
+            }
+        });
+
+        selectPictureDialogBuilder.setPositiveButton("From Gallery", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+
+                imageChooser();
+
+            }
+        });
+
+        AlertDialog selectPictureDialog = selectPictureDialogBuilder.create();
+        selectPictureDialog.show();
+
+
+
+    }
+
+
 
 
     //BACK TO NORMAL
+    public void clearPhoto (View view)
+    {
+        userSelectedImage = false;
+        recipeImageUri = null;
+
+        recipeImage.setImageResource(R.drawable.add_dish);
+
+        File recipeImageFile = new File(getFilesDir(), MyConstants.IMAGE_FILE_NAME);
+        if (recipeImageFile.exists()) {
+            recipeImageFile.delete();
+        }
+
+    }
+
+
     public void next(View view){
 
-        if (recipeImageUri !=null){
+        if (userSelectedImage && recipeImageUri !=null){
 
             saveRecipeImage();
 
+            Intent toAddRecipeIngredients = new Intent(TrulyFinalCreateRecipeImage.this, TrulyFinalCreateRecipeIngredients.class);
+            toAddRecipeIngredients.putExtra("Previous Activity", MyConstants.NOT_FROM_FINISH_SCREEN);
+
+            //From General
+            toAddRecipeIngredients.putExtra(MyConstants.CUSTOM_RECIPE_NAME, recipeName);
+            toAddRecipeIngredients.putExtra(MyConstants.CUSTOM_RECIPE_DESCRIPTION, recipeDescription);
+
+
+            //From this no need to save anything in intent, recipeImage is saved to files.
+
+
+            startActivity(toAddRecipeIngredients);
         }
 
-        Intent toAddRecipeIngredients = new Intent(this, TrulyFinalCreateRecipeIngredients.class);
-        toAddRecipeIngredients.putExtra("Previous Activity", MyConstants.NOT_FROM_FINISH_SCREEN);
+        else //No Image Selected
+        {
+            AlertDialog.Builder noRecipeImageDialogBuilder = new AlertDialog.Builder(TrulyFinalCreateRecipeImage.this);
 
-        //From General
-        toAddRecipeIngredients.putExtra(MyConstants.CUSTOM_RECIPE_NAME, recipeName);
-        toAddRecipeIngredients.putExtra(MyConstants.CUSTOM_RECIPE_DESCRIPTION, recipeDescription);
-
-
-        //From this no need to save anything in intent, recipeImage is saved to files.
+            noRecipeImageDialogBuilder.setTitle("No Picture Selected");
+            noRecipeImageDialogBuilder.setMessage("Are You Sure You Want to Upload This Recipe Without a Picture of the Dish?");
 
 
-        startActivity(toAddRecipeIngredients);
+            noRecipeImageDialogBuilder.setNegativeButton("Back", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                }
+            });
+
+
+            noRecipeImageDialogBuilder.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+
+                    Intent toAddRecipeIngredients = new Intent(TrulyFinalCreateRecipeImage.this, TrulyFinalCreateRecipeIngredients.class);
+                    toAddRecipeIngredients.putExtra("Previous Activity", MyConstants.NOT_FROM_FINISH_SCREEN);
+
+                    //From General
+                    toAddRecipeIngredients.putExtra(MyConstants.CUSTOM_RECIPE_NAME, recipeName);
+                    toAddRecipeIngredients.putExtra(MyConstants.CUSTOM_RECIPE_DESCRIPTION, recipeDescription);
+
+
+                    //From this no need to save anything in intent, recipeImage is saved to files.
+
+
+                    startActivity(toAddRecipeIngredients);
+
+                }
+            });
+
+            AlertDialog noRecipeImageDialog = noRecipeImageDialogBuilder.create();
+            noRecipeImageDialog.show();
+        }
+
+
 
     }
 
@@ -314,3 +426,4 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
 
 
 }
+

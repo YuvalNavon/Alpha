@@ -28,8 +28,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-
 
 public class LessonScreenFrag extends Fragment {
 
@@ -43,10 +41,12 @@ public class LessonScreenFrag extends Fragment {
     int lessonNumber;
 
     //For Both
-    int mode;
+    int permanentOrCommunity;
     String lessonName;
 
 
+
+    //For FromLessonIntro
     int currStepNumber;
 
     TextView stepNumberTV, stepNameTV, stepDescriptionTV;
@@ -76,35 +76,44 @@ public class LessonScreenFrag extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true /* enabled by default */) {
-            @Override
-            public void handleOnBackPressed() {
-                // Handle the back button press event here
-                //Setting up Alert Dialogs
-                AlertDialog.Builder exitLessonDialogBuilder = new AlertDialog.Builder(getContext());
+        if (getArguments()!=null)
+        {
 
-                exitLessonDialogBuilder.setTitle("Quitting Lesson");
-                exitLessonDialogBuilder.setMessage("Are you sure you want to Quit this Lesson?");
 
-                exitLessonDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // Handle click here
+                requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true /* enabled by default */) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        // Handle the back button press event here
+                        //Setting up Alert Dialogs
+                        AlertDialog.Builder exitLessonDialogBuilder = new AlertDialog.Builder(getContext());
+
+                        exitLessonDialogBuilder.setTitle("Quitting Lesson");
+                        exitLessonDialogBuilder.setMessage("Are you sure you want to Quit this Lesson?");
+
+                        exitLessonDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // Handle click here
+                            }
+                        });
+
+
+                        exitLessonDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                getActivity().finish();
+                            }
+                        });
+
+                        // Create and show the AlertDialog
+                        AlertDialog exitLessonDialog = exitLessonDialogBuilder.create();
+                        exitLessonDialog.show();
                     }
                 });
 
 
-                exitLessonDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                       getActivity().finish();
-                    }
-                });
 
-                // Create and show the AlertDialog
-                AlertDialog exitLessonDialog = exitLessonDialogBuilder.create();
-                exitLessonDialog.show();
-            }
-        });
 
+
+        }
 
 
     }
@@ -140,19 +149,19 @@ public class LessonScreenFrag extends Fragment {
         });
 
         Context context = getContext();
+
         recipe = myServices.XMLToRecipe(context, MyConstants.DOWNLOADED_RECIPE_NAME);
 
-
         Bundle dataFromIntent =getArguments();
-        mode = dataFromIntent.getInt(MyConstants.LESSON_INTRO_MODE_KEY);
+        permanentOrCommunity = dataFromIntent.getInt(MyConstants.LESSON_INTRO_MODE_KEY);
 
-        if (mode == MyConstants.PERMENANT_LESSON_INTRO)
+        if (permanentOrCommunity == MyConstants.PERMENANT_LESSON_INTRO)
         {
             lessonName = dataFromIntent.getString("Lesson Name");
             lessonPosition = dataFromIntent.getInt("Lesson Position in List");
         }
 
-        else if (mode == MyConstants.COMMUNITY_LESSON_INTRO)
+        else if (permanentOrCommunity == MyConstants.COMMUNITY_LESSON_INTRO)
         {
             lessonName = dataFromIntent.getString(MyConstants.LESSON_NAME_KEY);
             creatorID = dataFromIntent.getString(MyConstants.LESSON_CREATOR_ID_KEY);
@@ -162,7 +171,6 @@ public class LessonScreenFrag extends Fragment {
 
         currStepNumber = 0;
         setStepDetails(currStepNumber);
-
 
 
 
@@ -197,6 +205,8 @@ public class LessonScreenFrag extends Fragment {
 
     }
 
+
+
     public void setStepDetails(int stepNumber){
         if (recipe.getSteps()!= null && !recipe.getSteps().isEmpty() )
         {
@@ -227,52 +237,6 @@ public class LessonScreenFrag extends Fragment {
         else return false;
     }
 
-//    public String determineGIF(int stepNumber){
-//        if (stepNumber>MyConstants.GIFS_LINKS_LIST.size()){
-//            return MyConstants.NO_GIF_ERROR;
-//        }
-//        else{
-//            String stepName = recipe.getSteps().get(stepNumber).getName();
-//            String gif = MyConstants.NO_GIF_ERROR;
-//            for (int i = 0; i<MyConstants.GIFS_LINKS_LIST.size(); i++){
-//                String actionName = formatStepName(stepName);
-//            }
-//            return gif;
-//        }
-//
-//    }
-
-//    public String formatStepName(String stepName){
-//
-//        //Find Connector Words to Remove them
-//        String beforeConnector, afterConnector;
-//        int spaceCount = 0;
-//        String tempName = stepName;
-//        for (int i = 0; i<stepName.length();i++){
-//            if (stepName.charAt(i) == ' ') spaceCount = spaceCount + 1;
-//        }
-//        for (int i = 0; i<spaceCount; i++){
-//            String currWord = tempName.substring(0, tempName.indexOf(' '));
-//            for (int j = 0;j<MyConstants.CONNECTOR_WORDS.length;j++){
-//                if (currWord.equals(MyConstants.CONNECTOR_WORDS[j])){
-//                   stepName = removeFirstWord(stepName, currWord);
-//                }
-//            }
-//            tempName = tempName.substring(tempName.indexOf(' ') + 1);
-//        }
-//
-//        return stepName;
-//    }
-
-//    public static String removeFirstWord(String input, String word) {
-//        int index = input.indexOf(word);
-//        if (index != -1) {
-//            String before = input.substring(0, index).trim();
-//            String after = input.substring(index + word.length()).trim();
-//            return before + " " + after;
-//        }
-//        return input;
-//    }
 
     public void nextStep(View view){
 
@@ -285,9 +249,9 @@ public class LessonScreenFrag extends Fragment {
             refUsers=FBDB.getReference("Users").child(loggedInUser.getUid());
 
             Intent toLessonFinishedScreen = new Intent(context, LessonFinished.class);
-            toLessonFinishedScreen.putExtra(MyConstants.LESSON_INTRO_MODE_KEY, mode);
+            toLessonFinishedScreen.putExtra(MyConstants.LESSON_INTRO_MODE_KEY, permanentOrCommunity);
 
-            if (mode == MyConstants.PERMENANT_LESSON_INTRO)
+            if (permanentOrCommunity == MyConstants.PERMENANT_LESSON_INTRO)
             {
                 courseGetter = new ValueEventListener() {
                     @Override
@@ -314,7 +278,7 @@ public class LessonScreenFrag extends Fragment {
                 refUsers.addValueEventListener(courseGetter);
             }
 
-            else if (mode == MyConstants.COMMUNITY_LESSON_INTRO)
+            else if (permanentOrCommunity == MyConstants.COMMUNITY_LESSON_INTRO)
             {
                 courseGetter = new ValueEventListener() {
                     @Override

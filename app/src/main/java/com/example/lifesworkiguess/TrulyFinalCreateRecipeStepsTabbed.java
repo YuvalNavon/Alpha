@@ -1,11 +1,13 @@
 package com.example.lifesworkiguess;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.google.android.material.tabs.TabLayout;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -37,7 +39,6 @@ public class TrulyFinalCreateRecipeStepsTabbed extends AppCompatActivity {
     StepsViewModel stepsViewModel;
     ArrayList<String[]> stepsInStringLists;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,8 +59,8 @@ public class TrulyFinalCreateRecipeStepsTabbed extends AppCompatActivity {
         fragmentList.add(viewStepsFrag);
 
         ArrayList<String> fragmentTitleList = new ArrayList<>();
-        fragmentTitleList.add("Make Step");
-        fragmentTitleList.add("Added Steps");
+        fragmentTitleList.add("Add Step");
+        fragmentTitleList.add("View Steps");
 
 
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), fragmentList, fragmentTitleList);
@@ -187,26 +188,54 @@ public class TrulyFinalCreateRecipeStepsTabbed extends AppCompatActivity {
 
 
 
+
     public void next(View view){
-        Intent toAddRecipeExtraInfo = new Intent(this, TrulyFinalCreateRecipeExtraInfo.class);
-        toAddRecipeExtraInfo.putExtra("Previous Activity", MyConstants.NOT_FROM_FINISH_SCREEN);
 
-        //From General
-        toAddRecipeExtraInfo.putExtra(MyConstants.CUSTOM_RECIPE_NAME, recipeName);
-        toAddRecipeExtraInfo.putExtra(MyConstants.CUSTOM_RECIPE_DESCRIPTION, recipeDescription);
+        ArrayList<Step> stepsList = stepsViewModel.getStepsList().getValue();
+        if (stepsList==null || stepsList.isEmpty() || stepsList.size()<2)
+        {
+            AlertDialog.Builder addStepsDialogBuilder = new AlertDialog.Builder(TrulyFinalCreateRecipeStepsTabbed.this);
+
+            addStepsDialogBuilder.setTitle("Not Enough Steps");
+            addStepsDialogBuilder.setMessage("Please Add at least 2 Steps for your Recipe!");
 
 
-        //From Image - Nothing, image is saved in files
+            addStepsDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
 
-        //From Ingredients
-        toAddRecipeExtraInfo.putExtra(MyConstants.CUSTOM_RECIPE_INGREDIENTS, jsonOfIngredients);
+                }
+            });
 
-        //From This
-        Gson gson = new Gson();
-        String jsonOfSteps = gson.toJson(stepsInStringLists);
-        toAddRecipeExtraInfo.putExtra(MyConstants.CUSTOM_RECIPE_STEPS, jsonOfSteps);
 
-        startActivity(toAddRecipeExtraInfo);
+            AlertDialog addStepsDialog = addStepsDialogBuilder.create();
+            addStepsDialog.show();
+        }
+
+        else
+        {
+            Intent toAddRecipeExtraInfo = new Intent(this, TrulyFinalCreateRecipeExtraInfo.class);
+            toAddRecipeExtraInfo.putExtra("Previous Activity", MyConstants.NOT_FROM_FINISH_SCREEN);
+
+            //From General
+            toAddRecipeExtraInfo.putExtra(MyConstants.CUSTOM_RECIPE_NAME, recipeName);
+            toAddRecipeExtraInfo.putExtra(MyConstants.CUSTOM_RECIPE_DESCRIPTION, recipeDescription);
+
+
+            //From Image - Nothing, image is saved in files
+
+            //From Ingredients
+            toAddRecipeExtraInfo.putExtra(MyConstants.CUSTOM_RECIPE_INGREDIENTS, jsonOfIngredients);
+
+            //From This
+            Gson gson = new Gson();
+            String jsonOfSteps = gson.toJson(stepsInStringLists);
+            toAddRecipeExtraInfo.putExtra(MyConstants.CUSTOM_RECIPE_STEPS, jsonOfSteps);
+
+            startActivity(toAddRecipeExtraInfo);
+        }
+
+
+
     }
 
     public void back(View view){

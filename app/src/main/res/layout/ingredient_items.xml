@@ -17,7 +17,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:gravity="center"
-            android:text="TextView" />
+            android:text="TextView"
+            android:textColor="@color/orange"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/ingredientAmountAndUnitsTV"
@@ -25,7 +28,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:gravity="center"
-            android:text="TextView" />
+            android:text="TextView"
+            android:textSize="16sp"
+            android:textStyle="italic" />
     </LinearLayout>
 
     <TextView
