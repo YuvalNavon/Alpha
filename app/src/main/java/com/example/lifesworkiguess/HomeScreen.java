@@ -95,7 +95,17 @@ public class HomeScreen extends AppCompatActivity implements CustomViewHolder.On
                     {
                         currentlyLoggedUser.setCompletedCourses(new ArrayList<>());
                     }
-                    currentlyLoggedUser.getCompletedCourses().add(currentlyLoggedUser.getSelectedCourse());
+
+                    boolean userPreviouslyCompletedCourse = false;
+
+                    for (String checkedCompletedCourseName: currentlyLoggedUser.getCompletedCourses())
+                    {
+                        if (currentlyLoggedUser.getSelectedCourse().equals(checkedCompletedCourseName))
+                            userPreviouslyCompletedCourse = true;
+
+                    }
+                    if (!userPreviouslyCompletedCourse)
+                        currentlyLoggedUser.getCompletedCourses().add(currentlyLoggedUser.getSelectedCourse());
                     refUsers.setValue(currentlyLoggedUser);
 
                 }

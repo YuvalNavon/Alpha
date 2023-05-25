@@ -25,7 +25,7 @@
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.1" />
+                android:layout_weight="0.4" />
 
             <TextView
                 android:id="@+id/OverviewMessageTV"
@@ -38,7 +38,7 @@
                 android:textSize="34sp" />
 
             <TextView
-                android:id="@+id/OverviewLessonPositionOrCreatorNameTV"
+                android:id="@+id/CR_OverviewMessage"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.5"

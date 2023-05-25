@@ -1,5 +1,8 @@
 package com.example.lifesworkiguess;
 
+import static android.content.Context.MODE_PRIVATE;
+
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -39,9 +42,10 @@ public class TrulyFinalCreateRecipeViewIngredientsFrag extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-           jsonofIngredients = getArguments().getString(MyConstants.CUSTOM_RECIPE_INGREDIENTS, null);
-        }
+
+        SharedPreferences settings=getActivity().getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+        jsonofIngredients = settings.getString(MyConstants.CUSTOM_RECIPE_INGREDIENTS, null);
+
     }
 
     @Override

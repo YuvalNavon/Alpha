@@ -168,9 +168,10 @@
             android:layout_height="match_parent"
             android:layout_weight="2"
             android:backgroundTint="@color/orange"
-            android:shadowColor="@color/gray"
             android:onClick="signUpORChangeCourse"
-            android:text="Next" />
+            android:shadowColor="@color/gray"
+            android:text="Next"
+            android:textColor="@color/white" />
 
         <Space
             android:layout_width="0dp"

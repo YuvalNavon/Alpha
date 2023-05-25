@@ -88,7 +88,7 @@ public class CommunityLessonCustomAdapter extends RecyclerView.Adapter<Community
 
         FirebaseStorage FBStorage = FirebaseStorage.getInstance();
         StorageReference storagePFPRef = FBStorage.getReference("Users").child(userID).child(MyConstants.PROFILE_PICTURE);
-        long MAXBYTES = 1024 * 1024;
+        long MAXBYTES = 1024 * 1024 * 5;
         holder.userIV.setImageResource(R.drawable.default_profile_picture);
         Bitmap bitmap = ((BitmapDrawable) holder.userIV.getDrawable()).getBitmap();
         bitmap = myServices.getCircularBitmap(bitmap);

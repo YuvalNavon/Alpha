@@ -151,7 +151,7 @@ public class TrulyFinalCreateRecipeMakeStepFrag extends Fragment {
             stepsList.add(addedStep);
 
             stepsViewModel.setStepsList(stepsList);
-            Toast.makeText(getContext(), "ADDED", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Step Added!", Toast.LENGTH_SHORT).show();
 
             stepNameET.setText("");
             stepDescriptionET.setText("");

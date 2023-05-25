@@ -59,7 +59,7 @@ public class customAdapter extends RecyclerView.Adapter<CustomViewHolder> {
         String lessonLogoUri = course.getLessonsList().get(position).getLogoUri();
         holder.lessonName.setText("Make Some " + lessonName + "!");
         fDownRef = fStorage.child(lessonName).child(lessonLogoUri);
-        long MAXBYTES = 1024 * 1024;
+        long MAXBYTES = 1024 * 1024 * 5;
         fDownRef.getBytes(MAXBYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {

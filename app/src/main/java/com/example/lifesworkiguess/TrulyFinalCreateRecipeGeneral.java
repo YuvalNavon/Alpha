@@ -107,16 +107,23 @@ public class TrulyFinalCreateRecipeGeneral extends AppCompatActivity {
             madeCommunityLessonsGetter = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
+
                     User currentUser = snapshot.getValue(User.class);
+
+
                     ArrayList<String> madeCommunityLessons = currentUser.getUploadedRecipeNames();
+                    ArrayList<Integer> madeCommunityLessonsStatuses = currentUser.getUploadedRecipeStatuses();
                     boolean madeRecipeBefore = false;
-                    for (String checkedRecipeName : madeCommunityLessons)
+                    for (int i = 0; i<madeCommunityLessons.size();i++)
                     {
-                        if (checkedRecipeName.toLowerCase(Locale.ROOT).equals(recipeName.toLowerCase(Locale.ROOT)))
+                        if (madeCommunityLessons.get(i).toLowerCase(Locale.ROOT).equals(recipeName.toLowerCase(Locale.ROOT))
+                        && madeCommunityLessonsStatuses.get(i)==1)
                         {
                             madeRecipeBefore = true;
+
                         }
                     }
+
 
                     if (madeRecipeBefore)
                     {
@@ -138,7 +145,8 @@ public class TrulyFinalCreateRecipeGeneral extends AppCompatActivity {
 
 
                                 //to UploadedCommunityLessonsList Activity
-                                Intent toUploadedCommunityLessonsList = new Intent(TrulyFinalCreateRecipeGeneral.this, MadeCommunityLessonsList.class);
+                                Intent toUploadedCommunityLessonsList = new Intent(TrulyFinalCreateRecipeGeneral.this, moreDetailsLists.class);
+                                toUploadedCommunityLessonsList.putExtra("View Mode", "Your Recipes");
                                 startActivity(toUploadedCommunityLessonsList);
                                 finish();
 
@@ -155,8 +163,11 @@ public class TrulyFinalCreateRecipeGeneral extends AppCompatActivity {
                         toAddRecipeImage.putExtra("Previous Activity", MyConstants.NOT_FROM_FINISH_SCREEN);
 
                         //From This
-                        toAddRecipeImage.putExtra(MyConstants.CUSTOM_RECIPE_NAME, recipeName);
-                        toAddRecipeImage.putExtra(MyConstants.CUSTOM_RECIPE_DESCRIPTION, recipeDescription);
+                        SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+                        SharedPreferences.Editor editor=settings.edit();
+                        editor.putString(MyConstants.CUSTOM_RECIPE_NAME, recipeName);
+                        editor.putString(MyConstants.CUSTOM_RECIPE_DESCRIPTION, recipeDescription);
+                        editor.commit();
 
 
                         startActivity(toAddRecipeImage);
@@ -179,15 +190,15 @@ public class TrulyFinalCreateRecipeGeneral extends AppCompatActivity {
                 Toast.makeText(this, "Please Enter a Name for this Recipe!", Toast.LENGTH_SHORT).show();
             }
 
-            if (recipeDescription.isEmpty())
+            else if (recipeDescription.isEmpty())
             {
                 Toast.makeText(this, "Please Enter a Description for this Recipe!", Toast.LENGTH_SHORT).show();
             }
 
 
-            if (recipeNameHasComma(recipeName))
+            else if (recipeNameHasComma(recipeName))
             {
-                Toast.makeText(this, "The Recipe's Name can't have ',' in it!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "The Recipe's Name can't have ',' in it.", Toast.LENGTH_SHORT).show();
                 //better to use Alert Dialog for this one
             }
         }

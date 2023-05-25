@@ -1,10 +1,12 @@
 package com.example.lifesworkiguess;
 
+import static android.content.Context.MODE_PRIVATE;
 import static com.example.lifesworkiguess.myServices.recipeToXML;
 import static com.example.lifesworkiguess.myServices.uploadXML;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -81,16 +83,18 @@ public class TrulyFinalCreateRecipeOverviewFrag extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            recipeName = getArguments().getString(MyConstants.CUSTOM_RECIPE_NAME);
-            recipeDescription = getArguments().getString(MyConstants.CUSTOM_RECIPE_DESCRIPTION);
-            recipeTime = getArguments().getString(MyConstants.CUSTOM_RECIPE_TIME);
-            recipeDifficultyLevel = getArguments().getString(MyConstants.CUSTOM_RECIPE_DIFFICULTY_LEVEL);
-            recipeServeCount = getArguments().getInt(MyConstants.CUSTOM_RECIPE_SERVE_COUNT);
-            recipeKosher = getArguments().getBoolean(MyConstants.CUSTOM_RECIPE_KOSHER);
-            jsonofIngredients = getArguments().getString(MyConstants.CUSTOM_RECIPE_INGREDIENTS);
-            jsonofSteps = getArguments().getString(MyConstants.CUSTOM_RECIPE_STEPS);
-        }
+
+         SharedPreferences settings=getActivity().getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+
+         recipeName = settings.getString(MyConstants.CUSTOM_RECIPE_NAME, null);
+         recipeDescription = settings.getString(MyConstants.CUSTOM_RECIPE_DESCRIPTION, null);
+         recipeTime = settings.getString(MyConstants.CUSTOM_RECIPE_TIME, null);
+         recipeDifficultyLevel = settings.getString(MyConstants.CUSTOM_RECIPE_DIFFICULTY_LEVEL, null);
+         recipeServeCount = settings.getInt(MyConstants.CUSTOM_RECIPE_SERVE_COUNT, MyConstants.NO_SERVE_COUNT_ERROR);
+         recipeKosher = settings.getBoolean(MyConstants.CUSTOM_RECIPE_KOSHER,false);
+         jsonofIngredients = settings.getString(MyConstants.CUSTOM_RECIPE_INGREDIENTS,null);
+         jsonofSteps = settings.getString(MyConstants.CUSTOM_RECIPE_STEPS,null);
+
     }
 
 
@@ -167,7 +171,7 @@ public class TrulyFinalCreateRecipeOverviewFrag extends Fragment {
     public void onResume() {
         super.onResume();
 
-        if (refUsers!=null && userRecipeAdder!=null) refUsers.addValueEventListener(userRecipeAdder);
+        if (refUsers!=null && userRecipeAdder!=null) refUsers.addListenerForSingleValueEvent(userRecipeAdder);
 
     }
 
@@ -231,13 +235,16 @@ public class TrulyFinalCreateRecipeOverviewFrag extends Fragment {
                 currentUser.addCustomRecipe(recipeName);
                 refUsers.setValue(currentUser);
 
-                //Adding the Recipe to the CompletedLessons branch of the Database
+                //Adding the Recipe to the Community Lessons and Community Lessons By User branches of the Database
                 CommunityLesson  addedLesson = new CommunityLesson(recipeName, recipeName, recipeServeCount, recipeTime,
                         recipeDifficultyLevel, recipeKosher, loggedInUser.getUid(), recipeDescription, currentUser.getUploadedRecipeNames().size()-1 );
 
 
                 refCommunityLessons =FBDB.getReference("Community Lessons");
                 refCommunityLessons.child( loggedInUser.getUid() + " , " + Integer.toString(currentUser.getUploadedRecipeNames().size()-1)).setValue(addedLesson);
+
+                refCommunityLessons =FBDB.getReference("Community Lessons By User").child(loggedInUser.getUid());
+                refCommunityLessons.child(Integer.toString(currentUser.getUploadedRecipeNames().size()-1)).setValue(addedLesson);
 
 
                 //Adding the Recipe to the FirebaseStorage
@@ -278,6 +285,33 @@ public class TrulyFinalCreateRecipeOverviewFrag extends Fragment {
                     }
                 }
 
+
+                //General - no need, as its the first screen in making recipes so if its closed then the recipe should be gone
+
+                //Image
+                File recipeImageFile = new File(getContext().getFilesDir(), MyConstants.IMAGE_FILE_NAME);
+                if (recipeImageFile.exists()) {
+                    recipeImageFile.delete();
+                }
+
+                File recipeNoImageFile = new File(getContext().getFilesDir(), MyConstants.NO_IMAGE_FILE_NAME);
+                if (recipeNoImageFile.exists()) {
+                    recipeNoImageFile.delete();
+                }
+
+                //Ingredients, Steps and Extra Info
+                SharedPreferences settings=getActivity().getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+                SharedPreferences.Editor editor=settings.edit();
+                editor.putString(MyConstants.CUSTOM_RECIPE_NAME, null);
+                editor.putString(MyConstants.CUSTOM_RECIPE_DESCRIPTION, null);
+                editor.putString(MyConstants.CUSTOM_RECIPE_INGREDIENTS, null);
+                editor.putString(MyConstants.CUSTOM_RECIPE_STEPS, null);
+                editor.putInt(MyConstants.CUSTOM_RECIPE_HOURS_SPINNER_CURR_POS, MyConstants.CUSTOM_RECIPE_NO_SPINNER_POS_SAVED);
+                editor.putInt(MyConstants.CUSTOM_RECIPE_MINUTES_SPINNER_CURR_POS, MyConstants.CUSTOM_RECIPE_NO_SPINNER_POS_SAVED);
+                editor.putString(MyConstants.CUSTOM_RECIPE_DIFFICULTY_LEVEL, null);
+                editor.putInt(MyConstants.CUSTOM_RECIPE_SERVE_COUNT, 0);
+                editor.putBoolean(MyConstants.CUSTOM_RECIPE_KOSHER, false);
+                editor.commit();
 
                 Intent toCommunityScreen = new Intent(getContext(), CommunityScreen.class);
                 toCommunityScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -6,11 +6,13 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -434,11 +436,52 @@ public class myServices {
         FirebaseUser currentUser = fAuth.getCurrentUser();
         FirebaseStorage fStorage = FirebaseStorage.getInstance();
         StorageReference fDownRef = fStorage.getReference("Users").child(currentUser.getUid()).child(MyConstants.PROFILE_PICTURE);
-        long MAXBYTES = 1024*1024;
+        long MAXBYTES = 1024*1024 * 5;
         fDownRef.getBytes(MAXBYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0 , bytes.length);
+                // Create a temporary file to save the image data
+                File tempFile = null;
+                try {
+                    tempFile = File.createTempFile("tempImage", ".jpg");
+                    FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
+                    fileOutputStream.write(bytes);
+                    fileOutputStream.close();
+
+                    // Get the EXIF orientation information
+                    ExifInterface exifInterface = new ExifInterface(tempFile.getAbsolutePath());
+                    int orientation = exifInterface.getAttributeInt(
+                            ExifInterface.TAG_ORIENTATION,
+                            ExifInterface.ORIENTATION_UNDEFINED);
+
+                    int rotationAngle = 0;
+                    switch (orientation) {
+                        case ExifInterface.ORIENTATION_ROTATE_90:
+                            rotationAngle = 90;
+                            break;
+                        case ExifInterface.ORIENTATION_ROTATE_180:
+                            rotationAngle = 180;
+                            break;
+                        case ExifInterface.ORIENTATION_ROTATE_270:
+                            rotationAngle = 270;
+                            break;
+                        default:
+                            rotationAngle = 0;
+                            break;
+                    }
+
+                    // Rotate the Bitmap by the calculated rotation angle
+                    Matrix matrix = new Matrix();
+                    matrix.setRotate(rotationAngle);
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 bitmap = getCircularBitmap(bitmap);
                 iv.setImageBitmap(bitmap);
             }

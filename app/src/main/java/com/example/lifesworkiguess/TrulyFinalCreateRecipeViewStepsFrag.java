@@ -67,8 +67,11 @@ public class TrulyFinalCreateRecipeViewStepsFrag extends Fragment implements Add
 
         if (getArguments() != null) {
             mode = getArguments().getString(MyConstants.CUSTOM_RECIPE_STEPS_VIEW_MODE, null);
-            jsonofSteps = getArguments().getString(MyConstants.CUSTOM_RECIPE_STEPS, null);
         }
+
+        SharedPreferences settings=getActivity().getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+        jsonofSteps = settings.getString(MyConstants.CUSTOM_RECIPE_STEPS, null);
+
 
     }
 

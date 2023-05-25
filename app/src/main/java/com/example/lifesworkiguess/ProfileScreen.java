@@ -12,9 +12,12 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +34,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class ProfileScreen extends AppCompatActivity implements CompletedCoursesViewHolder.OnItemClickListener, CompletedLessonsViewHolder.OnItemClickListener {
+public class ProfileScreen extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     FirebaseAuth fAuth;
     FirebaseUser loggedInUser;
@@ -42,11 +45,9 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
     ImageView profileScreenPFPIV,profileScreenMenuPFPIV ;
     Button changeCourse;
     LinearLayout profileScreen;
-    User globalCurrentlyLoggedInUser;
 
-    RecyclerView CompletedCoursesView, CompletedLessonsView;
+    ListView moreDetailsList;
 
-    ArrayList<String> coursesNamesForRV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +55,7 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
         setContentView(R.layout.activity_profile_screen);
 
 
-        //Recycler Views
-        CompletedCoursesView = findViewById(R.id.CompletedCoursesRV);
-        CompletedLessonsView = findViewById(R.id.CompletedLessonsRV);
+
 
 
         changeCourse = findViewById(R.id.PFPScreenChangeCourseBTN);
@@ -65,6 +64,13 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
         //Loading User's Info
         loadCurrentUserData();
 
+        moreDetailsList = findViewById(R.id.ProfileScreen_MoreDetailsList);
+
+        String[] moreDetails = new String[]{"View Completed Lessons & Courses", "View Completed Community Recipes", "View Recipes You Made"};
+        moreDetailsList.setOnItemClickListener(this);
+        moreDetailsList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        ArrayAdapter<String> adp = new ArrayAdapter<>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, moreDetails);
+        moreDetailsList.setAdapter(adp);
 
 
 
@@ -84,8 +90,8 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
     protected void onResume() {
 
         super.onResume();
-        if (refUsers!=null && userAndCourseGetter !=null) refUsers.addValueEventListener(userAndCourseGetter);
-        if (refLesson!=null && getLessonName!=null) refLesson.addValueEventListener(getLessonName);
+        if (refUsers!=null && userAndCourseGetter !=null) refUsers.addListenerForSingleValueEvent(userAndCourseGetter);
+        if (refLesson!=null && getLessonName!=null) refLesson.addListenerForSingleValueEvent(getLessonName);
         loadCurrentUserData();
     }
 
@@ -136,19 +142,7 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
                     changeCourse.setEnabled(false);
                 }
 
-                //Making Completed Courses RV:
-                coursesNamesForRV = new ArrayList<>();
-                coursesNamesForRV.add(loggedInUser.getSelectedCourse());
-                for (String finishedCourseName: loggedInUser.getCompletedCourses()){
-                    if(!finishedCourseName.equals(MyConstants.COMPLETED_COURSES_PLACEHOLDER) && !finishedCourseName.equals(loggedInUser.getSelectedCourse()) ){
-                        //No need to add any code that treats a case where PLACEHOLDER exists in the users completed courses, bc if it does exist
-                        //then the RV should only contain the Currently Selected Course, and if it Doesnt Exist, then there is no need to treat it.
-                        coursesNamesForRV.add(finishedCourseName);
-                    }
-                }
-                makeCompletedCoursesRecyclerView(loggedInUser);
 
-                //To make Loading seem smooth 2
                 profileScreen.setVisibility(View.VISIBLE);
 
 
@@ -168,92 +162,7 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
 
     }
 
-    public void makeCompletedCoursesRecyclerView(User currentUser){
-        globalCurrentlyLoggedInUser = currentUser;
 
-        // Create an instance of your adapter
-        CompletedCoursesAdapter adapter = new CompletedCoursesAdapter(ProfileScreen.this, coursesNamesForRV, this::onItemClick);
-
-
-        // Set the layout manager for the RecyclerView
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(ProfileScreen.this);
-        linearLayoutManager.setOrientation(RecyclerView.HORIZONTAL);
-        CompletedCoursesView.setLayoutManager(linearLayoutManager);
-
-        // Set the adapter for the RecyclerView
-        CompletedCoursesView.setAdapter(adapter);
-    }
-
-    public void makeCompletedLessonsRecyclerView(Course pickedCourse){
-        //For smoothe loading 1
-        CompletedLessonsView.setVisibility(View.INVISIBLE);
-        CompletedLessonsView.setEnabled(true);
-
-        CompletedLessonsAdapter adapter = new CompletedLessonsAdapter(ProfileScreen.this, globalCurrentlyLoggedInUser, pickedCourse, this::onItemClick2);
-        // Set the layout manager for the RecyclerView
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(ProfileScreen.this);
-        linearLayoutManager.setOrientation(RecyclerView.HORIZONTAL);
-        CompletedLessonsView.setLayoutManager(linearLayoutManager);
-
-        // Set the adapter for the RecyclerView
-        CompletedLessonsView.setAdapter(adapter);
-
-        //For smoothe loading 2
-        Toast.makeText(ProfileScreen.this, "Please wait", Toast.LENGTH_SHORT).show();
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                CompletedLessonsView.setVisibility(View.VISIBLE);
-                CompletedLessonsView.setEnabled(true);
-
-            }
-        }, 1000);
-    }
-
-
-
-
-
-
-
-    @Override
-    public void onItemClick(int position) {
-
-
-        FirebaseDatabase FBDB = FirebaseDatabase.getInstance("https://cookproject-ac2c0-default-rtdb.europe-west1.firebasedatabase.app");
-        String pickedCourseName =  coursesNamesForRV.get(position);
-        refLesson= FBDB.getReference("Courses").child(pickedCourseName);
-        getLessonName = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-
-                    Course pickedCourse = new Course(pickedCourseName);
-                for (DataSnapshot data : snapshot.getChildren()) {
-                    PermanentLesson addedPermanentLesson = data.getValue(PermanentLesson.class);
-                    pickedCourse.addLesson(addedPermanentLesson);
-
-                }
-                //By default, FB sorts items by ABC, so this is used to sort lessons by predetermined numbers set by me:
-                pickedCourse.sortLessonsListByNumber();
-
-                makeCompletedLessonsRecyclerView(pickedCourse);
-
-                }
-
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        };
-        refLesson.addValueEventListener(getLessonName);
-    }
-
-    @Override
-    public void onItemClick2(int position) {
-
-    }
 
 
     public void changeCourse(View view){
@@ -296,5 +205,27 @@ public class ProfileScreen extends AppCompatActivity implements CompletedCourses
     }
 
     public void goToCommunityPage(View view){  myServices.goToCommunityPage(ProfileScreen.this);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+        Intent toCompletedScreen = new Intent(ProfileScreen.this, moreDetailsLists.class);
+
+        if (position==0)
+        {
+           toCompletedScreen.putExtra("View Mode", "Completed Lessons & Courses");
+        }
+        if (position==1)
+        {
+            toCompletedScreen.putExtra("View Mode", "Completed Community Recipes");
+
+        }
+        if (position==2)
+        {
+            toCompletedScreen.putExtra("View Mode", "Your Recipes");
+
+        }
+        startActivity(toCompletedScreen);
     }
 }

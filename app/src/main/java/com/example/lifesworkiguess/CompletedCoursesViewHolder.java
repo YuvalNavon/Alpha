@@ -19,7 +19,7 @@ public class CompletedCoursesViewHolder extends RecyclerView.ViewHolder implemen
     }
 
     public interface OnItemClickListener {
-        void onItemClick(int position);
+        void onItemClickCompletedCourses(int position);
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
@@ -35,7 +35,7 @@ public class CompletedCoursesViewHolder extends RecyclerView.ViewHolder implemen
         if (listener != null) {
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
-                listener.onItemClick(position);
+                listener.onItemClickCompletedCourses(position);
             }
         }
     }

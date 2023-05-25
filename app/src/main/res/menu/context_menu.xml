@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/start_recipe"
+        android:title="Start Recipe" />
+    <item
+        android:id="@+id/view_reviews"
+        android:title="View Reviews" />
+    <item
+        android:id="@+id/edit_recipe"
+        android:title="Edit Recipe" />
+    <item
+        android:id="@+id/delete_recipe"
+        android:title="Delete Recipe" />
+</menu>

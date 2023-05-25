@@ -2,6 +2,7 @@ package com.example.lifesworkiguess;
 
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
@@ -14,6 +15,7 @@ public class CompletedLessonsViewHolder extends RecyclerView.ViewHolder implemen
     public ImageView dishIV;
     public TextView lessonNameTV;
     public RatingBar dishRatingRB;
+    public LinearLayout LL;
     public OnItemClickListener listener;
 
     public CompletedLessonsViewHolder(@NonNull View itemView) {
@@ -22,8 +24,9 @@ public class CompletedLessonsViewHolder extends RecyclerView.ViewHolder implemen
         dishIV = itemView.findViewById(R.id.completedLessonDishIV);
         lessonNameTV = itemView.findViewById(R.id.completedLessonNameTV);
         dishRatingRB = itemView.findViewById(R.id.completedLessonRatingRB);
+        LL = itemView.findViewById(R.id.completedLessonsLL);
 
-        dishIV.setOnClickListener(this);
+        LL.setOnClickListener(this);
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
@@ -33,7 +36,7 @@ public class CompletedLessonsViewHolder extends RecyclerView.ViewHolder implemen
 
 
     public interface OnItemClickListener {
-        void onItemClick2(int position);
+        void onItemClickCompletedLessons(int position);
     }
 
 
@@ -43,7 +46,7 @@ public class CompletedLessonsViewHolder extends RecyclerView.ViewHolder implemen
         if (listener != null) {
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
-                listener.onItemClick2(position);
+                listener.onItemClickCompletedLessons(position);
             }
         }
     }

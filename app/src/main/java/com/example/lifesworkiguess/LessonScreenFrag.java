@@ -191,8 +191,7 @@ public class LessonScreenFrag extends Fragment {
     public void onResume() {
 
         super.onResume();
-        if (refUsers!=null && courseGetter!=null) refUsers.addListenerForSingleValueEvent(courseGetter);
-        if (refCommunityLessons!=null && communityLessonGetter!=null) refCommunityLessons.addListenerForSingleValueEvent(communityLessonGetter);
+
 
     }
 
@@ -242,95 +241,114 @@ public class LessonScreenFrag extends Fragment {
 
         Context context = getContext();
         if (stepIsLast(currStepNumber)){
-            Toast.makeText(context, "FINISHED", Toast.LENGTH_LONG).show();
             FirebaseAuth fAuth = FirebaseAuth.getInstance();
             FirebaseUser loggedInUser = fAuth.getCurrentUser();
-            FirebaseDatabase FBDB = FirebaseDatabase.getInstance("https://cookproject-ac2c0-default-rtdb.europe-west1.firebasedatabase.app");
-            refUsers=FBDB.getReference("Users").child(loggedInUser.getUid());
 
-            Intent toLessonFinishedScreen = new Intent(context, LessonFinished.class);
-            toLessonFinishedScreen.putExtra(MyConstants.LESSON_INTRO_MODE_KEY, permanentOrCommunity);
-
-            if (permanentOrCommunity == MyConstants.PERMENANT_LESSON_INTRO)
+            if (permanentOrCommunity == MyConstants.COMMUNITY_LESSON_INTRO)
             {
-                courseGetter = new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (creatorID.equals(loggedInUser.getUid())) //Cant let user Review their owen lessons
+                {
+                    Intent toHomeScreen = new Intent(context, HomeScreen.class);
+                    getContext().startActivity(toHomeScreen);
 
-                        User currentlyLoggedUser = snapshot.getValue(User.class);
-                        currentlyLoggedUser.setLessonFinished(lessonPosition);
-
-                        FBDB.getReference("Users/" + loggedInUser.getUid()).setValue(currentlyLoggedUser);
-
-                        toLessonFinishedScreen.putExtra("Lesson Position in List", lessonPosition);
-                        toLessonFinishedScreen.putExtra("Lesson Name", lessonName);
-                        toLessonFinishedScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-                        context.startActivity(toLessonFinishedScreen);
-
-
-
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                };
-                refUsers.addValueEventListener(courseGetter);
+                }
             }
 
-            else if (permanentOrCommunity == MyConstants.COMMUNITY_LESSON_INTRO)
+
+
+
+            else
             {
-                courseGetter = new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                FirebaseDatabase FBDB = FirebaseDatabase.getInstance("https://cookproject-ac2c0-default-rtdb.europe-west1.firebasedatabase.app");
+                refUsers=FBDB.getReference("Users").child(loggedInUser.getUid());
 
-                        User currentlyLoggedUser = snapshot.getValue(User.class);
-                        currentlyLoggedUser.addFinishedCommunityLesson(creatorID, lessonNumber);
-                        FBDB.getReference("Users/" + loggedInUser.getUid()).setValue(currentlyLoggedUser);
+                Intent toLessonFinishedScreen = new Intent(context, LessonFinished.class);
+                toLessonFinishedScreen.putExtra(MyConstants.LESSON_INTRO_MODE_KEY, permanentOrCommunity);
 
-                        //Updating Community Lessons branch
-                        refCommunityLessons = FBDB.getReference("Community Lessons").child(creatorID + " , " + lessonNumber  );
-                        communityLessonGetter = new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (permanentOrCommunity == MyConstants.PERMENANT_LESSON_INTRO)
+                {
+                    courseGetter = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
 
+                            User currentlyLoggedUser = snapshot.getValue(User.class);
+                            currentlyLoggedUser.setLessonFinished(lessonPosition);
 
-                                CommunityLesson finishedLesson = snapshot.getValue(CommunityLesson.class);
+                            FBDB.getReference("Users/" + loggedInUser.getUid()).setValue(currentlyLoggedUser);
 
-                                finishedLesson.addUserWhoCompleted(loggedInUser.getUid());
-                                refCommunityLessons.setValue(finishedLesson).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        toLessonFinishedScreen.putExtra(MyConstants.LESSON_CREATOR_ID_KEY, creatorID);
-                                        toLessonFinishedScreen.putExtra(MyConstants.LESSON_NAME_KEY, lessonName);
-                                        toLessonFinishedScreen.putExtra(MyConstants.COMMUNITY_LESSON_NUMBER_KEY, lessonNumber);
-
-                                        toLessonFinishedScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        context.startActivity(toLessonFinishedScreen);
-                                    }
-                                });
-
-
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        };
-                        refCommunityLessons.addListenerForSingleValueEvent(communityLessonGetter);
+                            toLessonFinishedScreen.putExtra("Lesson Position in List", lessonPosition);
+                            toLessonFinishedScreen.putExtra("Lesson Name", lessonName);
+                            toLessonFinishedScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                            context.startActivity(toLessonFinishedScreen);
 
 
 
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    };
+                    refUsers.addValueEventListener(courseGetter);
+                }
+
+                else if (permanentOrCommunity == MyConstants.COMMUNITY_LESSON_INTRO)
+                {
+                    courseGetter = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                            User currentlyLoggedUser = snapshot.getValue(User.class);
+                            currentlyLoggedUser.addFinishedCommunityLesson(creatorID, lessonNumber);
+                            FBDB.getReference("Users/" + loggedInUser.getUid()).setValue(currentlyLoggedUser);
+
+                            //Updating Community Lessons branch
+                            refCommunityLessons = FBDB.getReference("Community Lessons").child(creatorID + " , " + lessonNumber  );
+                            communityLessonGetter = new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
 
 
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                                    CommunityLesson finishedLesson = snapshot.getValue(CommunityLesson.class);
 
-                    }
-                };
-                refUsers.addListenerForSingleValueEvent(courseGetter);
+                                    finishedLesson.addUserWhoCompleted(loggedInUser.getUid());
+                                    refCommunityLessons.setValue(finishedLesson).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            toLessonFinishedScreen.putExtra(MyConstants.LESSON_CREATOR_ID_KEY, creatorID);
+                                            toLessonFinishedScreen.putExtra(MyConstants.LESSON_NAME_KEY, lessonName);
+                                            toLessonFinishedScreen.putExtra(MyConstants.COMMUNITY_LESSON_NUMBER_KEY, lessonNumber);
+
+                                            toLessonFinishedScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            context.startActivity(toLessonFinishedScreen);
+                                        }
+                                    });
+
+
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            };
+                            refCommunityLessons.addListenerForSingleValueEvent(communityLessonGetter);
+
+
+
+
+
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    };
+                    refUsers.addListenerForSingleValueEvent(courseGetter);
+                }
+
+
+
             }
 
 
@@ -347,7 +365,6 @@ public class LessonScreenFrag extends Fragment {
         }
 
 //        formatStepName(recipe.getSteps().get(currStepNumber).getName());
-
     }
 
     public void prevStep(View view){

@@ -40,9 +40,9 @@ public class CompletedCoursesAdapter extends RecyclerView.Adapter<CompletedCours
 
         holder.setOnItemClickListener(new CompletedCoursesViewHolder.OnItemClickListener() {
                 @Override
-                public void onItemClick(int position) {
+                public void onItemClickCompletedCourses(int position) {
                     if (listener != null) {
-                        listener.onItemClick(position);
+                        listener.onItemClickCompletedCourses(position);
                     }
                 }
         });
@@ -57,7 +57,7 @@ public class CompletedCoursesAdapter extends RecyclerView.Adapter<CompletedCours
     }
 
     public interface OnItemClickListener {
-        void onItemClick(int position);
+        void onItemClickCompletedCourses(int position);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {

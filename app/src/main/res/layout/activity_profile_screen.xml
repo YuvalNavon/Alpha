@@ -85,7 +85,7 @@
                         android:id="@+id/profileScreenCourseTV"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_weight="1"
+                        android:layout_weight="1.4"
                         android:gravity="center"
                         android:text="ENTER CURRENT COURSE"
                         android:textColor="@color/orange"
@@ -149,25 +149,8 @@
                 android:layout_height="0dp"
                 android:layout_weight="1" />
 
-            <TextView
-                android:id="@+id/textView18"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1.5"
-                android:gravity="center"
-                android:text="History"
-                android:textColor="@color/orange"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/CompletedCoursesRV"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="3" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/CompletedLessonsRV"
+            <ListView
+                android:id="@+id/ProfileScreen_MoreDetailsList"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="10" />

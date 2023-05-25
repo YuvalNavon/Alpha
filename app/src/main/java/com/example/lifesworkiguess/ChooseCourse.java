@@ -183,15 +183,35 @@ public class ChooseCourse extends AppCompatActivity implements AdapterView.OnIte
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                                     long lessonCount = snapshot.getChildrenCount();
-                                    currentUser.getLessonsRating().add(new ArrayList<>());
-                                    int latestRatingsListIndex = currentUser.getLessonsRating().size() -1; //we need to update this variable bc we just added a new list to the list.
-                                    currentUser.getLessonsRating().get(latestRatingsListIndex).add(currentUser.getSelectedCourse());
-                                    for (int i = 0; i < lessonCount; i++) {
 
-                                        currentUser.getLessonsStatus().add(0);
-                                        currentUser.getLessonsRating().get(latestRatingsListIndex).add("0");
+                                    boolean userPickedPreviouslyCompletedCourse = false;
+                                    for (String courseName: currentUser.getCompletedCourses())
+                                    {
+                                        if (currentUser.getSelectedCourse().equals(courseName))
+                                            userPickedPreviouslyCompletedCourse = true;
 
                                     }
+                                    if (!userPickedPreviouslyCompletedCourse)
+                                    {
+                                        currentUser.getLessonsRating().add(new ArrayList<>());
+                                        int latestRatingsListIndex = currentUser.getLessonsRating().size() -1; //we need to update this variable bc we just added a new list to the list.
+                                        currentUser.getLessonsRating().get(latestRatingsListIndex).add(currentUser.getSelectedCourse());
+                                        for (int i = 0; i < lessonCount; i++) {
+
+                                            currentUser.getLessonsStatus().add(0);
+                                            currentUser.getLessonsRating().get(latestRatingsListIndex).add("0");
+
+                                        }
+                                    }
+                                    else
+                                    {
+                                        for (int i = 0; i < lessonCount; i++) {
+
+                                            currentUser.getLessonsStatus().add(1);
+
+                                        }
+                                    }
+
                                     refUsers.setValue(currentUser);
                                     Toast.makeText(ChooseCourse.this, "Please wait", Toast.LENGTH_SHORT).show();
                                     Handler handler = new Handler();

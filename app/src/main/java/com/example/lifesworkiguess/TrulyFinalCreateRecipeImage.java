@@ -85,9 +85,7 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
 
 
         else if (gi.getStringExtra("Previous Activity").equals(MyConstants.NOT_FROM_FINISH_SCREEN)){
-            //From General
-            recipeName =  gi.getStringExtra(MyConstants.CUSTOM_RECIPE_NAME);
-            recipeDescription = gi.getStringExtra(MyConstants.CUSTOM_RECIPE_DESCRIPTION);
+
 
         }
 
@@ -361,13 +359,6 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
 
             Intent toAddRecipeIngredients = new Intent(TrulyFinalCreateRecipeImage.this, TrulyFinalCreateRecipeIngredients.class);
             toAddRecipeIngredients.putExtra("Previous Activity", MyConstants.NOT_FROM_FINISH_SCREEN);
-
-            //From General
-            toAddRecipeIngredients.putExtra(MyConstants.CUSTOM_RECIPE_NAME, recipeName);
-            toAddRecipeIngredients.putExtra(MyConstants.CUSTOM_RECIPE_DESCRIPTION, recipeDescription);
-
-
-            //From this no need to save anything in intent, recipeImage is saved to files.
 
 
             startActivity(toAddRecipeIngredients);

@@ -149,18 +149,6 @@ public class TrulyFinalCreateRecipeExtraInfo extends AppCompatActivity implement
 
         else if (gi.getStringExtra("Previous Activity").equals(MyConstants.NOT_FROM_FINISH_SCREEN)){
 
-            //From General
-            recipeName =  gi.getStringExtra(MyConstants.CUSTOM_RECIPE_NAME);
-            recipeDescription = gi.getStringExtra(MyConstants.CUSTOM_RECIPE_DESCRIPTION);
-
-            //From Image - Nothing, image is saved in files
-
-            //From Ingredients
-            jsonOfIngredients = gi.getStringExtra(MyConstants.CUSTOM_RECIPE_INGREDIENTS);
-
-            //From Steps
-            jsonOfSteps = gi.getStringExtra(MyConstants.CUSTOM_RECIPE_STEPS);
-
 
         }
 
@@ -535,25 +523,15 @@ public class TrulyFinalCreateRecipeExtraInfo extends AppCompatActivity implement
             Intent toAddRecipeFinish = new Intent(this, TrulyFinalCreateRecipeFinishScreen.class);
             toAddRecipeFinish.putExtra("Previous Activity", MyConstants.NOT_FROM_FINISH_SCREEN);
 
-            //From General
-            toAddRecipeFinish.putExtra(MyConstants.CUSTOM_RECIPE_NAME, recipeName);
-            toAddRecipeFinish.putExtra(MyConstants.CUSTOM_RECIPE_DESCRIPTION, recipeDescription);
+            SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+            SharedPreferences.Editor editor=settings.edit();
+            editor.putString(MyConstants.CUSTOM_RECIPE_TIME, finalRecipeTime);
+            editor.putString(MyConstants.CUSTOM_RECIPE_DIFFICULTY_LEVEL, recipeDifficultyLevel);
+            editor.putInt(MyConstants.CUSTOM_RECIPE_SERVE_COUNT, recipeServeCount);
+            editor.putBoolean(MyConstants.CUSTOM_RECIPE_KOSHER, recipeKosher);
+            editor.commit();
 
 
-            //From Image - Nothing, image is saved in files
-
-            //From Ingredients
-            toAddRecipeFinish.putExtra(MyConstants.CUSTOM_RECIPE_INGREDIENTS, jsonOfIngredients);
-
-            //From Steps
-            toAddRecipeFinish.putExtra(MyConstants.CUSTOM_RECIPE_STEPS, jsonOfSteps);
-
-            //From This
-            makeFinalRecipeTime(recipeTimeHours, recipeTimeMinutes);
-            toAddRecipeFinish.putExtra(MyConstants.CUSTOM_RECIPE_TIME, finalRecipeTime);
-            toAddRecipeFinish.putExtra(MyConstants.CUSTOM_RECIPE_DIFFICULTY_LEVEL, recipeDifficultyLevel);
-            toAddRecipeFinish.putExtra(MyConstants.CUSTOM_RECIPE_SERVE_COUNT, recipeServeCount);
-            toAddRecipeFinish.putExtra(MyConstants.CUSTOM_RECIPE_KOSHER, recipeKosher);
 
             startActivity(toAddRecipeFinish);
         }

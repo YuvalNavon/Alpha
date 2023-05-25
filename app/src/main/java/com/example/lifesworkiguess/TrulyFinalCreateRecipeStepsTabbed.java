@@ -109,15 +109,6 @@ public class TrulyFinalCreateRecipeStepsTabbed extends AppCompatActivity {
 
         else if (gi.getStringExtra("Previous Activity").equals(MyConstants.NOT_FROM_FINISH_SCREEN)){
 
-            //From General
-            recipeName =  gi.getStringExtra(MyConstants.CUSTOM_RECIPE_NAME);
-            recipeDescription = gi.getStringExtra(MyConstants.CUSTOM_RECIPE_DESCRIPTION);
-
-            //From Image - Nothing, image is saved in files
-
-            //From Ingredients
-            jsonOfIngredients = gi.getStringExtra(MyConstants.CUSTOM_RECIPE_INGREDIENTS);
-
 
         }
     }
@@ -216,20 +207,13 @@ public class TrulyFinalCreateRecipeStepsTabbed extends AppCompatActivity {
             Intent toAddRecipeExtraInfo = new Intent(this, TrulyFinalCreateRecipeExtraInfo.class);
             toAddRecipeExtraInfo.putExtra("Previous Activity", MyConstants.NOT_FROM_FINISH_SCREEN);
 
-            //From General
-            toAddRecipeExtraInfo.putExtra(MyConstants.CUSTOM_RECIPE_NAME, recipeName);
-            toAddRecipeExtraInfo.putExtra(MyConstants.CUSTOM_RECIPE_DESCRIPTION, recipeDescription);
-
-
-            //From Image - Nothing, image is saved in files
-
-            //From Ingredients
-            toAddRecipeExtraInfo.putExtra(MyConstants.CUSTOM_RECIPE_INGREDIENTS, jsonOfIngredients);
-
             //From This
             Gson gson = new Gson();
             String jsonOfSteps = gson.toJson(stepsInStringLists);
-            toAddRecipeExtraInfo.putExtra(MyConstants.CUSTOM_RECIPE_STEPS, jsonOfSteps);
+            SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+            SharedPreferences.Editor editor=settings.edit();
+            editor.putString(MyConstants.CUSTOM_RECIPE_STEPS, jsonOfSteps);
+            editor.commit();
 
             startActivity(toAddRecipeExtraInfo);
         }

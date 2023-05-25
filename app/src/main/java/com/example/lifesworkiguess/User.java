@@ -16,8 +16,10 @@ public class User {
     private ArrayList<ArrayList<String>> LessonsRating;
     private ArrayList<String> CompletedCourses;
     private ArrayList<String> UploadedRecipeNames;
+    private ArrayList<Integer> UploadedRecipeStatuses;
     private ArrayList<ArrayList<String>> FinishedCommunityLessons;
     private int FinishedCourse;
+    private int Active;
 
 
 
@@ -51,7 +53,9 @@ public class User {
         //completes their first course (see homescreen)
         FinishedCourse = MyConstants.NOT_FINISHED_COURSE;
         UploadedRecipeNames = new ArrayList<>();
+        UploadedRecipeStatuses = new ArrayList<>();
         this.FinishedCommunityLessons = new ArrayList<>();
+        this.Active = 1;
 
 
 
@@ -72,14 +76,17 @@ public class User {
         LessonsRating = lessonsRating;
         CompletedCourses = completedCourses;
         UploadedRecipeNames = new ArrayList<>();
+        UploadedRecipeStatuses = new ArrayList<>();
         FinishedCourse = finishedCourse;
         this.FinishedCommunityLessons = new ArrayList<>();
 
     }
 
+
     public User(String username, String password, String email, String cookingStyle, String experienceLevel, String selectedCourse, String hours, int finishedSetUp,
                 ArrayList<Integer> lessonsStatus, ArrayList<ArrayList<String>> lessonsRating, ArrayList<String> completedCourses,
-                ArrayList<String> uploadedRecipeNames, int finishedCourse) {
+                ArrayList<String> uploadedRecipeNames, ArrayList<Integer> uploadedRecipeStatuses,
+                int finishedCourse, int active) {
         Username = username;
         Password = password;
         Email = email;
@@ -92,13 +99,16 @@ public class User {
         LessonsRating = lessonsRating;
         CompletedCourses = completedCourses;
         this.UploadedRecipeNames = uploadedRecipeNames;
+        this.UploadedRecipeStatuses = uploadedRecipeStatuses;
         FinishedCourse = finishedCourse;
         this.FinishedCommunityLessons = new ArrayList<>();
+        Active = active;
     }
 
     public User(String username, String password, String email, String cookingStyle, String experienceLevel, String selectedCourse, String hours, int finishedSetUp,
                 ArrayList<Integer> lessonsStatus, ArrayList<ArrayList<String>> lessonsRating, ArrayList<String> completedCourses,
-                ArrayList<String> uploadedRecipeNames, ArrayList<ArrayList<String>> finishedCommunityLessons, int finishedCourse) {
+                ArrayList<String> uploadedRecipeNames, ArrayList<Integer> uploadedRecipeStatuses,
+                ArrayList<ArrayList<String>> finishedCommunityLessons, int finishedCourse, int active) {
         Username = username;
         Password = password;
         Email = email;
@@ -111,8 +121,10 @@ public class User {
         LessonsRating = lessonsRating;
         CompletedCourses = completedCourses;
         UploadedRecipeNames = uploadedRecipeNames;
+        UploadedRecipeStatuses = uploadedRecipeStatuses;
         FinishedCommunityLessons = finishedCommunityLessons;
         FinishedCourse = finishedCourse;
+        Active = active;
     }
 
     public String getUsername() {
@@ -160,8 +172,17 @@ public class User {
     }
 
     public ArrayList<String> getUploadedRecipeNames() {
+        if (UploadedRecipeNames == null)
+            UploadedRecipeNames = new ArrayList<>();
         return UploadedRecipeNames;
     }
+
+    public ArrayList<Integer> getUploadedRecipeStatuses() {
+        if (UploadedRecipeStatuses == null)
+            UploadedRecipeStatuses = new ArrayList<>();
+        return UploadedRecipeStatuses;
+    }
+
 
     public ArrayList<ArrayList<String>> getFinishedCommunityLessons() {
         return FinishedCommunityLessons;
@@ -172,6 +193,9 @@ public class User {
     }
 
 
+    public int getActive() {
+        return Active;
+    }
 
     public void setUsername(String username) {
         Username = username;
@@ -222,6 +246,10 @@ public class User {
         this.UploadedRecipeNames = uploadedRecipeNames;
     }
 
+    public void setUploadedRecipeStatuses(ArrayList<Integer> uploadedRecipeStatuses) {
+        UploadedRecipeStatuses = uploadedRecipeStatuses;
+    }
+
     public void setFinishedCommunityLessons(ArrayList<ArrayList<String>> finishedCommunityLessons) {
         FinishedCommunityLessons = finishedCommunityLessons;
     }
@@ -231,6 +259,9 @@ public class User {
     }
 
 
+    public void setActive(int active) {
+        this.Active = active;
+    }
 
     public String determineExperienceLevel(String experienceLevel){
         if (experienceLevel.equals(MyConstants.COMPLETELY_NEW))
@@ -311,6 +342,9 @@ public class User {
         if (UploadedRecipeNames== null)  UploadedRecipeNames = new ArrayList<>(); //Supposedly this condition should never be met as we initialize the list for every constructor
         //except the error one
         UploadedRecipeNames.add(recipeName);
+
+        if (UploadedRecipeStatuses == null) UploadedRecipeStatuses = new ArrayList<>();
+        UploadedRecipeStatuses.add(1);
     }
 
     public void addFinishedCommunityLesson(String creatorID, int lessonNumber){
