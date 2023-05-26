@@ -1,8 +1,10 @@
 package com.example.lifesworkiguess;
 
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -10,6 +12,7 @@ import androidx.core.content.FileProvider;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -126,6 +129,42 @@ public class LessonFinished extends AppCompatActivity {
 
 
         }
+
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                // Handle the back button press event here
+                //Setting up Alert Dialogs
+                AlertDialog.Builder saveDialogBuilder = new AlertDialog.Builder(LessonFinished.this);
+
+                saveDialogBuilder.setTitle("Before Going Back...");
+                saveDialogBuilder.setMessage("Are You Sure You want to go back to the Course Screen Without Saving? ");
+
+                saveDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Handle click here
+                    }
+                });
+
+                saveDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        Intent toHomeScreen = new Intent(LessonFinished.this, HomeScreen.class);
+                        toHomeScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(toHomeScreen);
+                        finish();
+                    }
+                });
+
+
+
+                // Create and show the AlertDialog
+                AlertDialog exitDialog = saveDialogBuilder.create();
+                exitDialog.show();
+            }
+        });
 
 
 
@@ -351,9 +390,9 @@ public class LessonFinished extends AppCompatActivity {
                                                 }
 
 
-                                                Intent toHomeScreen = new Intent(LessonFinished.this, CommunityScreen.class);
-                                                toHomeScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                startActivity(toHomeScreen);
+                                                Intent toCommunityScreen = new Intent(LessonFinished.this, CommunityScreen.class);
+                                                toCommunityScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                startActivity(toCommunityScreen);
                                                 finish();
 
                                             }

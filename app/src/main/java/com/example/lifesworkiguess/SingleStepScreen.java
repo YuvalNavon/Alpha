@@ -25,6 +25,8 @@ public class SingleStepScreen extends AppCompatActivity {
     int stepNumber;
     String originalStepName, originalStepDescription, originalStepTime;
 
+    String mode; //Can only Contain "From Finish"
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +58,7 @@ public class SingleStepScreen extends AppCompatActivity {
         stepDescriptionET.setText(originalStepDescription);
         stepTimeET.setText(originalStepTime);
 
+
         stepNameET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -85,36 +88,60 @@ public class SingleStepScreen extends AppCompatActivity {
             public void handleOnBackPressed() {
                 // Handle the back button press event here
                 //Setting up Alert Dialogs
-                AlertDialog.Builder saveStepChangesDialogBuilder = new AlertDialog.Builder(SingleStepScreen.this);
 
-                saveStepChangesDialogBuilder.setTitle("Before Going Back...");
-                saveStepChangesDialogBuilder.setMessage("Would you like to Save your Changes?");
+                String changedStepName = stepNameET.getText().toString();
+                String changedStepDescription = stepDescriptionET.getText().toString();
+                String changedStepTime = stepTimeET.getText().toString();
 
-                saveStepChangesDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // Handle click here
-                        finish();
-                    }
-                });
+                if (changedStepName.equals(originalStepName) && changedStepDescription.equals(originalStepDescription) &&changedStepTime.equals(originalStepTime))
+                {
+                    finish();
+                }
 
-                saveStepChangesDialogBuilder.setNeutralButton("Continue Editing", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                else
+                {
 
-                    }
-                });
+                    AlertDialog.Builder saveStepChangesDialogBuilder = new AlertDialog.Builder(SingleStepScreen.this);
 
-                saveStepChangesDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        saveChanges();
-                    }
-                });
+                    saveStepChangesDialogBuilder.setTitle("Before Going Back...");
+                    saveStepChangesDialogBuilder.setMessage("Would you like to Save your Changes?");
 
-                // Create and show the AlertDialog
-                AlertDialog exitLessonDialog = saveStepChangesDialogBuilder.create();
-                exitLessonDialog.show();
+                    saveStepChangesDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // Handle click here
+                            finish();
+                        }
+                    });
+
+                    saveStepChangesDialogBuilder.setNeutralButton("Continue Editing", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+
+                    saveStepChangesDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            saveChanges();
+                        }
+                    });
+
+                    // Create and show the AlertDialog
+                    AlertDialog saveStepChangesDialog = saveStepChangesDialogBuilder.create();
+                    saveStepChangesDialog.show();
+                }
+
             }
         });
+
+        mode = fromCreatingRecipe.getStringExtra("Origin");
+        if (mode!=null && mode.equals("From Finish"))
+        {
+            stepNameET.setEnabled(false);
+            stepDescriptionET.setEnabled(false);
+            stepTimeET.setEnabled(false);
+            saveBTN.setText("Back");
+        }
     }
 
 
@@ -124,52 +151,69 @@ public class SingleStepScreen extends AppCompatActivity {
         String changedStepDescription = stepDescriptionET.getText().toString();
         String changedStepTime = stepTimeET.getText().toString();
 
-        if (!changedStepName.isEmpty() && !changedStepDescription.isEmpty() && !changedStepTime.isEmpty())
+        if (changedStepName.equals(originalStepName) && changedStepDescription.equals(originalStepDescription) &&changedStepTime.equals(originalStepTime))
         {
-
-            AlertDialog.Builder saveStepChangesDialogBuilder = new AlertDialog.Builder(SingleStepScreen.this);
-
-            saveStepChangesDialogBuilder.setTitle("Are You Sure?");
-            saveStepChangesDialogBuilder.setMessage("Would you like to Save your Changes?");
-
-            saveStepChangesDialogBuilder.setNegativeButton("Not Yet", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    // Handle click here
-                }
-            });
-
-
-            saveStepChangesDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
-                    SharedPreferences.Editor editor=settings.edit();
-                    editor.putInt(MyConstants.STEP_NUMBER_KEY, stepNumber );
-                    editor.putString(MyConstants.STEP_NAME_KEY, changedStepName);
-                    editor.putString(MyConstants.STEP_DESCRIPTION_KEY, changedStepDescription);
-                    editor.putString(MyConstants.STEP_TIME_KEY, changedStepTime);
-                    editor.commit();
-                    finish();
-                }
-            });
-
-            // Create and show the AlertDialog
-            AlertDialog exitLessonDialog = saveStepChangesDialogBuilder.create();
-            exitLessonDialog.show();
-
-
+            finish();
         }
 
         else
         {
-            Toast.makeText(this, "Please fill all Fields!", Toast.LENGTH_SHORT).show();
+            if (!changedStepName.isEmpty() && !changedStepDescription.isEmpty() && !changedStepTime.isEmpty())
+            {
+
+                AlertDialog.Builder saveStepChangesDialogBuilder = new AlertDialog.Builder(SingleStepScreen.this);
+
+                saveStepChangesDialogBuilder.setTitle("Are You Sure?");
+                saveStepChangesDialogBuilder.setMessage("Would you like to Save your Changes?");
+
+                saveStepChangesDialogBuilder.setNegativeButton("Not Yet", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Handle click here
+                    }
+                });
+
+
+                saveStepChangesDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+                        SharedPreferences.Editor editor=settings.edit();
+                        editor.putInt(MyConstants.STEP_NUMBER_KEY, stepNumber );
+                        editor.putString(MyConstants.STEP_NAME_KEY, changedStepName);
+                        editor.putString(MyConstants.STEP_DESCRIPTION_KEY, changedStepDescription);
+                        editor.putString(MyConstants.STEP_TIME_KEY, changedStepTime);
+                        editor.commit();
+                        finish();
+                    }
+                });
+
+                // Create and show the AlertDialog
+                AlertDialog exitLessonDialog = saveStepChangesDialogBuilder.create();
+                exitLessonDialog.show();
+
+
+            }
+
+            else
+            {
+                Toast.makeText(this, "Please fill all Fields!", Toast.LENGTH_SHORT).show();
+            }
+
         }
+
 
 
     }
 
     public void clickedSave(View view){
+        if (mode!=null &&  mode.equals("From Finish"))
+        {
+            finish();
+        }
+        else
+        {
+            saveChanges();
 
-        saveChanges();
+        }
     }
 
     public void resetChanges(View view){

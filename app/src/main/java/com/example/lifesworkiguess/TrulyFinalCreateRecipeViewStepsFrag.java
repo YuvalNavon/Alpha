@@ -200,15 +200,13 @@ public class TrulyFinalCreateRecipeViewStepsFrag extends Fragment implements Add
     @Override
     public void onItemClick(int position) {
 
-        if (mode.equals(MyConstants.CUSTOM_RECIPE_VIEW_STEPS_DURING_MAKING))
-        {
+        if (mode.equals(MyConstants.CUSTOM_RECIPE_VIEW_STEPS_DURING_MAKING)) {
             Step pickedStep = stepsViewModel.getStepsList().getValue().get(position);
             String stepName = pickedStep.getName();
             String stepDescription = pickedStep.getDescription();
             String stepTime = pickedStep.getTime();
             String stepAction = pickedStep.getAction();
             int stepNumber = pickedStep.getNumber();
-
             Intent toSingleStepScreen = new Intent(getContext(), SingleStepScreen.class);
 
             toSingleStepScreen.putExtra("Step Number", stepNumber);
@@ -219,6 +217,31 @@ public class TrulyFinalCreateRecipeViewStepsFrag extends Fragment implements Add
 
             getContext().startActivity(toSingleStepScreen);
         }
+
+        else if (mode.equals(MyConstants.CUSTOM_RECIPE_VIEW_STEPS_FINISH))
+        {
+            Step pickedStep = stepsList.get(position);
+            String stepName = pickedStep.getName();
+            String stepDescription = pickedStep.getDescription();
+            String stepTime = pickedStep.getTime();
+            String stepAction = pickedStep.getAction();
+            int stepNumber = pickedStep.getNumber();
+
+            Intent toSingleStepScreen = new Intent(getContext(), SingleStepScreen.class);
+            toSingleStepScreen.putExtra("Origin", "From Finish");
+            toSingleStepScreen.putExtra("Step Number", stepNumber);
+            toSingleStepScreen.putExtra("Step Name", stepName);
+            toSingleStepScreen.putExtra("Step Description", stepDescription);
+            toSingleStepScreen.putExtra("Step Time", stepTime);
+            toSingleStepScreen.putExtra("Step Action", stepAction);
+
+            getContext().startActivity(toSingleStepScreen);
+        }
+
+
+
+
+
     }
 
 

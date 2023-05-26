@@ -525,6 +525,7 @@ public class TrulyFinalCreateRecipeExtraInfo extends AppCompatActivity implement
 
             SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
             SharedPreferences.Editor editor=settings.edit();
+            makeFinalRecipeTime(recipeTimeHours, recipeTimeMinutes);
             editor.putString(MyConstants.CUSTOM_RECIPE_TIME, finalRecipeTime);
             editor.putString(MyConstants.CUSTOM_RECIPE_DIFFICULTY_LEVEL, recipeDifficultyLevel);
             editor.putInt(MyConstants.CUSTOM_RECIPE_SERVE_COUNT, recipeServeCount);

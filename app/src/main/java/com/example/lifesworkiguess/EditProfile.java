@@ -3,18 +3,27 @@ package com.example.lifesworkiguess;
 import static com.example.lifesworkiguess.MyConstants.SELECT_PICTURE;
 import static com.example.lifesworkiguess.MyConstants.USERNAME_ERROR_MESSAGE;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -37,6 +46,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class EditProfile extends AppCompatActivity {
 
     FirebaseDatabase FBDB;
@@ -54,6 +68,8 @@ public class EditProfile extends AppCompatActivity {
 
     String originalEmail, originalPassword, originalUsername;
     boolean PFPChanged;
+    String currentPhotoPath;
+
 
 
     @Override
@@ -232,6 +248,12 @@ public class EditProfile extends AppCompatActivity {
         });
 
 
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+              preSave("Pressed Back");
+            }
+        });
     }
 
     @Override
@@ -282,6 +304,8 @@ public class EditProfile extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+
+        //FOR GALLERY
         if (resultCode == RESULT_OK) {
 
             // compare the resultCode with the
@@ -302,6 +326,79 @@ public class EditProfile extends AppCompatActivity {
 
 
             }
+        }
+
+        //FOR CAMERA
+        if (requestCode == MyConstants.CAMERA_REQUEST_CODE)
+        {
+
+            if(resultCode == Activity.RESULT_OK){
+
+                File f = new File(currentPhotoPath);
+                selectedImageUri = Uri.fromFile(f);
+                PFPIV.setImageURI(selectedImageUri);
+                PFPChanged = true;
+
+
+            }
+        }
+    }
+
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd__HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File imageFL = File.createTempFile(
+                imageFileName, /* prefix */
+                " .jpg",       /* suffix */
+                storageDir     /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = imageFL.getAbsolutePath();
+        return imageFL;
+    }
+
+    private void dispatchTakePictureIntent(){
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        //Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null){
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex){
+                //Error occurred while creating the File
+
+            }
+            if (photoFile!= null){
+                selectedImageUri = FileProvider.getUriForFile(this,
+                        "com.example.lifesworkiguess.android.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, selectedImageUri);
+                startActivityForResult(takePictureIntent, MyConstants.CAMERA_REQUEST_CODE);
+            }
+        }
+    }
+
+    private void askCameraPermissions() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CAMERA}, MyConstants.CAMERA_PERM_CODE);
+        }
+        else{
+            dispatchTakePictureIntent();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            dispatchTakePictureIntent();
+        } else {
+            Toast.makeText(this, "Camera Permission is required to use the camera!", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -348,7 +445,8 @@ public class EditProfile extends AppCompatActivity {
 
                 changeCourseDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        // Handle click here
+
+
                     }
                 });
 
@@ -401,150 +499,7 @@ public class EditProfile extends AppCompatActivity {
     }
 
 
-    public void save(int mode){
-        String email = emailET.getText().toString();
-        String password = passwordET.getText().toString();
-        String username = usernameET.getText().toString();
 
-        //Checking if Changes were Made
-
-        // NO CHANGES
-
-        if (noChangesMade(email, password, username) ){
-
-            Toast.makeText(this, "NO CHANGES", Toast.LENGTH_SHORT).show();
-            if (mode==MyConstants.EDIT_PFP_SCREEN_SAVE_MODE){
-
-                Intent toHomeScreen = new Intent(EditProfile.this, HomeScreen.class);
-                startActivity(toHomeScreen);
-
-            }
-
-            else if (mode==MyConstants.EDIT_PFP_SCREEN_SAVE_AND_CHANGE_COURSE_MODE){
-
-                Intent toChooseCourse = new Intent(EditProfile.this, ChooseCourse.class);
-                toChooseCourse.putExtra(MyConstants.CHOOSE_COURSE_ORIGIN, MyConstants.FROM_PROFILE);
-                startActivity(toChooseCourse);
-
-            }
-
-        }
-
-        // YES CHANGES
-
-        else{
-
-
-            myServices.isEmailAvailable(email, new OnEmailCheckListener() {
-                @Override
-                public void onEmailCheck(boolean isAvailable) {
-
-                    if (isAvailable) // Email IS available
-                    {
-                        myServices.isUsernameAvailable(username, new OnUsernameCheckListener() {
-                            @Override
-                            public void onUsernameCheck(boolean isAvailable) {
-
-                                if (isAvailable) //Username IS Available
-                                {
-                                    if (noFieldsClear() && myServices.emailInFormat(email) && myServices.passwordValid(password))
-                                    {
-
-
-                                        userInfo = new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                                                loggedInUser.updateEmail(email);
-                                                loggedInUser.updatePassword(password);
-
-                                                User currentlyLoggedInUser = snapshot.getValue(User.class);
-                                                currentlyLoggedInUser.setEmail(email);
-                                                currentlyLoggedInUser.setPassword(password);
-                                                currentlyLoggedInUser.setUsername(username);
-                                                refUsers.setValue(currentlyLoggedInUser);
-
-                                                //Keeping Login Info
-                                                SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
-                                                SharedPreferences.Editor editor=settings.edit();
-                                                editor.putString(MyConstants.LOGIN_EMAIL, email);
-                                                editor.putString(MyConstants.LOGIN_PASSWORD, password);
-                                                editor.commit();
-
-                                                if (PFPChanged) myServices.uploadProfilePhotoToFirebase(EditProfile.this, selectedImageUri);
-
-
-                                                Handler handler = new Handler();
-                                                handler.postDelayed(new Runnable() {
-                                                    public void run() {
-                                                        // Actions to do after 1.5 second
-                                                        if (mode==MyConstants.EDIT_PFP_SCREEN_SAVE_MODE){
-                                                            Intent toHomeScreen = new Intent(EditProfile.this, HomeScreen.class);
-                                                            startActivity(toHomeScreen);
-                                                        }
-                                                        else if (mode==MyConstants.EDIT_PFP_SCREEN_SAVE_AND_CHANGE_COURSE_MODE){
-                                                            Intent toChooseCourse = new Intent(EditProfile.this, ChooseCourse.class);
-                                                            toChooseCourse.putExtra(MyConstants.CHOOSE_COURSE_ORIGIN, MyConstants.FROM_PROFILE);
-                                                            startActivity(toChooseCourse);
-                                                        }
-                                                    }
-                                                }, 1500);
-
-
-
-
-
-
-
-                                            }
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError error) {
-
-                                            }
-                                        };
-                                        refUsers.addValueEventListener(userInfo);
-
-
-                                    }
-
-                                    else
-                                    {
-                                        if (!noFieldsClear())
-                                            Toast.makeText(EditProfile.this, "Please Fill all fields!", Toast.LENGTH_LONG).show();
-
-                                        else if (!myServices.emailInFormat(email))
-                                            Toast.makeText(EditProfile.this, MyConstants.INVALID_FORMAT_EMAIL_ERROR_MESSAGE, Toast.LENGTH_LONG).show();
-
-                                        else if (!myServices.passwordValid(password))
-                                            Toast.makeText(EditProfile.this, MyConstants.PASSWORD_ERROR_MESSAGE, Toast.LENGTH_LONG).show();
-
-
-                                    }
-                                }
-
-                                else //Username ISN'T Available
-                                {
-
-                                    Toast.makeText(EditProfile.this, USERNAME_ERROR_MESSAGE, Toast.LENGTH_LONG).show();
-
-                                }
-                            }
-                        });
-
-                    }
-
-                    else  // Email ISN'T available
-                    {
-                        Toast.makeText(EditProfile.this, MyConstants.USED_EMAIL_ERROR_MESSAGE, Toast.LENGTH_SHORT).show();
-
-                    }
-                }
-            });
-
-
-
-        }
-    }
 
     public void save2(int mode){
 
@@ -592,6 +547,10 @@ public class EditProfile extends AppCompatActivity {
                                                                 public void onComplete(@NonNull Task<Void> task) {
                                                                     if (task.isSuccessful())
                                                                     {
+                                                                        originalEmail = email;
+                                                                        originalPassword = password;
+                                                                        originalUsername = username;
+
                                                                         User currentlyLoggedInUser = snapshot.getValue(User.class);
                                                                         currentlyLoggedInUser.setEmail(email);
                                                                         currentlyLoggedInUser.setPassword(password);
@@ -615,6 +574,7 @@ public class EditProfile extends AppCompatActivity {
                                                                             fDownRef.putFile(selectedImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                                                                 @Override
                                                                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                                                    PFPChanged = false;
                                                                                     Toast.makeText(EditProfile.this, "Photo Uploaded!", Toast.LENGTH_LONG).show();
                                                                                     if (mode==MyConstants.EDIT_PFP_SCREEN_SAVE_MODE)
                                                                                     {
@@ -639,6 +599,8 @@ public class EditProfile extends AppCompatActivity {
 
                                                                             else if(mode==MyConstants.EDIT_PFP_SCREEN_SAVE_AND_CHANGE_COURSE_MODE)
                                                                             {
+                                                                                View rootView = findViewById(R.id.EditProfileLL);
+                                                                                enableClickableViews(rootView);
                                                                                 makeCourseChangeDialog();
                                                                             }
                                                                         }
@@ -679,7 +641,7 @@ public class EditProfile extends AppCompatActivity {
 
                                             }
                                         };
-                                        refUsers.addValueEventListener(userInfo);
+                                        refUsers.addListenerForSingleValueEvent(userInfo);
 
 
                                     }
@@ -732,12 +694,40 @@ public class EditProfile extends AppCompatActivity {
     }
 
     public void changePFP(View view){
-        imageChooser();
-    }
 
-    public void saveChanges(View view){
+        AlertDialog.Builder selectPictureDialogBuilder = new AlertDialog.Builder(EditProfile.this);
 
-//        save(MyConstants.EDIT_PFP_SCREEN_SAVE_MODE);
+        selectPictureDialogBuilder.setTitle("Choose Photo");
+
+
+        selectPictureDialogBuilder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            }
+        });
+
+
+        selectPictureDialogBuilder.setNegativeButton("Use Camera", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                askCameraPermissions();
+            }
+        });
+
+        selectPictureDialogBuilder.setPositiveButton("From Gallery", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+
+                imageChooser();
+
+            }
+        });
+
+        AlertDialog selectPictureDialog = selectPictureDialogBuilder.create();
+        selectPictureDialog.show();    }
+
+
+    public void preSave(String origin){
+
 
         String email = emailET.getText().toString();
         String password = passwordET.getText().toString();
@@ -755,8 +745,17 @@ public class EditProfile extends AppCompatActivity {
         {
             AlertDialog.Builder confirmChangesBuilder = new AlertDialog.Builder(this);
 
-            confirmChangesBuilder.setTitle("Confirm Changes");
-            confirmChangesBuilder.setMessage("Are You Sure You want to Save these Changes?");
+            if (origin.equals("Pressed Save"))
+            {
+                confirmChangesBuilder.setTitle("Confirm Changes");
+                confirmChangesBuilder.setMessage("Are You Sure You want to Save these Changes?");
+            }
+
+            else if (origin.equals("Pressed Back"))
+            {
+                confirmChangesBuilder.setTitle("Before Going Back...");
+                confirmChangesBuilder.setMessage("We noticed You made some Changes.\n Would You like to Save your Changes?");
+            }
 
             confirmChangesBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
@@ -769,14 +768,7 @@ public class EditProfile extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int id) {
                     // Handle click here
                     save2(MyConstants.EDIT_PFP_SCREEN_SAVE_MODE);
-//                    Handler handler = new Handler();
-//                    handler.postDelayed(new Runnable() {
-//                        public void run() {
-//                            // Actions to do after 1 second
-//                            Intent toProfileScreen = new Intent(EditProfile.this, ProfileScreen.class);
-//                            startActivity(toProfileScreen);
-//                        }
-//                    }, 1000);
+
                 }
             });
 
@@ -787,10 +779,11 @@ public class EditProfile extends AppCompatActivity {
 
         }
 
+    }
 
+    public void saveChanges(View view){
 
-
-
+        preSave("Pressed Save");
     }
 
     public void changeCourse(View view){
@@ -827,6 +820,7 @@ public class EditProfile extends AppCompatActivity {
                     save2(MyConstants.EDIT_PFP_SCREEN_SAVE_AND_CHANGE_COURSE_MODE); //We makeCourseChangeDialog there
 
 
+
                 }
             });
 
@@ -841,7 +835,6 @@ public class EditProfile extends AppCompatActivity {
 
 
 
-//        save(MyConstants.EDIT_PFP_SCREEN_SAVE_AND_CHANGE_COURSE_MODE);
     }
 
     public void signOut(View view){

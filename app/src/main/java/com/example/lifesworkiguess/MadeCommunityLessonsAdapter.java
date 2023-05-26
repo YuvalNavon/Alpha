@@ -49,7 +49,6 @@ public class MadeCommunityLessonsAdapter extends RecyclerView.Adapter<MadeCommun
             @Override
             public boolean onLongClick(View v) {
 
-                String pickedLessonName = v.getTag().toString();
                 // Create a PopupMenu with the item view as an anchor
                 PopupMenu popupMenu = new PopupMenu(v.getContext(), v);
 

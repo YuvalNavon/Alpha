@@ -80,6 +80,16 @@
                 android:layout_height="0dp"
                 android:layout_weight="0.5" />
 
+            <TextView
+                android:id="@+id/textView13"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Description"
+                android:textColor="@color/orange"
+                android:textSize="20sp" />
+
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

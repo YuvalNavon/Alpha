@@ -78,6 +78,7 @@ FirebaseAuth fAuth;
 
     public void toSignUp(View view){
         Intent toChooseCourse = new Intent(this, ChooseCourse.class);
+        toChooseCourse.putExtra("Previous Activity", MyConstants.FROM_MAIN_ACTIVITY);
         startActivity(toChooseCourse);
     }
 }

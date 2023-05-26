@@ -280,69 +280,20 @@ public class moreDetailsLists extends AppCompatActivity implements
 
     //Recipes Made by User:
     public void getRecipesMadeByUser(){
-        refUsers = FBDB.getReference("Users").child(loggedInUser.getUid());
-        infoGetter = new ValueEventListener() {
+        refLesson = FBDB.getReference("Community Lessons By User").child(loggedInUser.getUid());
+        getLessonName = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                globalCurrentlyLoggedInUser = snapshot.getValue(User.class);
-
-                activeRecipesMadeByUserNames = new ArrayList<>();
-                ArrayList<String> allUserRecipeNames = globalCurrentlyLoggedInUser.getUploadedRecipeNames();
-                recipesMadeByUserStatuses = globalCurrentlyLoggedInUser.getUploadedRecipeStatuses();
-
                 activeRecipesMadeByUser = new ArrayList<>();
 
-
-                for (int i = 0; i<recipesMadeByUserStatuses.size(); i++)
+                for (DataSnapshot child: snapshot.getChildren())
                 {
-                    if (recipesMadeByUserStatuses.get(i)==1)
-                        activeRecipesMadeByUserNames.add(allUserRecipeNames.get(i));
+                    CommunityLesson checkedLesson = child.getValue(CommunityLesson.class);
+                    if (checkedLesson.isActive()) activeRecipesMadeByUser.add(checkedLesson);
                 }
 
-//                for (int i = 0; i<recipesMadeByUserStatuses.size(); i++)
-//                {
-//                    if (recipesMadeByUserStatuses.get(i)==1)
-//                    {
-//                        refLesson = FBDB.getReference("Community Lessons").child(loggedInUser.getUid() + " , " + i );
-//                        getLessonName = new ValueEventListener() {
-//                            @Override
-//                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//
-//                                CommunityLesson addedActiveLesson = snapshot.getValue(CommunityLesson.class);
-//                                activeRecipesMadeByUser.add(addedActiveLesson);
-//                            }
-//
-//                            @Override
-//                            public void onCancelled(@NonNull DatabaseError error) {
-//
-//                            }
-//                        };
-//                        refLesson.addListenerForSingleValueEvent(getLessonName);
-//                    }
-//
-//                }
-
-                refLesson = FBDB.getReference("Community Lessons");
-                getLessonName = new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        ArrayList<CommunityLesson> allCommunityLessons;
-                        for (int i = 0; i<recipesMadeByUserStatuses.size(); i++)
-                        {
-                            if (recipesMadeByUserStatuses.get(i)==1)
-                            {
-
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                };
-                refLesson.addListenerForSingleValueEvent(getLessonName);
+                makeRecipesMadeByUserRV();
 
 
             }
@@ -352,7 +303,7 @@ public class moreDetailsLists extends AppCompatActivity implements
 
             }
         };
-        refUsers.addListenerForSingleValueEvent(infoGetter);
+        refLesson.addListenerForSingleValueEvent(getLessonName);
     }
 
     public void makeRecipesMadeByUserRV()
