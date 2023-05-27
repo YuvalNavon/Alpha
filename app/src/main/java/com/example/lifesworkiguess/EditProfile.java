@@ -87,7 +87,7 @@ public class EditProfile extends AppCompatActivity {
 
         //Setting Current User Profile Picture (PFP)
         PFPIV = findViewById(R.id.editProfilePFPIV);
-        myServices.getProfilePhotoFromFirebase(PFPIV);
+        myServices.getProfilePhotoFromFirebase(PFPIV, loggedInUser.getUid());
         PFPChanged = false;
 
 

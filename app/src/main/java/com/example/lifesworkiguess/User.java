@@ -396,6 +396,11 @@ public class User {
 
     }
 
+    public void setLessonAsInactive(int lessonNumber)
+    {
+        UploadedRecipeStatuses.set(lessonNumber, 0);
+    }
+
     //INITIALIZATION OF LESSON NUMBERS AND STATUS (LessonsStatus) AND RATINGS (LessonRatings) ONLY OCCURS IN UsernameScreen due to firebase reasons
 
 }

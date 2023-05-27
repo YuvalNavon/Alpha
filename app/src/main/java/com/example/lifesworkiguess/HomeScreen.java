@@ -47,7 +47,7 @@ public class HomeScreen extends AppCompatActivity implements CustomViewHolder.On
 
         //PFP Load Code
         iv = findViewById(R.id.homePFPIV);
-        myServices.getProfilePhotoFromFirebase(iv);
+        myServices.getProfilePhotoFromFirebase(iv, loggedInUser.getUid());
 
 
 
@@ -137,7 +137,9 @@ public class HomeScreen extends AppCompatActivity implements CustomViewHolder.On
 
         super.onResume();
         if (refUsers!=null && courseGetter!=null) refUsers.addValueEventListener(courseGetter);
-        myServices.getProfilePhotoFromFirebase(iv);
+        fAuth = FirebaseAuth.getInstance();
+        loggedInUser = fAuth.getCurrentUser();
+        myServices.getProfilePhotoFromFirebase(iv, loggedInUser.getUid());
 
     }
 

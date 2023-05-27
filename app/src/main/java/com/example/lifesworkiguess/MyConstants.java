@@ -97,6 +97,7 @@ public class MyConstants {
     public static final String LESSON_NAME_KEY = "Lesson Name";
     public static final String COMMUNITY_LESSON_DESCRIPTION_KEY = "Lesson Description";
     public static final String COMMUNITY_LESSON_NUMBER_KEY = "Lesson Number";
+    public static final String COMMUNITY_LESSON_RATINGS_KEY = "Lesson Ratings";
     public static final int NO_COMMUNITY_LESSON_NUMBER_ERROR = 999;
 
 

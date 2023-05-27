@@ -36,8 +36,8 @@ public class LessonScreenFrag extends Fragment {
 
     //For Community Lesson
     String creatorID;
-    ValueEventListener communityLessonGetter;
-    DatabaseReference refCommunityLessons;
+    ValueEventListener communityLessonGetter,communityLessonGetterByUser ;
+    DatabaseReference refCommunityLessons, refCommunityLessonsByUser;
     int lessonNumber;
 
     //For Both
@@ -183,6 +183,7 @@ public class LessonScreenFrag extends Fragment {
         super.onPause();
         if (refUsers!=null && courseGetter!=null) refUsers.removeEventListener(courseGetter);
         if (refCommunityLessons!=null && communityLessonGetter!=null) refCommunityLessons.removeEventListener(communityLessonGetter);
+        if (refCommunityLessonsByUser!=null && communityLessonGetterByUser!=null) refCommunityLessonsByUser.removeEventListener(communityLessonGetterByUser);
 
     }
 
@@ -200,6 +201,7 @@ public class LessonScreenFrag extends Fragment {
         super.onDestroy();
         if (refUsers!=null && courseGetter!=null) refUsers.removeEventListener(courseGetter);
         if (refCommunityLessons!=null && communityLessonGetter!=null) refCommunityLessons.removeEventListener(communityLessonGetter);
+        if (refCommunityLessonsByUser!=null && communityLessonGetterByUser!=null) refCommunityLessonsByUser.removeEventListener(communityLessonGetterByUser);
 
 
     }
@@ -244,17 +246,13 @@ public class LessonScreenFrag extends Fragment {
             FirebaseAuth fAuth = FirebaseAuth.getInstance();
             FirebaseUser loggedInUser = fAuth.getCurrentUser();
 
-            if (permanentOrCommunity == MyConstants.COMMUNITY_LESSON_INTRO)
+            if (permanentOrCommunity == MyConstants.COMMUNITY_LESSON_INTRO && creatorID.equals(loggedInUser.getUid())) //Cant let user Review their owen lessons
             {
-                if (creatorID.equals(loggedInUser.getUid())) //Cant let user Review their owen lessons
-                {
                     Intent toHomeScreen = new Intent(context, HomeScreen.class);
                     getContext().startActivity(toHomeScreen);
 
-                }
+
             }
-
-
 
 
             else
@@ -289,7 +287,7 @@ public class LessonScreenFrag extends Fragment {
 
                         }
                     };
-                    refUsers.addValueEventListener(courseGetter);
+                    refUsers.addListenerForSingleValueEvent(courseGetter);
                 }
 
                 else if (permanentOrCommunity == MyConstants.COMMUNITY_LESSON_INTRO)
@@ -315,12 +313,37 @@ public class LessonScreenFrag extends Fragment {
                                     refCommunityLessons.setValue(finishedLesson).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void unused) {
-                                            toLessonFinishedScreen.putExtra(MyConstants.LESSON_CREATOR_ID_KEY, creatorID);
-                                            toLessonFinishedScreen.putExtra(MyConstants.LESSON_NAME_KEY, lessonName);
-                                            toLessonFinishedScreen.putExtra(MyConstants.COMMUNITY_LESSON_NUMBER_KEY, lessonNumber);
 
-                                            toLessonFinishedScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-                                            context.startActivity(toLessonFinishedScreen);
+                                            //And for the second Branch
+                                            refCommunityLessonsByUser = FBDB.getReference("Community Lessons By User").child(creatorID).child(Integer.toString(lessonNumber));
+                                            communityLessonGetterByUser = new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                                                    CommunityLesson finishedLesson = snapshot.getValue(CommunityLesson.class);
+
+                                                    finishedLesson.addUserWhoCompleted(loggedInUser.getUid());
+                                                    refCommunityLessonsByUser.setValue(finishedLesson).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void unused) {
+                                                            toLessonFinishedScreen.putExtra(MyConstants.LESSON_CREATOR_ID_KEY, creatorID);
+                                                            toLessonFinishedScreen.putExtra(MyConstants.LESSON_NAME_KEY, lessonName);
+                                                            toLessonFinishedScreen.putExtra(MyConstants.COMMUNITY_LESSON_NUMBER_KEY, lessonNumber);
+
+                                                            toLessonFinishedScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                            context.startActivity(toLessonFinishedScreen);
+                                                        }
+                                                    });
+
+
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                                }
+                                            };
+                                            refCommunityLessonsByUser.addListenerForSingleValueEvent(communityLessonGetterByUser);
                                         }
                                     });
 
@@ -333,6 +356,7 @@ public class LessonScreenFrag extends Fragment {
                                 }
                             };
                             refCommunityLessons.addListenerForSingleValueEvent(communityLessonGetter);
+
 
 
 

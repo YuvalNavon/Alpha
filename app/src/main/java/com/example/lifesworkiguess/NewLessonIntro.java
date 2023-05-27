@@ -34,13 +34,14 @@ public class NewLessonIntro extends AppCompatActivity {
         boolean lessonFinal;
 
         //For CommunityLessonSetup
+        CommunityLesson selectedCommunityLesson;
         String creatorUsername, creatorID, lessonDescription;
         int lessonNumber;
 
         //For Both
         Intent getLessonData;
         String lessonName;
-        Bundle overviewBundle, ingredientsBundle, stepsBundle;
+        Bundle overviewBundle, ingredientsBundle, stepsBundle, ratingsBundle;
         FirebaseDatabase FBDB;
         DatabaseReference refLessons;
         ValueEventListener lessonGetter;
@@ -78,10 +79,30 @@ public class NewLessonIntro extends AppCompatActivity {
 
 
 
+    }
+
+    @Override
+    protected void onPause() {
+
+        super.onPause();
+        if (refLessons!=null && lessonGetter !=null) refLessons.removeEventListener(lessonGetter);
 
 
+    }
 
 
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+        if (refLessons!=null && lessonGetter !=null) refLessons.addListenerForSingleValueEvent(lessonGetter);
+
+    }
+
+    public void onDestroy() {
+
+        super.onDestroy();
+        if (refLessons!=null && lessonGetter !=null) refLessons.removeEventListener(lessonGetter);
 
 
     }
@@ -116,6 +137,13 @@ public class NewLessonIntro extends AppCompatActivity {
             viewStepsFrag.setArguments(stepsBundle);
             fragmentList.add(viewStepsFrag);
             fragmentTitleList.add("Steps");
+
+            ViewRatings viewRatingsFrag = new ViewRatings();
+            viewRatingsFrag.setArguments(ratingsBundle);
+            fragmentList.add(viewRatingsFrag);
+            fragmentTitleList.add("Reviews");
+
+
         }
 
 
@@ -191,7 +219,7 @@ public class NewLessonIntro extends AppCompatActivity {
 
             }
         };
-        refLessons.addValueEventListener(lessonGetter);
+        refLessons.addListenerForSingleValueEvent(lessonGetter);
 
 
     }
@@ -212,7 +240,7 @@ public class NewLessonIntro extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                CommunityLesson selectedCommunityLesson = snapshot.getValue(CommunityLesson.class);
+                selectedCommunityLesson = snapshot.getValue(CommunityLesson.class);
 
                 myServices.downloadXML(NewLessonIntro.this, MyConstants.RECIPE_STORAGE_NAME,
                         "Community Recipes/" + creatorID + "/" + selectedCommunityLesson.getLessonRecipeName());
@@ -239,6 +267,7 @@ public class NewLessonIntro extends AppCompatActivity {
 
                         setUpIngredients();
                         setUpSteps();
+                        setUpRatings();
 
                         setUpScreen();
                     }
@@ -290,6 +319,20 @@ public class NewLessonIntro extends AppCompatActivity {
         String jsonOfSteps = gson.toJson(stepsInStringLists);
         stepsBundle.putString(MyConstants.CUSTOM_RECIPE_STEPS_VIEW_MODE, MyConstants.CUSTOM_RECIPE_VIEW_STEPS_FINISH);
         stepsBundle.putString(MyConstants.CUSTOM_RECIPE_STEPS, jsonOfSteps);
+        stepsBundle.putBoolean("From Lesson Intro", true);
+    }
+
+    public void setUpRatings()
+    {
+
+        ArrayList<ArrayList<String>> ratings = selectedCommunityLesson.getRatings();
+        ratingsBundle = new Bundle();
+        Gson gson = new Gson();
+        String jsonofRatings = gson.toJson(ratings);
+        ratingsBundle.putString(MyConstants.COMMUNITY_LESSON_RATINGS_KEY, jsonofRatings);
+        ratingsBundle.putString(MyConstants.LESSON_CREATOR_ID_KEY, creatorID);
+        ratingsBundle.putInt(MyConstants.COMMUNITY_LESSON_NUMBER_KEY, lessonNumber);
+
     }
 
 

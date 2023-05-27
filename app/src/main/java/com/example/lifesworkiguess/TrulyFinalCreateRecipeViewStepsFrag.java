@@ -67,10 +67,17 @@ public class TrulyFinalCreateRecipeViewStepsFrag extends Fragment implements Add
 
         if (getArguments() != null) {
             mode = getArguments().getString(MyConstants.CUSTOM_RECIPE_STEPS_VIEW_MODE, null);
+            jsonofSteps = getArguments().getString(MyConstants.CUSTOM_RECIPE_STEPS, null); //For Community Lesson Intro (I could have just written the steps into
+            //Shared Pref but I already made a Bundle in the NewLessonIntro class
+            isIntro = getArguments().getBoolean("From Lesson Intro", false);
         }
 
-        SharedPreferences settings=getActivity().getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
-        jsonofSteps = settings.getString(MyConstants.CUSTOM_RECIPE_STEPS, null);
+        if (jsonofSteps==null) //For viewing Recipe while making it
+        {
+            SharedPreferences settings=getActivity().getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+            jsonofSteps = settings.getString(MyConstants.CUSTOM_RECIPE_STEPS, null);
+        }
+
 
 
     }
@@ -158,7 +165,11 @@ public class TrulyFinalCreateRecipeViewStepsFrag extends Fragment implements Add
         }
 
 
-
+        if (isIntro)
+        {
+            TextView title = view.findViewById(R.id.ViewStepsFrag_Title);
+            title.setText("Steps");
+        }
 
 
 

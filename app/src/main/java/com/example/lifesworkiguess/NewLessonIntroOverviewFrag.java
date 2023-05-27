@@ -47,7 +47,7 @@ public class NewLessonIntroOverviewFrag extends Fragment {
 
 
 
-    TextView  lessonPositionOrCreatorTV, lessonNameTV,  expectedTimeTV, difficultyTV, kosherTV, serveCountTV, descriptionTV;
+    TextView  lessonPositionOrCreatorTV, lessonNameTV,  expectedTimeTV, difficultyTV, kosherTV, serveCountTV, descriptionTV, descriptionTitle;
     ImageView recipeIV, kosherIV;
     Button startBTN;
     ScrollView descriptionSV;
@@ -118,6 +118,7 @@ public class NewLessonIntroOverviewFrag extends Fragment {
         recipeIV = view.findViewById(R.id.LessonIntroRecipeIV);
         descriptionSV = view.findViewById(R.id.LessonIntroDescriptionSV);
         descriptionTV = view.findViewById(R.id.LessonIntroDescriptionTV);
+        descriptionTitle = view.findViewById(R.id.LessonIntroDescriptionTitle);
         startBTN = view.findViewById(R.id.startLessonBTN);
         spaceBetweenRecipeIVAndDescription = view.findViewById(R.id.LessonIntro_Space);
 
@@ -178,6 +179,7 @@ public class NewLessonIntroOverviewFrag extends Fragment {
 
             }
         });
+        descriptionTitle.setVisibility(View.GONE);
         descriptionSV.setVisibility(View.GONE);
         spaceBetweenRecipeIVAndDescription.setVisibility(View.GONE);
 

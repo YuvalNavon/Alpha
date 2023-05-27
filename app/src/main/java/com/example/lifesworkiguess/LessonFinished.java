@@ -66,8 +66,8 @@ public class LessonFinished extends AppCompatActivity {
     //For Community Lesson
     String creatorID;
     int lessonNumber;
-    DatabaseReference refCommunityLessons;
-    ValueEventListener communityLessonGetter;
+    DatabaseReference refCommunityLessons, refCommunityLessonsByUser;
+    ValueEventListener communityLessonGetter, communityLessonGetterByUser;
 
     //For Both
     int mode;
@@ -177,6 +177,8 @@ public class LessonFinished extends AppCompatActivity {
         super.onPause();
         if (refUsers!=null && lessonRater!=null) refUsers.removeEventListener(lessonRater);
         if (refCommunityLessons!=null && communityLessonGetter!=null) refCommunityLessons.removeEventListener(communityLessonGetter);
+        if (refCommunityLessonsByUser!=null && communityLessonGetterByUser!=null) refCommunityLessonsByUser.removeEventListener(communityLessonGetterByUser);
+
 
     }
 
@@ -187,6 +189,8 @@ public class LessonFinished extends AppCompatActivity {
         super.onResume();
         if (refUsers!=null && lessonRater!=null) refUsers.addListenerForSingleValueEvent(lessonRater);
         if (refCommunityLessons!=null && communityLessonGetter!=null) refCommunityLessons.addListenerForSingleValueEvent(communityLessonGetter);
+        if (refCommunityLessonsByUser!=null && communityLessonGetterByUser!=null) refCommunityLessonsByUser.addListenerForSingleValueEvent(communityLessonGetterByUser);
+
 
 
     }
@@ -196,6 +200,7 @@ public class LessonFinished extends AppCompatActivity {
         super.onDestroy();
         if (refUsers!=null && lessonRater!=null) refUsers.removeEventListener(lessonRater);
         if (refCommunityLessons!=null && communityLessonGetter!=null) refCommunityLessons.removeEventListener(communityLessonGetter);
+        if (refCommunityLessonsByUser!=null && communityLessonGetterByUser!=null) refCommunityLessonsByUser.removeEventListener(communityLessonGetterByUser);
 
 
     }
@@ -333,88 +338,155 @@ public class LessonFinished extends AppCompatActivity {
                     String review = reviewET.getText().toString();
                     float rating = ratingBar.getRating();
 
-                    //Adding the rating to the Community lesson itself
-                    ArrayList<String> reviewListForLesson= new ArrayList<>();
+                    if (rating==0 && (review!=null && !review.isEmpty()))  //User reviews but didnt rate, which i dont allow
+                    {
+                        //Setting up Alert Dialogs
+                        AlertDialog.Builder addRatingDialogBuilder = new AlertDialog.Builder(LessonFinished.this);
+                        addRatingDialogBuilder.setTitle("Please Rate this Lesson");
 
-                    reviewListForLesson.add(loggedInUser.getUid());
+                        addRatingDialogBuilder.setMessage("In order to write a Review for this Lesson, You must also Rate it." +
+                                "\nIf You don't want to Rate this Lesson, You can also Delete your Review.");
 
-                    if (rating!=0) reviewListForLesson.add(Float.toString(rating));
-                    else reviewListForLesson.add(MyConstants.NO_RATING_FOR_COMMUNITY_LESSON);
 
-                    if (review!=null && !review.isEmpty())  reviewListForLesson.add(review);
-                    else reviewListForLesson.add(MyConstants.NO_REVIEW_FOR_COMMUNITY_LESSON);
 
-                    refCommunityLessons = FBDB.getReference("Community Lessons").child(creatorID + " , " + lessonNumber);
-                    communityLessonGetter = new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                            CommunityLesson finishedLesson = snapshot.getValue(CommunityLesson.class);
 
-                            finishedLesson.addReview(reviewListForLesson);
-                            refCommunityLessons.setValue(finishedLesson).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        addRatingDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                            }
+                        });
+
+                        // Create and show the AlertDialog
+                        AlertDialog addRatingDialog = addRatingDialogBuilder.create();
+                        addRatingDialog.show();
+                    }
+
+                    else
+                    {
+                        //Adding the rating to the Community lesson itself
+                        ArrayList<String> reviewListForLesson= new ArrayList<>();
+
+                        reviewListForLesson.add(loggedInUser.getUid());
+
+                        if (rating!=0) reviewListForLesson.add(Float.toString(rating));
+                        else reviewListForLesson.add(MyConstants.NO_RATING_FOR_COMMUNITY_LESSON);
+
+                        if (review!=null && !review.isEmpty())  reviewListForLesson.add(review);
+                        else reviewListForLesson.add(MyConstants.NO_REVIEW_FOR_COMMUNITY_LESSON);
+
+                        if (rating!=0 || (review!=null && !review.isEmpty()) || dishHasPhoto) //User did input at least 1 thing
+                        {
+                            refCommunityLessons = FBDB.getReference("Community Lessons").child(creatorID + " , " + lessonNumber);
+                            communityLessonGetter = new ValueEventListener() {
                                 @Override
-                                public void onSuccess(Void unused) {
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                                    //Adding the Review to the User's finished lessons Review;
+                                    CommunityLesson finishedLesson = snapshot.getValue(CommunityLesson.class);
 
-                                    ArrayList<String> reviewListForUser = new ArrayList<>();
-
-                                    reviewListForUser.add(creatorID);
-
-                                    reviewListForUser.add(Integer.toString(lessonNumber));
-
-                                    if (rating!=0) reviewListForUser.add(Float.toString(rating));
-                                    else reviewListForUser.add(MyConstants.NO_RATING_FOR_COMMUNITY_LESSON);
-
-                                    if (review!=null && !review.isEmpty())  reviewListForUser.add(review);
-                                    else reviewListForUser.add(MyConstants.NO_REVIEW_FOR_COMMUNITY_LESSON);
-
-                                    currentlyLoggedInUser.addFinishedCommunityLessonReview(reviewListForUser);
-                                    refUsers.setValue(currentlyLoggedInUser, new DatabaseReference.CompletionListener() {
-                                        //FIRST AND ONLY USE OF ON COMPLETE LISTENER WHEN UPDATING AN ITEM IN DATABASE, NOT REALLY NECESSARY ANYMORE BUT NO NEED TO CHANGE
+                                    finishedLesson.addReview(reviewListForLesson);
+                                    refCommunityLessons.setValue(finishedLesson).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
-                                        public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
-                                            if (error== null){
-                                                if (dishHasPhoto) {
-                                                    fDownRef = FirebaseStorage.getInstance().getReference().child("Users").child(loggedInUser.getUid()).
-                                                            child("Community Lessons").child(creatorID).child(Integer.toString(lessonNumber));
-                                                    fDownRef.putFile(photoURI).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                                        @Override
-                                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                                            Toast.makeText(LessonFinished.this, "Photo Uploaded!", Toast.LENGTH_LONG).show();
+                                        public void onSuccess(Void unused) {
 
+                                            refCommunityLessonsByUser = FBDB.getReference("Community Lessons By User").child(creatorID).child(Integer.toString(lessonNumber));
+                                            communityLessonGetterByUser = new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                                                    CommunityLesson finishedLesson = snapshot.getValue(CommunityLesson.class);
+
+                                                    finishedLesson.addReview(reviewListForLesson);
+                                                    refCommunityLessonsByUser.setValue(finishedLesson).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void unused) {
+
+                                                            //Adding the Review to the User's finished lessons Review;
+
+                                                            ArrayList<String> reviewListForUser = new ArrayList<>();
+
+                                                            reviewListForUser.add(creatorID);
+
+                                                            reviewListForUser.add(Integer.toString(lessonNumber));
+
+                                                            if (rating!=0) reviewListForUser.add(Float.toString(rating));
+                                                            else reviewListForUser.add(MyConstants.NO_RATING_FOR_COMMUNITY_LESSON);
+
+                                                            if (review!=null && !review.isEmpty())  reviewListForUser.add(review);
+                                                            else reviewListForUser.add(MyConstants.NO_REVIEW_FOR_COMMUNITY_LESSON);
+
+                                                            currentlyLoggedInUser.addFinishedCommunityLessonReview(reviewListForUser);
+                                                            refUsers.setValue(currentlyLoggedInUser, new DatabaseReference.CompletionListener() {
+                                                                //FIRST AND ONLY USE OF ON COMPLETE LISTENER WHEN UPDATING AN ITEM IN DATABASE, NOT REALLY NECESSARY ANYMORE BUT NO NEED TO CHANGE
+                                                                @Override
+                                                                public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                                                                    if (error== null){
+                                                                        if (dishHasPhoto) {
+                                                                            fDownRef = FirebaseStorage.getInstance().getReference().child("Users").child(loggedInUser.getUid()).
+                                                                                    child("Finished Community Lessons").child(creatorID).child(Integer.toString(lessonNumber));
+                                                                            fDownRef.putFile(photoURI).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                                                @Override
+                                                                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                                                    Toast.makeText(LessonFinished.this, "Photo Uploaded!", Toast.LENGTH_LONG).show();
+
+                                                                                }
+                                                                            });
+
+                                                                        }
+
+
+                                                                        Intent toCommunityScreen = new Intent(LessonFinished.this, CommunityScreen.class);
+                                                                        toCommunityScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                                        startActivity(toCommunityScreen);
+                                                                        finish();
+
+                                                                    }
+                                                                    else{
+                                                                        Toast.makeText(LessonFinished.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                                                                    }
+
+                                                                }
+                                                            });
                                                         }
                                                     });
 
+
+
                                                 }
 
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
 
-                                                Intent toCommunityScreen = new Intent(LessonFinished.this, CommunityScreen.class);
-                                                toCommunityScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                startActivity(toCommunityScreen);
-                                                finish();
-
-                                            }
-                                            else{
-                                                Toast.makeText(LessonFinished.this, error.getMessage(), Toast.LENGTH_LONG).show();
-                                            }
+                                                }
+                                            };
+                                            refCommunityLessonsByUser.addListenerForSingleValueEvent(communityLessonGetterByUser);
 
                                         }
                                     });
+
+
+
                                 }
-                            });
 
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            };
+                            refCommunityLessons.addListenerForSingleValueEvent(communityLessonGetter);
 
 
                         }
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
+                        else
+                        {
+                            Intent toCommunityScreen = new Intent(LessonFinished.this, CommunityScreen.class);
+                            toCommunityScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(toCommunityScreen);
+                            finish();
                         }
-                    };
-                    refCommunityLessons.addListenerForSingleValueEvent(communityLessonGetter);
+                    }
+
 
 
 

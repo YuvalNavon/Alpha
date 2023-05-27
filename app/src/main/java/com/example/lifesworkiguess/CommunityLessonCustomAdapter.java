@@ -61,13 +61,42 @@ public class CommunityLessonCustomAdapter extends RecyclerView.Adapter<Community
         ArrayList<ArrayList<String>> ratingsList = currLesson.getRatings();
         int ratingCount = 0;
         float averageRating = 2;
+
+        holder.lessonRB.setEnabled(false);
+        holder.lessonRB.setNumStars(5);
+
         if (ratingsList!= null && !ratingsList.isEmpty())
         {
-            ArrayList<String> currentRating;
-            if (position<ratingsList.size())
-                currentRating  = ratingsList.get(position);
-            ratingCount = ratingsList.size();
-            averageRating = 3;
+
+            float sumRating = 0;
+            int countOfReviewListsThatMeanUserOnlyUploadedPhotoAndDidntRateAndReview = 0;
+            for (int i = 0; i<ratingsList.size(); i++)
+            {
+                   ArrayList<String> currentRating  = ratingsList.get(i);
+                   if (!currentRating.get(1).equals(MyConstants.NO_RATING_FOR_COMMUNITY_LESSON))
+                   {
+                       sumRating+= Float.parseFloat(currentRating.get(1));
+                   }
+                   else
+                   {
+                       countOfReviewListsThatMeanUserOnlyUploadedPhotoAndDidntRateAndReview+=1;
+
+                   }
+
+            }
+
+            ratingCount = ratingsList.size() - countOfReviewListsThatMeanUserOnlyUploadedPhotoAndDidntRateAndReview;
+            if (ratingCount!=0)
+            {
+                averageRating = sumRating/ratingCount;
+                holder.lessonRatingCountTV.setText(Integer.toString(ratingCount));
+                holder.lessonRB.setRating(averageRating);
+            }
+            else
+            {
+                holder.lessonRatingCountTV.setText("No Ratings Yet");
+                holder.lessonRB.setVisibility(View.GONE);
+            }
         }
 
         holder.lessonNameTV.setText(lessonName);
@@ -80,10 +109,8 @@ public class CommunityLessonCustomAdapter extends RecyclerView.Adapter<Community
             holder.lessonKosherTV.setText("NOT\nKOSHER");
         }
         holder.usernameTV.setText(username);
-        holder.lessonRatingCountTV.setText(Integer.toString(ratingCount));
-        holder.lessonRB.setRating(averageRating);
-        holder.lessonRB.setEnabled(false);
-        holder.lessonRB.setNumStars(5);
+
+
 
 
         FirebaseStorage FBStorage = FirebaseStorage.getInstance();

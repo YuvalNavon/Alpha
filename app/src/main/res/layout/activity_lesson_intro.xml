@@ -61,11 +61,21 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
+        <TextView
+            android:id="@+id/LessonIntroDescriptionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Description"
+            android:textColor="@color/orange"
+            android:textSize="20sp" />
+
         <ScrollView
             android:id="@+id/LessonIntroDescriptionSV"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="2">
+            android:layout_weight="2.5">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -76,7 +86,10 @@
                     android:id="@+id/LessonIntroDescriptionTV"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="TextView" />
+                    android:padding="8dp"
+                    android:text="TextView"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
             </LinearLayout>
         </ScrollView>
 

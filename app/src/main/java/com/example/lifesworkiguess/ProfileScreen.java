@@ -116,8 +116,8 @@ public class ProfileScreen extends AppCompatActivity implements AdapterView.OnIt
         //Loading PFP's
         profileScreenPFPIV = findViewById(R.id.profileScreenPFPIV);
         profileScreenMenuPFPIV = findViewById(R.id.profileScreenMenuPFPIV);
-        myServices.getProfilePhotoFromFirebase(profileScreenPFPIV);
-        myServices.getProfilePhotoFromFirebase(profileScreenMenuPFPIV);
+        myServices.getProfilePhotoFromFirebase(profileScreenPFPIV, loggedInUser.getUid());
+        myServices.getProfilePhotoFromFirebase(profileScreenMenuPFPIV, loggedInUser.getUid());
 
 
         //Loading User Data

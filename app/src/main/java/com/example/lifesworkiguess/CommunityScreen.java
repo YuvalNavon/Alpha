@@ -239,6 +239,7 @@ public class CommunityScreen extends AppCompatActivity implements CommunityDishe
         toLessonIntro.putExtra(MyConstants.COMMUNITY_LESSON_DESCRIPTION_KEY, foundLessonsList.get(position).getDescription());
         toLessonIntro.putExtra(MyConstants.COMMUNITY_LESSON_NUMBER_KEY, foundLessonsList.get(position).getNumber());
 
+
         startActivity(toLessonIntro);
 
 

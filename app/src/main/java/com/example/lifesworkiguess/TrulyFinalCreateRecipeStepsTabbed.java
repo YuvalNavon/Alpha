@@ -129,7 +129,7 @@ public class TrulyFinalCreateRecipeStepsTabbed extends AppCompatActivity {
 
     public void saveCurrentlyAddedSteps(){
 
-        //The added Ingredients ArrayLists of String are deleted when the user finishes the recipe, either by uploading it or by going back to the community screen
+        //The added Steps ArrayLists of String are deleted when the user finishes the recipe, either by uploading it or by going back to the community screen
 
         Gson gson = new Gson();
         String jsonOfSteps = gson.toJson(stepsInStringLists);

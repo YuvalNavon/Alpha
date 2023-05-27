@@ -39,7 +39,7 @@
             android:layout_height="0dp"
             android:layout_weight="0.5"
             android:gravity="center"
-            android:text="Rate how your dish came out!"
+            android:text="Rate this Lesson!\nP.S: Rating a Lesson as 0 counts as not rating it. "
             android:textColor="@color/gray" />
 
         <RatingBar

@@ -431,11 +431,12 @@ public class myServices {
     }
 
 
-    public static void getProfilePhotoFromFirebase(ImageView iv){
-        FirebaseAuth fAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = fAuth.getCurrentUser();
+    public static void getProfilePhotoFromFirebase(ImageView iv, String userID){
+
+        iv.setImageResource(R.drawable.default_profile_picture);
+
         FirebaseStorage fStorage = FirebaseStorage.getInstance();
-        StorageReference fDownRef = fStorage.getReference("Users").child(currentUser.getUid()).child(MyConstants.PROFILE_PICTURE);
+        StorageReference fDownRef = fStorage.getReference("Users").child(userID).child(MyConstants.PROFILE_PICTURE);
         long MAXBYTES = 1024*1024 * 5;
         fDownRef.getBytes(MAXBYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override

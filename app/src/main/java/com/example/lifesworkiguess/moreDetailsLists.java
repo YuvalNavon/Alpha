@@ -26,7 +26,7 @@ import java.util.ArrayList;
 
 
 public class moreDetailsLists extends AppCompatActivity implements
-        CompletedCoursesAdapter.OnItemClickListener, CompletedLessonsAdapter.OnItemClickListener, MadeCommunityLessonsAdapter.OnItemClickListener{
+        CompletedCoursesAdapter.OnItemClickListener, CompletedLessonsAdapter.OnItemClickListener{
 
     String mode;
     TextView titleTV;
@@ -37,8 +37,7 @@ public class moreDetailsLists extends AppCompatActivity implements
     ValueEventListener infoGetter, getLessonName;
     DatabaseReference refUsers, refLesson;
 
-    ArrayList<String> completedCoursesNames, activeRecipesMadeByUserNames;
-    ArrayList<Integer> recipesMadeByUserStatuses;
+    ArrayList<String> completedCoursesNames;
     ArrayList<CommunityLesson> activeRecipesMadeByUser;
 
     FirebaseDatabase FBDB;
@@ -293,9 +292,23 @@ public class moreDetailsLists extends AppCompatActivity implements
                     if (checkedLesson.isActive()) activeRecipesMadeByUser.add(checkedLesson);
                 }
 
-                makeRecipesMadeByUserRV();
+                refUsers = FBDB.getReference("Users").child(loggedInUser.getUid());
+                infoGetter = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                        globalCurrentlyLoggedInUser = snapshot.getValue(User.class);
 
 
+                        makeRecipesMadeByUserRV();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                };
+                refUsers.addListenerForSingleValueEvent(infoGetter);
             }
 
             @Override
@@ -309,7 +322,7 @@ public class moreDetailsLists extends AppCompatActivity implements
     public void makeRecipesMadeByUserRV()
     {
         MadeCommunityLessonsAdapter adapter =
-                new MadeCommunityLessonsAdapter(moreDetailsLists.this, activeRecipesMadeByUser, loggedInUser.getUid() , this::onItemClickUploadedRecipes);
+                new MadeCommunityLessonsAdapter(moreDetailsLists.this, activeRecipesMadeByUser, loggedInUser.getUid(), globalCurrentlyLoggedInUser.getUsername());
 
         // Set the layout manager for the RecyclerView
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(moreDetailsLists.this);
@@ -328,8 +341,5 @@ public class moreDetailsLists extends AppCompatActivity implements
 
     }
 
-    @Override
-    public void onItemClickUploadedRecipes(int position) {
 
-    }
 }
