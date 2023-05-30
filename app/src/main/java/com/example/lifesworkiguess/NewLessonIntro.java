@@ -1,7 +1,5 @@
 package com.example.lifesworkiguess;
 
-import static com.example.lifesworkiguess.FBref.FBDB;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -133,7 +131,7 @@ public class NewLessonIntro extends AppCompatActivity {
         if (fromHomeOrCommunity==MyConstants.COMMUNITY_LESSON_INTRO) //I dont want the steps to be seen for permanent lessons
         {
             //Steps
-            TrulyFinalCreateRecipeViewStepsFrag viewStepsFrag = new TrulyFinalCreateRecipeViewStepsFrag();
+            StepsListFrag viewStepsFrag = new StepsListFrag();
             viewStepsFrag.setArguments(stepsBundle);
             fragmentList.add(viewStepsFrag);
             fragmentTitleList.add("Steps");
@@ -202,7 +200,6 @@ public class NewLessonIntro extends AppCompatActivity {
                                 overviewBundle.putInt(MyConstants.LESSON_SERVE_COUNT_KEY, lessonServeCount);
 
                                 setUpIngredients();
-                                setUpSteps();
 
                                 setUpScreen();
                             }
@@ -243,7 +240,7 @@ public class NewLessonIntro extends AppCompatActivity {
                 selectedCommunityLesson = snapshot.getValue(CommunityLesson.class);
 
                 myServices.downloadXML(NewLessonIntro.this, MyConstants.RECIPE_STORAGE_NAME,
-                        "Community Recipes/" + creatorID + "/" + selectedCommunityLesson.getLessonRecipeName());
+                        "Community Recipes/" + creatorID + "/" + lessonNumber);
 
 
                 Handler handler = new Handler();

@@ -3,7 +3,6 @@ package com.example.lifesworkiguess;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -18,24 +17,16 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-
 import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link TrulyFinalCreateRecipeMakeStepFrag#newInstance} factory method to
+ * Use the {@link CreateRecipeMakeStepFrag#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TrulyFinalCreateRecipeMakeStepFrag extends Fragment {
+public class CreateRecipeMakeStepFrag extends Fragment {
 
-    //From General
-    String recipeName, recipeDescription;
 
-    //From Image - Nothing
-
-    //From Ingredients
-    String jsonOfIngredients;
 
 
     //From this
@@ -49,7 +40,7 @@ public class TrulyFinalCreateRecipeMakeStepFrag extends Fragment {
 
     StepsViewModel stepsViewModel;
 
-    public TrulyFinalCreateRecipeMakeStepFrag() {
+    public CreateRecipeMakeStepFrag() {
         // Required empty public constructor
     }
 
@@ -59,11 +50,11 @@ public class TrulyFinalCreateRecipeMakeStepFrag extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment TrulyFinalCreateRecipeMakeStepFrag.
+     * @return A new instance of fragment CreateRecipeMakeStepFrag.
      */
     // TODO: Rename and change types and number of parameters
-    public static TrulyFinalCreateRecipeMakeStepFrag newInstance(String param1, String param2) {
-        TrulyFinalCreateRecipeMakeStepFrag fragment = new TrulyFinalCreateRecipeMakeStepFrag();
+    public static CreateRecipeMakeStepFrag newInstance(String param1, String param2) {
+        CreateRecipeMakeStepFrag fragment = new CreateRecipeMakeStepFrag();
         return fragment;
     }
 
@@ -103,41 +94,12 @@ public class TrulyFinalCreateRecipeMakeStepFrag extends Fragment {
 
         }
 
-        Activity parentActivity = getActivity();
-        Intent gi = parentActivity.getIntent();
-
-        //We check if the user got to this activity from the finish screen or from the activity before this one
-
-        if (gi.getStringExtra("Previous Activity").equals(MyConstants.FROM_FINISH_SCREEN)){
-            //Right now I do not allow users to edit by pressing on items from the finish screen, so  this will remain empty for now
-        }
-
-        else if (gi.getStringExtra("Previous Activity").equals(MyConstants.NOT_FROM_FINISH_SCREEN)){
-
-            //From General
-            recipeName =  gi.getStringExtra(MyConstants.CUSTOM_RECIPE_NAME);
-            recipeDescription = gi.getStringExtra(MyConstants.CUSTOM_RECIPE_DESCRIPTION);
-
-            //From Image - Nothing, image is saved in files
-
-            //From Ingredients
-            jsonOfIngredients = gi.getStringExtra(MyConstants.CUSTOM_RECIPE_INGREDIENTS);
-
-
-        }
 
 
 
         return view;
 
     }
-
-
-
-
-
-
-
 
 
 
@@ -167,19 +129,6 @@ public class TrulyFinalCreateRecipeMakeStepFrag extends Fragment {
         }
     }
 
-
-    public void next(View view){
-
-    }
-
-    public void back(View view){
-
-        //No need to save the string Lists of Steps bc finish() calls onDestroy and we save there
-        getActivity().finish();
-
-
-
-    }
 
 
 }

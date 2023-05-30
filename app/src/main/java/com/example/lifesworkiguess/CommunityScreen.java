@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -23,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class CommunityScreen extends AppCompatActivity implements CommunityDishesCustomViewHolder.OnItemClickListener, CommunityLessonViewHolder.OnItemClickListener {
 
@@ -30,12 +33,13 @@ public class CommunityScreen extends AppCompatActivity implements CommunityDishe
     FirebaseDatabase FBDB;
     DatabaseReference refCommunityLessons, refUsers;
     ValueEventListener communityLessonsGetter, usernameGetter;
-    FirebaseUser loggedInUser;
-    FirebaseAuth fAuth;
 
-    String pickedDishCatagoryName;
+
+    String pickedDishCatagoryName, searchQuery;
     ArrayList<CommunityLesson> foundLessonsList;
     ArrayList<String> usernamesList, userIDsList;
+
+    ImageView pfpIV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,10 +53,25 @@ public class CommunityScreen extends AppCompatActivity implements CommunityDishe
 
         FBDB = FirebaseDatabase.getInstance("https://cookproject-ac2c0-default-rtdb.europe-west1.firebasedatabase.app");
 
+        FirebaseAuth fAuth = FirebaseAuth.getInstance();
+        FirebaseUser loggedInUser =fAuth.getCurrentUser();
 
+        pfpIV = findViewById(R.id.CommunityScreenPFP);
+        myServices.getProfilePhotoFromFirebase(pfpIV, loggedInUser.getUid());
+
+    }
+
+
+    @Override
+    protected void onPause() {
+
+        super.onPause();
+        if (refUsers!=null && usernameGetter !=null) refUsers.removeEventListener(usernameGetter);
+        if (refCommunityLessons!=null && communityLessonsGetter !=null) refCommunityLessons.removeEventListener(communityLessonsGetter);
 
 
     }
+
 
     @Override
     protected void onResume() {
@@ -62,7 +81,20 @@ public class CommunityScreen extends AppCompatActivity implements CommunityDishe
         //to make sure everything added from previous custom recipes is deleted:
         deleteEverythingFromLastRecipe();
 
+
+
     }
+
+    public void onDestroy() {
+
+        super.onDestroy();
+        if (refUsers!=null && usernameGetter !=null) refUsers.removeEventListener(usernameGetter);
+        if (refCommunityLessons!=null && communityLessonsGetter !=null) refCommunityLessons.removeEventListener(communityLessonsGetter);
+
+
+    }
+
+
 
     public void deleteEverythingFromLastRecipe(){
 
@@ -172,6 +204,56 @@ public class CommunityScreen extends AppCompatActivity implements CommunityDishe
         foundCommunityLessonsRV.addItemDecoration(dividerItemDecoration);
     }
 
+    public void search(View view)
+    {
+        EditText searchBar = findViewById(R.id.CommunityScreen_Searchbar);
+        searchQuery = searchBar.getText().toString();
+        if (searchQuery!=null && !searchQuery.isEmpty())
+        {
+            foundLessonsList = new ArrayList<>();
+            userIDsList = new ArrayList<>();
+
+            searchQuery = searchQuery.toLowerCase(Locale.ROOT);
+            refCommunityLessons = FBDB.getReference("Community Lessons");
+
+            Query query = refCommunityLessons.orderByChild("lessonName");
+
+            communityLessonsGetter = new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for (DataSnapshot childSnapshot : snapshot.getChildren()) {
+
+
+                        String checkedLessonName = childSnapshot.child("lessonName").getValue(String.class); //Could use "lessonRecipeName" instead of "lessonName"
+                        String checkedLessonDescription = childSnapshot.child("description").getValue(String.class);
+
+                        checkedLessonName = checkedLessonName.toLowerCase();
+                        checkedLessonDescription = checkedLessonDescription.toLowerCase();
+                        if (checkedLessonName.contains(searchQuery) || checkedLessonDescription.contains(searchQuery)) {
+
+                            CommunityLesson foundLesson = childSnapshot.getValue(CommunityLesson.class);
+                            if (foundLesson.isActive())
+                            {
+                                foundLessonsList.add(foundLesson);
+                                userIDsList.add(foundLesson.getUserID());
+                            }
+
+                        }
+                    }
+
+                    getUsernamesList();
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            };
+            query.addListenerForSingleValueEvent(communityLessonsGetter);
+        }
+
+    }
+
     @Override
     public void onItemClick(int position) {
 
@@ -223,7 +305,7 @@ public class CommunityScreen extends AppCompatActivity implements CommunityDishe
 
 
     public void toCreateRecipe(View view){
-        Intent toCreateRecipeScreen = new Intent(this, TrulyFinalCreateRecipeGeneral.class);
+        Intent toCreateRecipeScreen = new Intent(this, CreateRecipeGeneral.class);
         startActivity(toCreateRecipeScreen);
     }
 
@@ -244,4 +326,14 @@ public class CommunityScreen extends AppCompatActivity implements CommunityDishe
 
 
     }
+
+
+    public void goToHomePage(View view){
+        myServices.goToHomePage(CommunityScreen.this);
+    }
+
+    public void goToProfile(View view){
+        myServices.goToProfilePage(CommunityScreen.this);
+    }
+
 }

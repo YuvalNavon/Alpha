@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TrulyFinalCreateRecipeGeneral">
+    tools:context=".CreateRecipeGeneral">
 
     <Space
         android:layout_width="0dp"
@@ -103,12 +103,22 @@
                 android:layout_weight="1" />
 
             <ImageView
-                android:id="@+id/imageView11"
+                android:id="@+id/CR_General_NextBTN"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:onClick="next"
                 app:srcCompat="@drawable/right_arrow" />
+
+            <Button
+                android:id="@+id/CR_General_EditBTN"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:onClick="saveEdit"
+                android:backgroundTint="@color/orange"
+                android:textColor="@color/white"
+                android:text="Save Changes" />
 
             <Space
                 android:layout_width="0dp"

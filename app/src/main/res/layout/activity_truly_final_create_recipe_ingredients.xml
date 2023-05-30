@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TrulyFinalCreateRecipeIngredients">
+    tools:context=".CreateRecipeIngredients">
 
     <Space
         android:layout_width="0dp"
@@ -194,25 +194,31 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/imageView10"
+                android:id="@+id/CR_Ingredients_BackBTN"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:onClick="back"
                 app:srcCompat="@drawable/left_arrow" />
 
-            <Space
+            <Button
+                android:id="@+id/CR_Ingredients_EditBTN"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.2" />
+                android:layout_weight="2"
+                android:backgroundTint="@color/orange"
+                android:onClick="saveEdit"
+                android:text="Save Changes"
+                android:textColor="@color/white" />
 
             <ImageView
-                android:id="@+id/imageView12"
+                android:id="@+id/CR_Ingredients_NextBTN"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:onClick="next"
                 app:srcCompat="@drawable/right_arrow" />
+
         </LinearLayout>
 
         <Space

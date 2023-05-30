@@ -75,7 +75,10 @@ public class AddedStepsCustomAdapter extends RecyclerView.Adapter<AddedStepsView
         {
             Step currStep = stepsList.get(i);
             currStep.setNumber(i);
+            stepsList.set(i, currStep);
         }
+        if (stepsViewModel!=null) stepsViewModel.setStepsList(stepsList);
+
     }
 
     public void swapItems(int fromPosition, int toPosition) {
@@ -94,8 +97,7 @@ public class AddedStepsCustomAdapter extends RecyclerView.Adapter<AddedStepsView
         stepsList.remove(position);
         // Notify the adapter that the item has been removed
         notifyItemRemoved(position);
-
-        if (stepsViewModel!=null) stepsViewModel.setStepsList(stepsList);
+        updateStepNumbers();
     }
 
 

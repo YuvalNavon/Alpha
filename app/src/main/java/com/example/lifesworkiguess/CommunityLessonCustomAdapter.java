@@ -3,7 +3,9 @@ package com.example.lifesworkiguess;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.ExifInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +21,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -98,6 +103,11 @@ public class CommunityLessonCustomAdapter extends RecyclerView.Adapter<Community
                 holder.lessonRB.setVisibility(View.GONE);
             }
         }
+        else
+        {
+            holder.lessonRatingCountTV.setText("No Ratings Yet");
+            holder.lessonRB.setVisibility(View.GONE);
+        }
 
         holder.lessonNameTV.setText(lessonName);
         holder.lessonTimeTV.setText(lessonTime);
@@ -130,15 +140,53 @@ public class CommunityLessonCustomAdapter extends RecyclerView.Adapter<Community
         });
 
 
-        StorageReference storageLessonImageRef =  FBStorage.getReference("Community Lessons").child(userID)
-                .child(lessonName).child(MyConstants.RECIPE_STORAGE_NAME);
+        StorageReference storageLessonImageRef =  FBStorage.getReference("Community Recipes").child(userID)
+                .child(Integer.toString(currLesson.getNumber())).child(MyConstants.RECIPE_IMAGE_STORAGE_NAME);
         holder.lessonIV.setImageResource(R.drawable.add_dish_photo);
-        Bitmap bitmap2 = ((BitmapDrawable) holder.lessonIV.getDrawable()).getBitmap();
-        holder.lessonIV.setImageBitmap(bitmap2);
         storageLessonImageRef.getBytes(MAXBYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                // Create a temporary file to save the image data
+                File tempFile = null;
+                try {
+                    tempFile = File.createTempFile("tempImage", ".jpg");
+                    FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
+                    fileOutputStream.write(bytes);
+                    fileOutputStream.close();
+
+                    // Get the EXIF orientation information
+                    ExifInterface exifInterface = new ExifInterface(tempFile.getAbsolutePath());
+                    int orientation = exifInterface.getAttributeInt(
+                            ExifInterface.TAG_ORIENTATION,
+                            ExifInterface.ORIENTATION_UNDEFINED);
+
+                    int rotationAngle = 0;
+                    switch (orientation) {
+                        case ExifInterface.ORIENTATION_ROTATE_90:
+                            rotationAngle = 90;
+                            break;
+                        case ExifInterface.ORIENTATION_ROTATE_180:
+                            rotationAngle = 180;
+                            break;
+                        case ExifInterface.ORIENTATION_ROTATE_270:
+                            rotationAngle = 270;
+                            break;
+                        default:
+                            rotationAngle = 0;
+                            break;
+                    }
+
+                    // Rotate the Bitmap by the calculated rotation angle
+                    Matrix matrix = new Matrix();
+                    matrix.setRotate(rotationAngle);
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 holder.lessonIV.setImageBitmap(bitmap);
             }
         });

@@ -1,7 +1,6 @@
 package com.example.lifesworkiguess;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -13,14 +12,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -31,22 +26,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
-public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
+public class CreateRecipeImage extends AppCompatActivity {
 
     //From General
     String recipeName, recipeDescription;
@@ -54,8 +40,8 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
     //From this
     boolean userSelectedImage;
 
-    ImageView recipeImage;
-    Button imageButton;
+    ImageView recipeImage, nextBTN, backBTN;
+    Button imageButton, editBTN;
     Uri recipeImageUri;
     String currentPhotoPath;
 
@@ -67,6 +53,9 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
 
         recipeImage = findViewById(R.id.IVCreateRecipe);
         imageButton = findViewById(R.id.CR_ImageButton);
+        nextBTN = findViewById(R.id.CR_Image_NextBTN);
+        backBTN = findViewById(R.id.CR_Image_BackBTN);
+        editBTN = findViewById(R.id.CR_Image_EditBTN);
         imageButton.setVisibility(View.INVISIBLE);
         imageButton.setEnabled(false);
 
@@ -79,14 +68,20 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
         Intent gi = getIntent();
         //We check if the user got to this activity from the finish screen or from the activity before this one
 
-        if (gi.getStringExtra("Previous Activity").equals(MyConstants.FROM_FINISH_SCREEN)){
+        if (gi.getStringExtra("Previous Activity")!=null && gi.getStringExtra("Previous Activity").equals(MyConstants.FROM_FINISH_SCREEN)){
             //Right now I do not allow users to edit by pressing on items from the finish screen, so  this will remain empty for now
         }
 
 
-        else if (gi.getStringExtra("Previous Activity").equals(MyConstants.NOT_FROM_FINISH_SCREEN)){
+        else if (gi.getStringExtra("Previous Activity")!=null && gi.getStringExtra("Previous Activity").equals(MyConstants.FROM_PROFILE_AKA_EDIT_MODE)){
 
+            nextBTN.setVisibility(View.GONE);
+            backBTN.setVisibility(View.GONE);
+        }
 
+        else
+        {
+            editBTN.setVisibility(View.GONE);
         }
 
 
@@ -96,12 +91,18 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
     public void onDestroy() {
 
         super.onDestroy();
-        //The recipeImageUri is deleted when the user finishes the recipe, either by uploading it or by going back to the community screen
-        if (recipeImageUri !=null){
+        Intent gi = getIntent();
+        if (gi.getStringExtra("Previous Activity")==null ||
+                (gi.getStringExtra("Previous Activity")!=null &&  !gi.getStringExtra("Previous Activity").equals(MyConstants.FROM_PROFILE_AKA_EDIT_MODE)))
+        {//WE ONLY SAVE WHEN CLOSED WHEN WRITING A NEW RECIPE, IF YOU EDIT AN UPLOADED ONE THEN THE ONLY WAY TO SAVE IS VIA SAVEEDIT
+            //The recipeImageUri is deleted when the user finishes the recipe, either by uploading it or by going back to the community screen
+            if (recipeImageUri !=null){
 
-            saveRecipeImage();
+                saveRecipeImage();
 
+            }
         }
+
 
     }
 
@@ -298,7 +299,7 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
     public void selectPicture(View view){
 
 
-        AlertDialog.Builder selectPictureDialogBuilder = new AlertDialog.Builder(TrulyFinalCreateRecipeImage.this);
+        AlertDialog.Builder selectPictureDialogBuilder = new AlertDialog.Builder(CreateRecipeImage.this);
 
         selectPictureDialogBuilder.setTitle("Choose Photo");
 
@@ -357,7 +358,7 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
 
             saveRecipeImage();
 
-            Intent toAddRecipeIngredients = new Intent(TrulyFinalCreateRecipeImage.this, TrulyFinalCreateRecipeIngredients.class);
+            Intent toAddRecipeIngredients = new Intent(CreateRecipeImage.this, CreateRecipeIngredients.class);
             toAddRecipeIngredients.putExtra("Previous Activity", MyConstants.NOT_FROM_FINISH_SCREEN);
 
 
@@ -366,7 +367,7 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
 
         else //No Image Selected
         {
-            AlertDialog.Builder noRecipeImageDialogBuilder = new AlertDialog.Builder(TrulyFinalCreateRecipeImage.this);
+            AlertDialog.Builder noRecipeImageDialogBuilder = new AlertDialog.Builder(CreateRecipeImage.this);
 
             noRecipeImageDialogBuilder.setTitle("No Picture Selected");
             noRecipeImageDialogBuilder.setMessage("Are You Sure You Want to Upload This Recipe Without a Picture of the Dish?");
@@ -383,7 +384,7 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int id) {
 
 
-                    Intent toAddRecipeIngredients = new Intent(TrulyFinalCreateRecipeImage.this, TrulyFinalCreateRecipeIngredients.class);
+                    Intent toAddRecipeIngredients = new Intent(CreateRecipeImage.this, CreateRecipeIngredients.class);
                     toAddRecipeIngredients.putExtra("Previous Activity", MyConstants.NOT_FROM_FINISH_SCREEN);
 
                     //From General
@@ -405,6 +406,52 @@ public class TrulyFinalCreateRecipeImage extends AppCompatActivity {
 
 
 
+    }
+
+    public void saveEdit(View view)
+    {
+        if (userSelectedImage && recipeImageUri !=null){
+
+            saveRecipeImage();
+
+            Intent backToFinish = new Intent(CreateRecipeImage.this, CreateRecipeFinishScreen.class);
+            backToFinish.putExtra("Previous Activity", MyConstants.FROM_PROFILE_AKA_EDIT_MODE);
+
+
+            startActivity(backToFinish);
+        }
+
+        else //No Image Selected
+        {
+            AlertDialog.Builder noRecipeImageDialogBuilder = new AlertDialog.Builder(CreateRecipeImage.this);
+
+            noRecipeImageDialogBuilder.setTitle("No Picture Selected");
+            noRecipeImageDialogBuilder.setMessage("Are You Sure You Want to Upload This Recipe Without a Picture of the Dish?");
+
+
+            noRecipeImageDialogBuilder.setNegativeButton("Back", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                }
+            });
+
+
+            noRecipeImageDialogBuilder.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+
+                    Intent backToFinish = new Intent(CreateRecipeImage.this, CreateRecipeFinishScreen.class);
+                    backToFinish.putExtra("Previous Activity", MyConstants.FROM_PROFILE_AKA_EDIT_MODE);
+
+
+                    startActivity(backToFinish);
+
+                }
+            });
+
+            AlertDialog noRecipeImageDialog = noRecipeImageDialogBuilder.create();
+            noRecipeImageDialog.show();
+        }
     }
 
     public void back(View view){

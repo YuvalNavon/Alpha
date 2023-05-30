@@ -36,7 +36,6 @@ public class NewLessonIntroOverviewFrag extends Fragment {
     //For CommunityLessonSetup
     String creatorUsername, creatorID, lessonDescription;
     int lessonNumber;
-    //Add Rating!!
 
     //For Both
     int mode;
@@ -203,7 +202,7 @@ public class NewLessonIntroOverviewFrag extends Fragment {
         descriptionTV.setText(lessonDescription);
 
 
-        StorageReference fStorage = FirebaseStorage.getInstance().getReference("Community Recipes").child(creatorID).child(lessonName);
+        StorageReference fStorage = FirebaseStorage.getInstance().getReference("Community Recipes").child(creatorID).child(Integer.toString(lessonNumber));
         StorageReference fDownRef = fStorage.child(MyConstants.RECIPE_IMAGE_STORAGE_NAME);
         long MAXBYTES = 1024 * 1024;
         fDownRef.getBytes(MAXBYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {

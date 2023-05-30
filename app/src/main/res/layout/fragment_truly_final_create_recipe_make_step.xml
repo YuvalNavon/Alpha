@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TrulyFinalCreateRecipeMakeStepFrag">
+    tools:context=".CreateRecipeMakeStepFrag">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".TrulyFinalCreateRecipeSteps">
+        >
 
         <Space
             android:layout_width="0dp"

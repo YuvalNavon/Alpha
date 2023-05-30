@@ -17,23 +17,15 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class TrulyFinalCreateRecipeExtraInfo extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class CreateRecipeExtraInfo extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
 
-    //From General
-    String recipeName, recipeDescription;
 
-    //From Image - Nothing
-
-    //From Ingredients
-    String jsonOfIngredients;
-
-    //From Steps
-    String jsonOfSteps;
 
     //This
     //We gotta implement scroll bars for the spinners!!
@@ -51,10 +43,19 @@ public class TrulyFinalCreateRecipeExtraInfo extends AppCompatActivity implement
     CheckBox recipeKosherCB;
     boolean recipeKosher;
 
+    Button editBTN;
+    ImageView nextBTN, backBTN;
+    TextView finishMessageTV;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_truly_final_create_recipe_extra_info);
+
+        editBTN = findViewById(R.id.CR_ExtraInfo_EditBTN);
+        nextBTN = findViewById(R.id.CR_ExtraInfo_NextBTN);
+        backBTN = findViewById(R.id.CR_ExtraInfo_BackBTN);
+        finishMessageTV = findViewById(R.id.CR_ExtraInfo_FinishTV);
 
         currHoursPos = 0;
         currMinutesPos = 0;
@@ -90,66 +91,112 @@ public class TrulyFinalCreateRecipeExtraInfo extends AppCompatActivity implement
             }
         });
 
-        //getting saved extra info
-        SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
 
-        currHoursPos = settings.getInt(MyConstants.CUSTOM_RECIPE_HOURS_SPINNER_CURR_POS, MyConstants.CUSTOM_RECIPE_NO_SPINNER_POS_SAVED);
-        if (currHoursPos!=MyConstants.CUSTOM_RECIPE_NO_SPINNER_POS_SAVED){
-            recipeTimeHoursSpinner.setSelection(currHoursPos);
-            onItemSelected(recipeTimeHoursSpinner, recipeTimeHoursSpinner.getSelectedView(), currHoursPos, 0); //id is irrelevant
 
-        }
 
-        currMinutesPos = settings.getInt(MyConstants.CUSTOM_RECIPE_MINUTES_SPINNER_CURR_POS, MyConstants.CUSTOM_RECIPE_NO_SPINNER_POS_SAVED);
-        if (currMinutesPos!=MyConstants.CUSTOM_RECIPE_NO_SPINNER_POS_SAVED){
-            recipeTimeMinutesSpinner.setSelection(currMinutesPos);
-            onItemSelected(recipeTimeMinutesSpinner, recipeTimeMinutesSpinner.getSelectedView(), currMinutesPos, 0); //id is irrelevant
-
-        }
-
-        recipeDifficultyLevel = settings.getString(MyConstants.CUSTOM_RECIPE_DIFFICULTY_LEVEL, null);
-        if (recipeDifficultyLevel !=null){
-            if (recipeDifficultyLevel==MyConstants.CUSTOM_RECIPE_DIFFICULTY_EASY){
-
-                difficultyPicked(easyBTN);
-
-            }
-
-            else if (recipeDifficultyLevel==MyConstants.CUSTOM_RECIPE_DIFFICULTY_STANDARD){
-
-                difficultyPicked(standardBTN);
-
-            }
-
-            else if (recipeDifficultyLevel==MyConstants.CUSTOM_RECIPE_DIFFICULTY_HARD){
-
-                difficultyPicked(hardBTN);
-
-            }
-        }
-        else //default value for difficulty is standard, if user didnt pick something else
-        {
-            difficultyPicked(standardBTN);
-
-        }
-
-        recipeServeCount = settings.getInt(MyConstants.CUSTOM_RECIPE_SERVE_COUNT, 0);
-        if (recipeServeCount!=0) serveCountET.setText(Integer.toString(recipeServeCount));
-
-        recipeKosher = settings.getBoolean(MyConstants.CUSTOM_RECIPE_KOSHER, false);
-        recipeKosherCB.setChecked(recipeKosher);
 
         Intent gi = getIntent();
 
         //We check if the user got to this activity from the finish screen or from the activity before this one
 
-        if (gi.getStringExtra("Previous Activity").equals(MyConstants.FROM_FINISH_SCREEN)){
-            //Right now I do not allow users to edit by pressing on items from the finish screen, so  this will remain empty for now
+        if (gi.getStringExtra("Previous Activity")!=null && gi.getStringExtra("Previous Activity").equals(MyConstants.FROM_FINISH_SCREEN)){
+            //Right now I do not allow users to edit by pressing on items from the finish screen BEFORE UPLOADING THE RECIPE ITSELF, so  this will remain empty for now
+            //I can do this SO SO SO EASILY but design Wise I think its useless and confusing
         }
 
-        else if (gi.getStringExtra("Previous Activity").equals(MyConstants.NOT_FROM_FINISH_SCREEN)){
+        else if (gi.getStringExtra("Previous Activity")!=null && gi.getStringExtra("Previous Activity").equals(MyConstants.FROM_PROFILE_AKA_EDIT_MODE))
+        { //User is editing uploaded Recipe
 
+            nextBTN.setVisibility(View.GONE);
+            backBTN.setVisibility(View.GONE);
+            finishMessageTV.setVisibility(View.GONE);
 
+            SharedPreferences settings=this.getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+
+            recipeKosher = settings.getBoolean(MyConstants.CUSTOM_RECIPE_KOSHER, false);
+            recipeKosherCB.setChecked(recipeKosher);
+
+            recipeDifficultyLevel = settings.getString(MyConstants.CUSTOM_RECIPE_DIFFICULTY_LEVEL, null);
+            if (recipeDifficultyLevel !=null){
+                if (recipeDifficultyLevel.equals(MyConstants.CUSTOM_RECIPE_DIFFICULTY_EASY)){
+
+                    difficultyPicked(easyBTN);
+
+                }
+
+                else if (recipeDifficultyLevel.equals(MyConstants.CUSTOM_RECIPE_DIFFICULTY_STANDARD)){
+
+                    difficultyPicked(standardBTN);
+
+                }
+
+                else if (recipeDifficultyLevel.equals(MyConstants.CUSTOM_RECIPE_DIFFICULTY_HARD)){
+
+                    difficultyPicked(hardBTN);
+
+                }
+            }
+            else //default value for difficulty is standard, if user didnt pick something else
+            {
+                difficultyPicked(standardBTN);
+
+            }
+
+            recipeServeCount = settings.getInt(MyConstants.CUSTOM_RECIPE_SERVE_COUNT, MyConstants.NO_SERVE_COUNT_ERROR);
+            if (recipeServeCount!=0) serveCountET.setText(Integer.toString(recipeServeCount));
+        }
+
+        else //Normal Creating Recipe Process
+        {
+            editBTN.setVisibility(View.GONE);
+            //getting saved extra info
+            SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+
+            currHoursPos = settings.getInt(MyConstants.CUSTOM_RECIPE_HOURS_SPINNER_CURR_POS, MyConstants.CUSTOM_RECIPE_NO_SPINNER_POS_SAVED);
+            if (currHoursPos!=MyConstants.CUSTOM_RECIPE_NO_SPINNER_POS_SAVED){
+                recipeTimeHoursSpinner.setSelection(currHoursPos);
+                onItemSelected(recipeTimeHoursSpinner, recipeTimeHoursSpinner.getSelectedView(), currHoursPos, 0); //id is irrelevant
+
+            }
+
+            currMinutesPos = settings.getInt(MyConstants.CUSTOM_RECIPE_MINUTES_SPINNER_CURR_POS, MyConstants.CUSTOM_RECIPE_NO_SPINNER_POS_SAVED);
+            if (currMinutesPos!=MyConstants.CUSTOM_RECIPE_NO_SPINNER_POS_SAVED){
+                recipeTimeMinutesSpinner.setSelection(currMinutesPos);
+                onItemSelected(recipeTimeMinutesSpinner, recipeTimeMinutesSpinner.getSelectedView(), currMinutesPos, 0); //id is irrelevant
+
+            }
+
+            recipeDifficultyLevel = settings.getString(MyConstants.CUSTOM_RECIPE_DIFFICULTY_LEVEL, null);
+            if (recipeDifficultyLevel !=null){
+                if (recipeDifficultyLevel.equals(MyConstants.CUSTOM_RECIPE_DIFFICULTY_EASY)){
+
+                    difficultyPicked(easyBTN);
+
+                }
+
+                else if (recipeDifficultyLevel.equals(MyConstants.CUSTOM_RECIPE_DIFFICULTY_STANDARD)){
+
+                    difficultyPicked(standardBTN);
+
+                }
+
+                else if (recipeDifficultyLevel.equals(MyConstants.CUSTOM_RECIPE_DIFFICULTY_HARD)){
+
+                    difficultyPicked(hardBTN);
+
+                }
+            }
+            else //default value for difficulty is standard, if user didnt pick something else
+            {
+                difficultyPicked(standardBTN);
+
+            }
+
+            recipeServeCount = settings.getInt(MyConstants.CUSTOM_RECIPE_SERVE_COUNT, 0);
+            if (recipeServeCount!=0) serveCountET.setText(Integer.toString(recipeServeCount));
+
+            recipeKosher = settings.getBoolean(MyConstants.CUSTOM_RECIPE_KOSHER, false);
+            recipeKosherCB.setChecked(recipeKosher);
         }
 
 
@@ -159,8 +206,15 @@ public class TrulyFinalCreateRecipeExtraInfo extends AppCompatActivity implement
     public void onDestroy() {
 
         super.onDestroy();
-        //The extra info is deleted when the user finishes the recipe, either by uploading it or by going back to the community screen
-        saveCurrentExtraInfo();
+
+        Intent gi = getIntent();
+        if (gi.getStringExtra("Previous Activity")==null ||
+                (gi.getStringExtra("Previous Activity")!=null &&  !gi.getStringExtra("Previous Activity").equals(MyConstants.FROM_PROFILE_AKA_EDIT_MODE)))
+        {//WE ONLY SAVE WHEN CLOSED WHEN WRITING A NEW RECIPE, IF YOU EDIT AN UPLOADED ONE THEN THE ONLY WAY TO SAVE IS VIA SAVEEDIT
+            //The extra info is deleted when the user finishes the recipe, either by uploading it or by going back to the community screen
+            saveCurrentExtraInfo();
+
+        }
 
     }
 
@@ -520,7 +574,7 @@ public class TrulyFinalCreateRecipeExtraInfo extends AppCompatActivity implement
         if (!serveCountET.getText().toString().isEmpty()) recipeServeCount = Integer.parseInt(serveCountET.getText().toString());
 
         if (recipeServeCount!= 0 && (currHoursPos>0 || currMinutesPos>0)){ //Intentionally wrote ">0" and not "!=0" bc pos Values can be -999 (from MyConstants)
-            Intent toAddRecipeFinish = new Intent(this, TrulyFinalCreateRecipeFinishScreen.class);
+            Intent toAddRecipeFinish = new Intent(this, CreateRecipeFinishScreen.class);
             toAddRecipeFinish.putExtra("Previous Activity", MyConstants.NOT_FROM_FINISH_SCREEN);
 
             SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
@@ -554,6 +608,43 @@ public class TrulyFinalCreateRecipeExtraInfo extends AppCompatActivity implement
     public void back(View view){
         //No need to save the string Lists of Steps bc finish() calls onDestroy and we save there
         finish();
+    }
+
+    public void saveEdit(View view)
+    {
+        //Checking For Valid Input
+        if (!serveCountET.getText().toString().isEmpty()) recipeServeCount = Integer.parseInt(serveCountET.getText().toString());
+
+        if (recipeServeCount!= 0 && (currHoursPos>0 || currMinutesPos>0))
+        { //Intentionally wrote ">0" and not "!=0" bc pos Values can be -999 (from MyConstants)
+
+            Intent backToFinish = new Intent(CreateRecipeExtraInfo.this, CreateRecipeFinishScreen.class);
+            backToFinish.putExtra("Previous Activity", MyConstants.FROM_PROFILE_AKA_EDIT_MODE);
+
+            //From This
+            SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+            SharedPreferences.Editor editor=settings.edit();
+            makeFinalRecipeTime(recipeTimeHours, recipeTimeMinutes);
+            editor.putString(MyConstants.CUSTOM_RECIPE_TIME, finalRecipeTime);
+            editor.putString(MyConstants.CUSTOM_RECIPE_DIFFICULTY_LEVEL, recipeDifficultyLevel);
+            editor.putInt(MyConstants.CUSTOM_RECIPE_SERVE_COUNT, recipeServeCount);
+            editor.putBoolean(MyConstants.CUSTOM_RECIPE_KOSHER, recipeKosher);
+            editor.commit();
+
+            backToFinish.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(backToFinish);
+        }
+
+        else{
+
+            if (recipeServeCount==0) {
+                Toast.makeText(this, "Please Enter the Recipe's Serve Count!", Toast.LENGTH_SHORT).show();
+            }
+            if (currHoursPos<=0 && currMinutesPos<=0){ //Intentionally wrote "<=0" and not "==0" bc pos Values can be -999 (from MyConstants)
+                Toast.makeText(this, "Please Enter a Valid Time for the Recipe!", Toast.LENGTH_SHORT).show();
+
+            }
+        }
     }
 
     @Override

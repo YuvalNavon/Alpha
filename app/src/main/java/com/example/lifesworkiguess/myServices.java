@@ -186,7 +186,7 @@ public class myServices {
     }
 
 
-    public static void recipeToXML(Context context, Recipe recipe, String fileName){
+    public static void recipeToXML(Context context, Recipe recipe){
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = null;
         try {
@@ -346,7 +346,7 @@ public class myServices {
 
 
 
-    public static  void downloadXML(Context context, String fileName, String path){
+    public static void downloadXML(Context context, String fileName, String path){
 
         if (isFileExists(context, MyConstants.DOWNLOADED_RECIPE_NAME))
         {
@@ -381,21 +381,7 @@ public class myServices {
 //        });
     }
 
-    public static void downloadFiles(Context context, String fileName, String destinationDirectory, String url){
-        if (isFileExists(context, fileName))
-        {
-            deleteFile(context, fileName);
-        }
 
-        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        Uri uri = Uri.parse(url);
-        DownloadManager.Request request = new DownloadManager.Request(uri);
-
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setDestinationInExternalFilesDir(context, destinationDirectory, fileName);
-
-        downloadManager.enqueue(request);
-    }
     public static boolean isFileExists(Context context, String filename){
 
 

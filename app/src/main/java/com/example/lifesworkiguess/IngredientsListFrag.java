@@ -52,16 +52,9 @@ public class IngredientsListFrag extends Fragment {
 
         context = getContext();
         recipe = myServices.XMLToRecipe(context, MyConstants.DOWNLOADED_RECIPE_NAME);
-        makeRecyclerView();
-
-        return view;
-    }
-
-    public void makeRecyclerView(){
 
         // Create an instance of your adapter
-        customAdapterIngredients adapter = new customAdapterIngredients(context, recipe.getIngredients());
-
+        customAdapterIngredients adapter = new customAdapterIngredients(context, recipe.getIngredients(), null, MyConstants.NOT_EDITING_RECIPE);
 
         // Set the layout manager for the RecyclerView
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
@@ -91,5 +84,12 @@ public class IngredientsListFrag extends Fragment {
             }
         });
 
+        return view;
     }
+
+//    public void makeRecyclerView(){
+//
+//      this is now in onCreateView
+//
+//    }
 }

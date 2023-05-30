@@ -11,7 +11,6 @@ import androidx.core.content.FileProvider;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,13 +18,11 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.View;
-import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -51,7 +48,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class UsernameScreen extends AppCompatActivity {
+public class FinishSignUpScreen extends AppCompatActivity {
 
     String cookingStyle, experienceLevel, weeklyHour, email,password, username;
     EditText usernameET;
@@ -287,7 +284,7 @@ public class UsernameScreen extends AppCompatActivity {
     }
 
     public void selectPFP(View view){
-        AlertDialog.Builder selectPictureDialogBuilder = new AlertDialog.Builder(UsernameScreen.this);
+        AlertDialog.Builder selectPictureDialogBuilder = new AlertDialog.Builder(FinishSignUpScreen.this);
 
         selectPictureDialogBuilder.setTitle("Choose Photo");
 
@@ -354,8 +351,7 @@ public class UsernameScreen extends AppCompatActivity {
                                 fDownRef.putFile(selectedImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                        Toast.makeText(UsernameScreen.this, "Photo Uploaded!", Toast.LENGTH_LONG).show();
-                                        Toast.makeText(UsernameScreen.this, "User Created!", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(FinishSignUpScreen.this, "User Created!", Toast.LENGTH_LONG).show();
                                         User newUser = new User(username, email, password, cookingStyle, experienceLevel, weeklyHour, FINISHED_SETUP);
                                         //GETTING LESSON NUMBER
                                         refLessons = FBDB.getReference("Courses").child(newUser.getSelectedCourse());
@@ -370,7 +366,7 @@ public class UsernameScreen extends AppCompatActivity {
 
                                                 }
                                                 refUsers.child(currentUser.getUid()).setValue(newUser);
-                                                Intent courseScreen = new Intent(UsernameScreen.this, HomeScreen.class );
+                                                Intent courseScreen = new Intent(FinishSignUpScreen.this, HomeScreen.class );
                                                 courseScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
                                                 startActivity(courseScreen);
 
@@ -389,7 +385,7 @@ public class UsernameScreen extends AppCompatActivity {
                             }
                             else if(!task.isSuccessful()){
                                 String errorMessage = task.getException().toString();
-                                Toast.makeText(UsernameScreen.this,
+                                Toast.makeText(FinishSignUpScreen.this,
                                         ""+ errorMessage.substring(errorMessage.indexOf(":")+2),
                                         Toast.LENGTH_LONG).show();
 
@@ -401,7 +397,7 @@ public class UsernameScreen extends AppCompatActivity {
 
                 else //Username ISN'T Available
                 {
-                    Toast.makeText(UsernameScreen.this, USERNAME_ERROR_MESSAGE, Toast.LENGTH_LONG).show();
+                    Toast.makeText(FinishSignUpScreen.this, USERNAME_ERROR_MESSAGE, Toast.LENGTH_LONG).show();
                 }
             }
         });

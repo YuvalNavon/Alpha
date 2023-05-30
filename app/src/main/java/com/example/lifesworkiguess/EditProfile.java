@@ -22,7 +22,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.View;
 import android.view.ViewGroup;
@@ -501,7 +500,7 @@ public class EditProfile extends AppCompatActivity {
 
 
 
-    public void save2(int mode){
+    public void save(int mode){
 
         View rootView = findViewById(R.id.EditProfileLL);
         disableClickableViews(rootView);
@@ -575,7 +574,6 @@ public class EditProfile extends AppCompatActivity {
                                                                                 @Override
                                                                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                                                                     PFPChanged = false;
-                                                                                    Toast.makeText(EditProfile.this, "Photo Uploaded!", Toast.LENGTH_LONG).show();
                                                                                     if (mode==MyConstants.EDIT_PFP_SCREEN_SAVE_MODE)
                                                                                     {
                                                                                         finish();
@@ -626,7 +624,6 @@ public class EditProfile extends AppCompatActivity {
 
                                                             View rootView = findViewById(R.id.EditProfileLL);
                                                             enableClickableViews(rootView);
-                                                            Toast.makeText(EditProfile.this, "EMAIL", Toast.LENGTH_SHORT).show();
 
                                                         }
                                                     }
@@ -737,7 +734,6 @@ public class EditProfile extends AppCompatActivity {
 
         if (noChangesMade(email, password, username))
         {
-            Toast.makeText(this, "No changes", Toast.LENGTH_SHORT).show();
             finish();
         }
 
@@ -767,7 +763,7 @@ public class EditProfile extends AppCompatActivity {
             confirmChangesBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     // Handle click here
-                    save2(MyConstants.EDIT_PFP_SCREEN_SAVE_MODE);
+                    save(MyConstants.EDIT_PFP_SCREEN_SAVE_MODE);
 
                 }
             });
@@ -817,7 +813,7 @@ public class EditProfile extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int id) {
 
                     // Handle click here
-                    save2(MyConstants.EDIT_PFP_SCREEN_SAVE_AND_CHANGE_COURSE_MODE); //We makeCourseChangeDialog there
+                    save(MyConstants.EDIT_PFP_SCREEN_SAVE_AND_CHANGE_COURSE_MODE); //We makeCourseChangeDialog there
 
 
 
@@ -865,8 +861,8 @@ public class EditProfile extends AppCompatActivity {
                 editor.putString("Password", null);
                 editor.commit();
 
-                //Back to MainActivity
-                Intent toMain = new Intent(EditProfile.this, MainActivity.class);
+                //Back to StartScreen
+                Intent toMain = new Intent(EditProfile.this, StartScreen.class);
                 toMain.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(toMain);
 

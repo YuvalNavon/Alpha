@@ -77,7 +77,7 @@ public class MyConstants {
     public static final int LESSON_INTRO_MODE_ERROR = 900;
     public static final int PERMENANT_LESSON_INTRO = 1;
     public static final int COMMUNITY_LESSON_INTRO = 2;
-
+    public static final String LESSON_NAME_KEY = "Lesson Name";
     public static final String LESSON_TIME_KEY = "Lesson Time";
     public static final String LESSON_DIFFICULTY_KEY = "Lesson Difficulty";
     public static final String LESSON_KOSHER_KEY = "Lesson Kosher";
@@ -94,7 +94,6 @@ public class MyConstants {
     //for Intro Screen of CommunityLesson
     public static final String LESSON_CREATOR_ID_KEY = "Creator ID";
     public static final String LESSON_CREATOR_USERNAME_KEY = "Creator Username";
-    public static final String LESSON_NAME_KEY = "Lesson Name";
     public static final String COMMUNITY_LESSON_DESCRIPTION_KEY = "Lesson Description";
     public static final String COMMUNITY_LESSON_NUMBER_KEY = "Lesson Number";
     public static final String COMMUNITY_LESSON_RATINGS_KEY = "Lesson Ratings";
@@ -120,6 +119,7 @@ public class MyConstants {
     //for Create Recipe Screens -> Intents Constants (Divided into screens: General, Image, and so on
     public static final String FROM_FINISH_SCREEN = "From Finish Screen";
     public static final String NOT_FROM_FINISH_SCREEN = "Not From Finish Screen";
+    public static final String FROM_PROFILE_AKA_EDIT_MODE = "Edit Mode";
 
             //General
     public static final String CUSTOM_RECIPE_NAME = "Custom Recipe Name";
@@ -175,5 +175,21 @@ public class MyConstants {
     //For Accessing Recipe from Storage
     public static final String RECIPE_STORAGE_NAME = "Recipe";
     public static final String RECIPE_IMAGE_STORAGE_NAME = "Recipe Image.jpg";
+
+    //For Editing CommunityLessons
+    public static final String ORIGINAL_CUSTOM_RECIPE_NUMBER = "Original Custom Recipe Number";
+    public static final String ORIGINAL_CUSTOM_RECIPE_NAME = "Original Custom Recipe Name";
+    public static final String ORIGINAL_CUSTOM_RECIPE_DESCRIPTION = "Original Custom Recipe Description";
+    public static final String ORIGINAL_CUSTOM_RECIPE_INGREDIENTS = "Original Custom Recipe Ingredients";
+    public static final String ORIGINAL_CUSTOM_RECIPE_STEPS = "Original Custom Recipe Steps";
+    public static final String ORIGINAL_CUSTOM_RECIPE_TIME = "Original Custom Recipe Time";
+    public static final String ORIGINAL_CUSTOM_RECIPE_DIFFICULTY_LEVEL = "Original Custom Recipe Difficulty Level";
+    public static final String ORIGINAL_CUSTOM_RECIPE_SERVE_COUNT = "Original Custom Recipe Serve Count";
+    public static final String ORIGINAL_CUSTOM_RECIPE_KOSHER = "Original Custom Recipe Kosher";
+
+    public static final int NOT_EDITING_RECIPE = 0;
+    public static final int EDITING_RECIPE = 1;
+
+
 
 }

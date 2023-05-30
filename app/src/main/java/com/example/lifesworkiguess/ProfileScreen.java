@@ -158,7 +158,7 @@ public class ProfileScreen extends AppCompatActivity implements AdapterView.OnIt
 
             }
         };
-        refUsers.addValueEventListener(userAndCourseGetter);
+        refUsers.addListenerForSingleValueEvent(userAndCourseGetter);
 
     }
 

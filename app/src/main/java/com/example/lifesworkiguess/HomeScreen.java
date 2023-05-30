@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -74,9 +73,26 @@ public class HomeScreen extends AppCompatActivity implements CustomViewHolder.On
                                     selectedCourse.addLesson(addedPermanentLesson);
 
                                 }
+
                                 //By default, FB sorts items by ABC, so this is used to sort lessons by predetermined numbers set by me:
                                 selectedCourse.sortLessonsListByNumber();
-                                makeCourseRecyclerView(selectedCourse);
+                                selectedCourseGlobal = selectedCourse;
+
+                                //Making Recycler View
+                                    lessonView = findViewById(R.id.lessonView);
+
+                                    // Create an instance of your adapter
+                                    customAdapter adapter = new customAdapter(HomeScreen.this, selectedCourse, HomeScreen.this::onItemClick);
+
+
+                                    // Set the layout manager for the RecyclerView
+                                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(HomeScreen.this);
+                                    linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
+                                    lessonView.setLayoutManager(linearLayoutManager);
+
+                                    // Set the adapter for the RecyclerView
+                                    lessonView.setAdapter(adapter);
+
 
                             }
                             @Override
@@ -89,7 +105,6 @@ public class HomeScreen extends AppCompatActivity implements CustomViewHolder.On
 
                 if (currentlyLoggedUser.hasFinishedCourse() && currentlyLoggedUser.getFinishedCourse()!=MyConstants.FINISHED_COURSE){
 
-                    Toast.makeText(HomeScreen.this, "CONGRATS", Toast.LENGTH_LONG).show();
                     currentlyLoggedUser.setFinishedCourse(MyConstants.FINISHED_COURSE);
                     if (currentlyLoggedUser.getCompletedCourses().get(MyConstants.COMPLETED_COURSES_PLACEHOLDER_INDEX).equals(MyConstants.COMPLETED_COURSES_PLACEHOLDER) )
                     {
@@ -151,22 +166,11 @@ public class HomeScreen extends AppCompatActivity implements CustomViewHolder.On
     }
 
 
-    public void makeCourseRecyclerView(Course course){
-        lessonView = findViewById(R.id.lessonView);
+//    public void makeCourseRecyclerView(Course course){
+//
+    // I put this in onCreate
 
-        // Create an instance of your adapter
-        customAdapter adapter = new customAdapter(HomeScreen.this, course, this::onItemClick);
-
-
-        // Set the layout manager for the RecyclerView
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(HomeScreen.this);
-        linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
-        lessonView.setLayoutManager(linearLayoutManager);
-
-        // Set the adapter for the RecyclerView
-        lessonView.setAdapter(adapter);
-        selectedCourseGlobal = course;
-    }
+//    }
 
     public boolean setLastLesson(Course course, int position){
         ArrayList<PermanentLesson> permanentLessons = course.getLessonsList();
@@ -177,7 +181,6 @@ public class HomeScreen extends AppCompatActivity implements CustomViewHolder.On
     @Override
     public void onItemClick(int position) {
 
-        Toast.makeText(HomeScreen.this,"PRESSED " + selectedCourseGlobal.getLessonsList().get(position).getLessonName() , Toast.LENGTH_LONG ).show();
         Intent toLessonIntro = new Intent(HomeScreen.this, NewLessonIntro.class);
 
         Lesson pickedLesson = selectedCourseGlobal.getLessonsList().get(position);

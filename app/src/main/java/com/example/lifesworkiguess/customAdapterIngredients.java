@@ -16,12 +16,18 @@ public class customAdapterIngredients  extends RecyclerView.Adapter<CustomViewHo
 
     Context context;
     ArrayList<Ingredient> ingredients;
+    OnItemClickListener listener;
+    int viewMode;
 
-    public customAdapterIngredients(Context context, ArrayList<Ingredient> ingredients) {
+
+    public customAdapterIngredients(Context context, ArrayList<Ingredient> ingredients, OnItemClickListener listener, int viewMode ) {
         this.context = context;
         this.ingredients = ingredients;
+        this.listener = listener;
+        this.viewMode = viewMode;
 
     }
+
 
 
 
@@ -37,8 +43,25 @@ public class customAdapterIngredients  extends RecyclerView.Adapter<CustomViewHo
         String ingredientName = ingredients.get(position).getName();
         String ingredientAmount = ingredients.get(position).getAmount();
         String ingredientUnits = ingredients.get(position).getUnits();
-        holder.ingredientName.setText(position+1 + ". " + ingredientName);
+        holder.ingredientName.setText(ingredientName);
         holder.ingredientAmountandUnits.setText(ingredientAmount + " " + ingredientUnits);
+
+        if (viewMode == MyConstants.EDITING_RECIPE)
+        {
+            holder.setOnItemClickListener(new CustomViewHolderIngredients.OnItemClickListener() {
+                @Override
+                public void onItemClick(int position) {
+                    if (listener != null) {
+                        listener.onItemClick(position);
+                    }
+                }
+            });
+        }
+
+
+
+
+
     }
 
     public void removeItem(int position) {
@@ -50,5 +73,13 @@ public class customAdapterIngredients  extends RecyclerView.Adapter<CustomViewHo
     @Override
     public int getItemCount() {
         return ingredients.size();
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
     }
 }

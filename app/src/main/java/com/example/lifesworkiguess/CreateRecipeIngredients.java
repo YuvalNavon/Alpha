@@ -13,9 +13,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -26,7 +26,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-public class TrulyFinalCreateRecipeIngredients extends AppCompatActivity {
+public class CreateRecipeIngredients extends AppCompatActivity {
 
 
     //From General
@@ -44,14 +44,18 @@ public class TrulyFinalCreateRecipeIngredients extends AppCompatActivity {
     RecyclerView ingredientsRV;
     ImageView upArrowIV, downArrowIV;
 
+    Button editBTN;
+    ImageView nextBTN, backBTN;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_truly_final_create_recipe_ingredients);
+
+        editBTN = findViewById(R.id.CR_Ingredients_EditBTN);
+        nextBTN =findViewById(R.id.CR_Ingredients_NextBTN);
+        backBTN = findViewById(R.id.CR_Ingredients_BackBTN);
 
         ingredientNameET = findViewById(R.id.ingredientNameCreateRecipe);
         ingredientAmountET = findViewById(R.id.ingredientAmountCreateRecipe);
@@ -66,31 +70,55 @@ public class TrulyFinalCreateRecipeIngredients extends AppCompatActivity {
         ingredientsList = new ArrayList<>();
         ingredientsInStringLists = new ArrayList<>();
 
-        //getting saved ingredients
-        SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
-        String jsonOfIngredients = settings.getString(MyConstants.CUSTOM_RECIPE_INGREDIENTS, null);
-        if (jsonOfIngredients!=null){
-            upArrowIV.setVisibility(View.VISIBLE);
-            downArrowIV.setVisibility(View.VISIBLE);
-            Gson gson = new Gson();
-            Type type = new TypeToken<ArrayList<String[]>>(){}.getType();
-            ingredientsInStringLists = gson.fromJson(jsonOfIngredients, type);
-            if (ingredientsInStringLists !=null){
-                makeRecyclerViewForReopen(ingredientsInStringLists);
-            }
-        }
+
 
         Intent gi = getIntent();
 
         //We check if the user got to this activity from the finish screen or from the activity before this one
 
-        if (gi.getStringExtra("Previous Activity").equals(MyConstants.FROM_FINISH_SCREEN)){
+        if (gi.getStringExtra("Previous Activity")!=null && gi.getStringExtra("Previous Activity").equals(MyConstants.FROM_FINISH_SCREEN)){
             //Right now I do not allow users to edit by pressing on items from the finish screen, so  this will remain empty for now
+            //I can do this SO SO SO EASILY but design Wise I think its useless and confusing
+
         }
 
-        else if (gi.getStringExtra("Previous Activity").equals(MyConstants.NOT_FROM_FINISH_SCREEN)){
+        else if (gi.getStringExtra("Previous Activity")!=null &&  gi.getStringExtra("Previous Activity").equals(MyConstants.FROM_PROFILE_AKA_EDIT_MODE))
+        {   //User is editing uploaded Recipe
 
+            nextBTN.setVisibility(View.GONE);
+            backBTN.setVisibility(View.GONE);
 
+            SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+            String jsonOfIngredients = settings.getString(MyConstants.CUSTOM_RECIPE_INGREDIENTS, null);
+            if (jsonOfIngredients!=null){
+                upArrowIV.setVisibility(View.VISIBLE);
+                downArrowIV.setVisibility(View.VISIBLE);
+                Gson gson = new Gson();
+                Type type = new TypeToken<ArrayList<String[]>>(){}.getType();
+                ingredientsInStringLists = gson.fromJson(jsonOfIngredients, type);
+                if (ingredientsInStringLists !=null){
+                    makeRecyclerViewForReopen(ingredientsInStringLists);
+                }
+            }
+
+        }
+
+        else  //Normal Creating Recipe Process
+        {
+            editBTN.setVisibility(View.GONE);
+            //getting saved ingredients
+            SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+            String jsonOfIngredients = settings.getString(MyConstants.CUSTOM_RECIPE_INGREDIENTS, null);
+            if (jsonOfIngredients!=null){
+                upArrowIV.setVisibility(View.VISIBLE);
+                downArrowIV.setVisibility(View.VISIBLE);
+                Gson gson = new Gson();
+                Type type = new TypeToken<ArrayList<String[]>>(){}.getType();
+                ingredientsInStringLists = gson.fromJson(jsonOfIngredients, type);
+                if (ingredientsInStringLists !=null){
+                    makeRecyclerViewForReopen(ingredientsInStringLists);
+                }
+            }
         }
 
 
@@ -100,13 +128,22 @@ public class TrulyFinalCreateRecipeIngredients extends AppCompatActivity {
     public void onDestroy() {
 
         super.onDestroy();
-        ingredientsListToStringLists(ingredientsList); //Updating ingredientsInStringLists if the user swiped items
-        //The added Ingredients ArrayLists of String are deleted when the user finishes the recipe, either by uploading it or by going back to the community screen
-        if (!ingredientsInStringLists.isEmpty()){
 
-            saveCurrentlyAddedIngredients();
+        Intent gi = getIntent();
+        if (gi.getStringExtra("Previous Activity")==null ||
+                (gi.getStringExtra("Previous Activity")!=null &&  !gi.getStringExtra("Previous Activity").equals(MyConstants.FROM_PROFILE_AKA_EDIT_MODE)))
+        {//WE ONLY SAVE WHEN CLOSED WHEN WRITING A NEW RECIPE, IF YOU EDIT AN UPLOADED ONE THEN THE ONLY WAY TO SAVE IS VIA SAVEEDIT
 
+            ingredientsListToStringLists(ingredientsList); //Updating ingredientsInStringLists if the user swiped items
+            //The added Ingredients ArrayLists of String are deleted when the user finishes the recipe, either by uploading it or by going back to the community screen
+            if (!ingredientsInStringLists.isEmpty()){
+
+                saveCurrentlyAddedIngredients();
+
+            }
         }
+
+
 
     }
 
@@ -195,7 +232,7 @@ public class TrulyFinalCreateRecipeIngredients extends AppCompatActivity {
         downArrowIV.setVisibility(View.VISIBLE);
 
         // Create an instance of your adapter
-        customAdapterIngredients adapter = new customAdapterIngredients(this, ingredientsList);
+        customAdapterIngredients adapter = new customAdapterIngredients(this, ingredientsList, null, MyConstants.NOT_EDITING_RECIPE);
 
         // Set the layout manager for the RecyclerView
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -250,7 +287,7 @@ public class TrulyFinalCreateRecipeIngredients extends AppCompatActivity {
     }
 
     public void next(View view){
-
+        ingredientsListToStringLists(ingredientsList);
         if (!ingredientsList.isEmpty())
         {
             ingredientName = ingredientNameET.getText().toString();
@@ -259,7 +296,7 @@ public class TrulyFinalCreateRecipeIngredients extends AppCompatActivity {
 
             if (!ingredientName.isEmpty() || !ingredientAmount.isEmpty() || !ingredientUnits.isEmpty())
             {
-                AlertDialog.Builder midIngredientAddingDialogBuilder = new AlertDialog.Builder(TrulyFinalCreateRecipeIngredients.this);
+                AlertDialog.Builder midIngredientAddingDialogBuilder = new AlertDialog.Builder(CreateRecipeIngredients.this);
 
                 midIngredientAddingDialogBuilder.setTitle("Ingredient Not Added");
                 midIngredientAddingDialogBuilder.setMessage("Would You like to Continue without Adding The Ingredient You're currently Writing?");
@@ -274,7 +311,7 @@ public class TrulyFinalCreateRecipeIngredients extends AppCompatActivity {
                 midIngredientAddingDialogBuilder.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent toAddRecipeSteps = new Intent(TrulyFinalCreateRecipeIngredients.this, TrulyFinalCreateRecipeStepsTabbed.class);
+                        Intent toAddRecipeSteps = new Intent(CreateRecipeIngredients.this, CreateRecipeStepsTabbed.class);
                         toAddRecipeSteps.putExtra("Previous Activity", MyConstants.NOT_FROM_FINISH_SCREEN);
 
                         Gson gson = new Gson();
@@ -295,7 +332,7 @@ public class TrulyFinalCreateRecipeIngredients extends AppCompatActivity {
 
             else
             {
-                Intent toAddRecipeSteps = new Intent(this, TrulyFinalCreateRecipeStepsTabbed.class);
+                Intent toAddRecipeSteps = new Intent(this, CreateRecipeStepsTabbed.class);
                 toAddRecipeSteps.putExtra("Previous Activity", MyConstants.NOT_FROM_FINISH_SCREEN);
 
                 Gson gson = new Gson();
@@ -312,7 +349,93 @@ public class TrulyFinalCreateRecipeIngredients extends AppCompatActivity {
 
         else //No Ingredients added
         {
-            AlertDialog.Builder noIngredientsDialogBuilder = new AlertDialog.Builder(TrulyFinalCreateRecipeIngredients.this);
+            AlertDialog.Builder noIngredientsDialogBuilder = new AlertDialog.Builder(CreateRecipeIngredients.this);
+
+            noIngredientsDialogBuilder.setTitle("No Ingredients");
+            noIngredientsDialogBuilder.setMessage("Please Add at least 1 Ingredient to Your Recipe!");
+
+
+            noIngredientsDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                }
+            });
+
+
+            AlertDialog noIngredientsDialog = noIngredientsDialogBuilder.create();
+            noIngredientsDialog.show();
+        }
+
+    }
+
+    public void saveEdit(View view){
+        ingredientsListToStringLists(ingredientsList);
+        if (!ingredientsList.isEmpty())
+        {
+            ingredientName = ingredientNameET.getText().toString();
+            ingredientAmount = ingredientAmountET.getText().toString();
+            ingredientUnits = ingredientUnitsET.getText().toString();
+
+            if (!ingredientName.isEmpty() || !ingredientAmount.isEmpty() || !ingredientUnits.isEmpty())
+            {
+                AlertDialog.Builder midIngredientAddingDialogBuilder = new AlertDialog.Builder(CreateRecipeIngredients.this);
+
+                midIngredientAddingDialogBuilder.setTitle("Ingredient Not Added");
+                midIngredientAddingDialogBuilder.setMessage("Would You like to Continue without Adding The Ingredient You're currently Writing?");
+
+
+                midIngredientAddingDialogBuilder.setNegativeButton("Back", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                });
+
+                midIngredientAddingDialogBuilder.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        Intent backToFinish = new Intent(CreateRecipeIngredients.this, CreateRecipeFinishScreen.class);
+                        backToFinish.putExtra("Previous Activity", MyConstants.FROM_PROFILE_AKA_EDIT_MODE);
+
+                        Gson gson = new Gson();
+                        String jsonOfIngredients = gson.toJson(ingredientsInStringLists);
+                        SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+                        SharedPreferences.Editor editor=settings.edit();
+                        editor.putString(MyConstants.CUSTOM_RECIPE_INGREDIENTS, jsonOfIngredients);
+                        editor.commit();
+
+                        startActivity(backToFinish);
+                    }
+                });
+
+
+                AlertDialog midIngredientAddingDialog = midIngredientAddingDialogBuilder.create();
+                midIngredientAddingDialog.show();
+            }
+
+            else
+            {
+                Intent backToFinish = new Intent(CreateRecipeIngredients.this, CreateRecipeFinishScreen.class);
+                backToFinish.putExtra("Previous Activity", MyConstants.FROM_PROFILE_AKA_EDIT_MODE);
+
+                Gson gson = new Gson();
+                String jsonOfIngredients = gson.toJson(ingredientsInStringLists);
+                SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+                SharedPreferences.Editor editor=settings.edit();
+                editor.putString(MyConstants.CUSTOM_RECIPE_INGREDIENTS, jsonOfIngredients);
+                editor.commit();
+
+
+
+
+                startActivity(backToFinish);
+            }
+
+        }
+
+        else //No Ingredients added
+        {
+            AlertDialog.Builder noIngredientsDialogBuilder = new AlertDialog.Builder(CreateRecipeIngredients.this);
 
             noIngredientsDialogBuilder.setTitle("No Ingredients");
             noIngredientsDialogBuilder.setMessage("Please Add at least 1 Ingredient to Your Recipe!");

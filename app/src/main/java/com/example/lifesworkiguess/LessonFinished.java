@@ -113,7 +113,7 @@ public class LessonFinished extends AppCompatActivity {
         {
             lessonPosition = gi.getIntExtra("Lesson Position in List", MyConstants.NO_LESSON_POSITION);
             lessonName = gi.getStringExtra("Lesson Name");
-            ratingMessageTV.setText("Rate how your Dish turned out!");
+            ratingMessageTV.setText("Rate how your Dish turned out!\nP.S: Rating a Lesson as 0 counts as not rating it.");
             reviewTV.setVisibility(View.GONE);
             reviewSV.setVisibility(View.GONE);
             reviewSpace.setVisibility(View.GONE);
@@ -125,7 +125,7 @@ public class LessonFinished extends AppCompatActivity {
             lessonName = gi.getStringExtra(MyConstants.LESSON_NAME_KEY);
             creatorID = gi.getStringExtra(MyConstants.LESSON_CREATOR_ID_KEY);
             lessonNumber = gi.getIntExtra(MyConstants.COMMUNITY_LESSON_NUMBER_KEY, MyConstants.NO_COMMUNITY_LESSON_NUMBER_ERROR);
-            ratingMessageTV.setText("Rate This Recipe!");
+            ratingMessageTV.setText("Rate This Recipe!\nP.S: Rating a Lesson as 0 counts as not rating it.");
 
 
         }
@@ -310,7 +310,6 @@ public class LessonFinished extends AppCompatActivity {
                                     fDownRef.putFile(photoURI).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                         @Override
                                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                            Toast.makeText(LessonFinished.this, "Photo Uploaded!", Toast.LENGTH_LONG).show();
 
                                         }
                                     });
@@ -427,7 +426,6 @@ public class LessonFinished extends AppCompatActivity {
                                                                             fDownRef.putFile(photoURI).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                                                                 @Override
                                                                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                                                                    Toast.makeText(LessonFinished.this, "Photo Uploaded!", Toast.LENGTH_LONG).show();
 
                                                                                 }
                                                                             });
@@ -503,15 +501,7 @@ public class LessonFinished extends AppCompatActivity {
         };
         refUsers.addListenerForSingleValueEvent(lessonRater);
 
-//
-//        Toast.makeText(LessonFinished.this, "Please wait", Toast.LENGTH_SHORT).show();
-//        Handler handler = new Handler();
-//        handler.postDelayed(new Runnable() {
-//            public void run() {
-//                // Actions to do after 2 second (to let dish photo upload and rating change)
-//
-//              }
-//            }, 2000);
+
 
 
     }

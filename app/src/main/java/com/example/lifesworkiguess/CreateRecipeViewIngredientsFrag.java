@@ -2,6 +2,7 @@ package com.example.lifesworkiguess;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -20,20 +22,20 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 
-public class TrulyFinalCreateRecipeViewIngredientsFrag extends Fragment {
+public class CreateRecipeViewIngredientsFrag extends Fragment implements customAdapterIngredients.OnItemClickListener {
 
     String jsonofIngredients;
     ArrayList<String[]> ingredientsInStringlists;
     ArrayList<Ingredient> ingredientsList;
     RecyclerView ingredientsRV;
 
-    public TrulyFinalCreateRecipeViewIngredientsFrag() {
+    public CreateRecipeViewIngredientsFrag() {
         // Required empty public constructor
     }
 
 
-    public static TrulyFinalCreateRecipeViewIngredientsFrag newInstance() {
-        TrulyFinalCreateRecipeViewIngredientsFrag fragment = new TrulyFinalCreateRecipeViewIngredientsFrag();
+    public static CreateRecipeViewIngredientsFrag newInstance() {
+        CreateRecipeViewIngredientsFrag fragment = new CreateRecipeViewIngredientsFrag();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -63,7 +65,7 @@ public class TrulyFinalCreateRecipeViewIngredientsFrag extends Fragment {
             if (ingredientsInStringlists !=null){
                 StringListsToIngredients();
                 // Create an instance of your adapter
-                customAdapterIngredients adapter = new customAdapterIngredients(getContext(), ingredientsList);
+                customAdapterIngredients adapter = new customAdapterIngredients(getContext(), ingredientsList, this::onItemClick, MyConstants.EDITING_RECIPE);
 
                 // Set the layout manager for the RecyclerView
                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
@@ -94,6 +96,20 @@ public class TrulyFinalCreateRecipeViewIngredientsFrag extends Fragment {
             Ingredient ingredient = new Ingredient(ingredientName, ingredientAmount, ingredientUnits);
             ingredientsList.add(ingredient);
 
+        }
+
+    }
+
+
+    @Override
+    public void onItemClick(int position) {
+
+        if (getActivity().getIntent().getStringExtra("Previous Activity")!=null &&
+                getActivity().getIntent().getStringExtra("Previous Activity").equals(MyConstants.FROM_PROFILE_AKA_EDIT_MODE))
+        {
+            Intent goToEditIngredients= new Intent(getContext(), CreateRecipeIngredients.class);
+            goToEditIngredients.putExtra("Previous Activity", MyConstants.FROM_PROFILE_AKA_EDIT_MODE);
+            getContext().startActivity(goToEditIngredients);
         }
 
     }

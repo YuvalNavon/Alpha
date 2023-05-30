@@ -50,10 +50,7 @@ public class newLessonScreen extends AppCompatActivity {
             lessonIntroSetUp();
         }
 
-//        else if (fromIntroOrFromDuringCreatingRecipe.equals(MyConstants.FROM_CREATING_RECIPE))
-//        {
-//            viewSingleStepSetUp();
-//        }
+
 
 
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), fragmentList, fragmentTitleList);
@@ -108,29 +105,5 @@ public class newLessonScreen extends AppCompatActivity {
 
     }
 
-    public void viewSingleStepSetUp(){
 
-        String stepName = getLessonDetails.getStringExtra("Step Name");
-        String stepDescription = getLessonDetails.getStringExtra("Step Description");
-
-        //Currently no implementation for Step Action and Step Time
-
-        int stepNumber = getLessonDetails.getIntExtra("Step Number", 0);
-
-        Bundle stepDetails = new Bundle();
-        stepDetails.putString(MyConstants.VIEW_STEP_MODE_KEY, MyConstants.FROM_CREATING_RECIPE);
-        stepDetails.putString("Step Name", stepName);
-        stepDetails.putString("Step Description", stepDescription);
-        stepDetails.putInt("Step Number", stepNumber);
-
-        LessonScreenFrag lessonScreenForOneStepFrag = new LessonScreenFrag();
-        lessonScreenForOneStepFrag.setArguments(stepDetails);
-
-        fragmentList = new ArrayList<>();
-        fragmentList.add(lessonScreenForOneStepFrag);
-
-        fragmentTitleList = new ArrayList<>();
-        fragmentTitleList.add("Step");
-
-    }
 }

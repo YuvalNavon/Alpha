@@ -15,6 +15,8 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 
 import com.example.lifesworkiguess.databinding.ActivityTrulyFinalCreateRecipeStepsTabbedBinding;
 import com.google.gson.Gson;
@@ -23,32 +25,31 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-public class TrulyFinalCreateRecipeStepsTabbed extends AppCompatActivity {
+public class CreateRecipeStepsTabbed extends AppCompatActivity {
 
     private ActivityTrulyFinalCreateRecipeStepsTabbedBinding binding;
 
-    //From General
-    String recipeName, recipeDescription;
-
-    //From Image - Nothing
-
-    //From Ingredients
-    String jsonOfIngredients;
 
     //From this
     StepsViewModel stepsViewModel;
     ArrayList<String[]> stepsInStringLists;
 
+    Button editBTN;
+    ImageView nextBTN, backBTN;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+
 
         //Tabbed Activity stuff
         binding = ActivityTrulyFinalCreateRecipeStepsTabbedBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        TrulyFinalCreateRecipeMakeStepFrag makeStepFrag = new TrulyFinalCreateRecipeMakeStepFrag();
-        TrulyFinalCreateRecipeViewStepsFrag viewStepsFrag = new TrulyFinalCreateRecipeViewStepsFrag();
+        CreateRecipeMakeStepFrag makeStepFrag = new CreateRecipeMakeStepFrag();
+        StepsListFrag viewStepsFrag = new StepsListFrag();
 
         Bundle stepsBundle = new Bundle();
         stepsBundle.putString(MyConstants.CUSTOM_RECIPE_STEPS_VIEW_MODE, MyConstants.CUSTOM_RECIPE_VIEW_STEPS_DURING_MAKING);
@@ -85,33 +86,61 @@ public class TrulyFinalCreateRecipeStepsTabbed extends AppCompatActivity {
             }
         });
 
-        //getting saved steps
-        SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
-        String jsonofSteps = settings.getString(MyConstants.CUSTOM_RECIPE_STEPS, null);
-        if (jsonofSteps !=null){
-            Gson gson = new Gson();
-            Type type = new TypeToken<ArrayList<String[]>>(){}.getType();
-            stepsInStringLists = gson.fromJson(jsonofSteps, type);
-            if (stepsInStringLists !=null){
-                makeRecyclerViewForReopen(stepsInStringLists);  //Basically we just put the saved steps in the stepsViewModel and that updates it so that in the ViewStepsFrag,
-                // the StepsViewModel Observe method is called and that method makes the RV
-            }
-        }
 
+        editBTN = findViewById(R.id.CR_Steps_EditBTN);
+        nextBTN = findViewById(R.id.CR_Steps_NextBTN);
+        backBTN = findViewById(R.id.CR_Steps_BackBTN);
 
         Intent gi = getIntent();
 
         //We check if the user got to this activity from the finish screen or from the activity before this one
 
-        if (gi.getStringExtra("Previous Activity").equals(MyConstants.FROM_FINISH_SCREEN)){
+        if (gi.getStringExtra("Previous Activity")!=null && gi.getStringExtra("Previous Activity").equals(MyConstants.FROM_FINISH_SCREEN)){
             //Right now I do not allow users to edit by pressing on items from the finish screen, so  this will remain empty for now
+            //I can do this SO SO SO EASILY but design Wise I think its useless and confusing
+
         }
 
-        else if (gi.getStringExtra("Previous Activity").equals(MyConstants.NOT_FROM_FINISH_SCREEN)){
+        else if (gi.getStringExtra("Previous Activity")!=null &&gi.getStringExtra("Previous Activity").equals(MyConstants.FROM_PROFILE_AKA_EDIT_MODE))
+        {   //User is editing uploaded Recipe
 
+            nextBTN.setVisibility(View.GONE);
+            backBTN.setVisibility(View.GONE);
+            //getting saved steps
+            SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+            String jsonofSteps = settings.getString(MyConstants.CUSTOM_RECIPE_STEPS, null);
+            if (jsonofSteps !=null){
+                Gson gson = new Gson();
+                Type type = new TypeToken<ArrayList<String[]>>(){}.getType();
+                stepsInStringLists = gson.fromJson(jsonofSteps, type);
+                if (stepsInStringLists !=null){
+                    makeRecyclerViewForReopen(stepsInStringLists);  //This method is just StringListsToSteps
+                    //Basically we just put the saved steps in the stepsViewModel and that updates it so that in the ViewStepsFrag,
+                    // the StepsViewModel Observe method is called and that method makes the RV
+                }
+            }
+        }
 
+        else  //Normal Creating Recipe Process
+        {
+            editBTN.setVisibility(View.GONE);
+            //getting saved steps
+            SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+            String jsonofSteps = settings.getString(MyConstants.CUSTOM_RECIPE_STEPS, null);
+            if (jsonofSteps !=null){
+                Gson gson = new Gson();
+                Type type = new TypeToken<ArrayList<String[]>>(){}.getType();
+                stepsInStringLists = gson.fromJson(jsonofSteps, type);
+                if (stepsInStringLists !=null){
+                    makeRecyclerViewForReopen(stepsInStringLists); //This method is just StringListsToSteps
+                    //Basically we just put the saved steps in the stepsViewModel and that updates it so that in the ViewStepsFrag,
+                    // the StepsViewModel Observe method is called and that method makes the RV
+                }
+            }
         }
     }
+
+
 
     public void onDestroy() {
 
@@ -185,7 +214,7 @@ public class TrulyFinalCreateRecipeStepsTabbed extends AppCompatActivity {
         ArrayList<Step> stepsList = stepsViewModel.getStepsList().getValue();
         if (stepsList==null || stepsList.isEmpty() || stepsList.size()<2)
         {
-            AlertDialog.Builder addStepsDialogBuilder = new AlertDialog.Builder(TrulyFinalCreateRecipeStepsTabbed.this);
+            AlertDialog.Builder addStepsDialogBuilder = new AlertDialog.Builder(CreateRecipeStepsTabbed.this);
 
             addStepsDialogBuilder.setTitle("Not Enough Steps");
             addStepsDialogBuilder.setMessage("Please Add at least 2 Steps for your Recipe!");
@@ -204,7 +233,7 @@ public class TrulyFinalCreateRecipeStepsTabbed extends AppCompatActivity {
 
         else
         {
-            Intent toAddRecipeExtraInfo = new Intent(this, TrulyFinalCreateRecipeExtraInfo.class);
+            Intent toAddRecipeExtraInfo = new Intent(this, CreateRecipeExtraInfo.class);
             toAddRecipeExtraInfo.putExtra("Previous Activity", MyConstants.NOT_FROM_FINISH_SCREEN);
 
             //From This
@@ -220,6 +249,45 @@ public class TrulyFinalCreateRecipeStepsTabbed extends AppCompatActivity {
 
 
 
+    }
+
+    public void saveEdit(View view)
+    {
+        ArrayList<Step> stepsList = stepsViewModel.getStepsList().getValue();
+        if (stepsList==null || stepsList.isEmpty() || stepsList.size()<2)
+        {
+            AlertDialog.Builder addStepsDialogBuilder = new AlertDialog.Builder(CreateRecipeStepsTabbed.this);
+
+            addStepsDialogBuilder.setTitle("Not Enough Steps");
+            addStepsDialogBuilder.setMessage("Please Add at least 2 Steps for your Recipe!");
+
+
+            addStepsDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                }
+            });
+
+
+            AlertDialog addStepsDialog = addStepsDialogBuilder.create();
+            addStepsDialog.show();
+        }
+
+        else
+        {
+            Intent backToFinish = new Intent(this, CreateRecipeFinishScreen.class);
+            backToFinish.putExtra("Previous Activity", MyConstants.FROM_PROFILE_AKA_EDIT_MODE);
+
+            //From This
+            Gson gson = new Gson();
+            String jsonOfSteps = gson.toJson(stepsInStringLists);
+            SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
+            SharedPreferences.Editor editor=settings.edit();
+            editor.putString(MyConstants.CUSTOM_RECIPE_STEPS, jsonOfSteps);
+            editor.commit();
+
+            startActivity(backToFinish);
+        }
     }
 
     public void back(View view){

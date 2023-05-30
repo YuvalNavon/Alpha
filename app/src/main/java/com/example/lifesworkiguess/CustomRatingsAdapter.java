@@ -169,7 +169,8 @@ public class CustomRatingsAdapter extends RecyclerView.Adapter<CustomRatingsView
 
     @Override
     public int getItemCount() {
-        return ratingsList.size();
+        if (ratingsList!=null) return ratingsList.size();
+        else return 0;
     }
 
     public interface OnItemClickListener {

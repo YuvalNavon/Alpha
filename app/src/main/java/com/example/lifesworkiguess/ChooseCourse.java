@@ -124,29 +124,108 @@ public class ChooseCourse extends AppCompatActivity implements AdapterView.OnIte
 
         Intent getOrigin = getIntent();
         if (getOrigin.getIntExtra("Previous Activity", MyConstants.NO_PREVIOUS_ACTIVITY_ERROR) == MyConstants.FROM_MAIN_ACTIVITY){
-            Intent makeUser = new Intent(this, SignUp.class);
-
-            makeUser.putExtra("Cooking Style", cookingStyle);
-            makeUser.putExtra("Experience Level", experienceLevel);
-            makeUser.putExtra("Weekly Hours", weeklyHour);
-
-            startActivity(makeUser);
+           toSignUp();
         }
         else if (getOrigin.getIntExtra("Previous Activity", MyConstants.NO_PREVIOUS_ACTIVITY_ERROR) == MyConstants.FROM_PROFILE){
 
+                changeCourse();
+            }
 
-                changeUsersCourse = new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        User currentUser = snapshot.getValue(User.class);
-                        if (experienceLevel.equals(currentUser.getExperienceLevel()) && cookingStyle.equals(currentUser.getCookingStyle())){
+    }
 
-                            if (!weeklyHour.equals(currentUser.getHours())) {
-                                currentUser.setHours(weeklyHour);
-                                refUsers.setValue(currentUser);
+
+    public void toSignUp()
+    {
+        Intent makeUser = new Intent(this, SignUp.class);
+
+        makeUser.putExtra("Cooking Style", cookingStyle);
+        makeUser.putExtra("Experience Level", experienceLevel);
+        makeUser.putExtra("Weekly Hours", weeklyHour);
+
+        startActivity(makeUser);
+    }
+
+    public void changeCourse()
+    {
+
+        changeUsersCourse = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User currentUser = snapshot.getValue(User.class);
+                if (experienceLevel.equals(currentUser.getExperienceLevel()) && cookingStyle.equals(currentUser.getCookingStyle())){
+
+                    if (!weeklyHour.equals(currentUser.getHours())) {
+                        currentUser.setHours(weeklyHour);
+                        refUsers.setValue(currentUser);
+                    }
+                    Toast.makeText(ChooseCourse.this, "Same Course", Toast.LENGTH_SHORT).show();
+
+                    Toast.makeText(ChooseCourse.this, "Please wait", Toast.LENGTH_SHORT).show();
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        public void run() {
+                            Intent toHomeScreen = new Intent(ChooseCourse.this, HomeScreen.class);
+                            toHomeScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(toHomeScreen);
+                        }
+                    }, 2000);
+
+
+                }
+
+                else{
+                    //For lessonsStatus and lessonsRating initialization:
+                    int latestRatingsListIndex = currentUser.getLessonsRating().size() -1;
+                    if (!currentUser.hasFinishedCourse()){
+                        currentUser.getLessonsRating().remove(latestRatingsListIndex);
+                        //WE DO NOT KEEP RATING OF COURSES THAT THE USER DID NOT FINISH AND CHANGE
+                    }
+                    currentUser.setLessonsStatus(new ArrayList<>());
+
+
+                    currentUser.setFinishedCourse(MyConstants.NOT_FINISHED_COURSE);
+                    currentUser.setCookingStyle(cookingStyle);
+                    currentUser.setExperienceLevel(experienceLevel);
+                    currentUser.setHours(weeklyHour);
+                    currentUser.updateSelectedCourse();
+                    refUsers.setValue(currentUser);
+
+
+                    refLessons = FBDB.getReference("Courses").child(currentUser.getSelectedCourse());
+                    lessonLoader = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            long lessonCount = snapshot.getChildrenCount();
+
+                            boolean userPickedPreviouslyCompletedCourse = false;
+                            for (String courseName: currentUser.getCompletedCourses())
+                            {
+                                if (currentUser.getSelectedCourse().equals(courseName))
+                                    userPickedPreviouslyCompletedCourse = true;
+
                             }
-                            Toast.makeText(ChooseCourse.this, "Same Course", Toast.LENGTH_SHORT).show();
+                            if (!userPickedPreviouslyCompletedCourse)
+                            {
+                                currentUser.getLessonsRating().add(new ArrayList<>());
+                                int latestRatingsListIndex = currentUser.getLessonsRating().size() -1; //we need to update this variable bc we just added a new list to the list.
+                                currentUser.getLessonsRating().get(latestRatingsListIndex).add(currentUser.getSelectedCourse());
+                                for (int i = 0; i < lessonCount; i++) {
 
+                                    currentUser.getLessonsStatus().add(0);
+                                    currentUser.getLessonsRating().get(latestRatingsListIndex).add("0");
+
+                                }
+                            }
+                            else
+                            {
+                                for (int i = 0; i < lessonCount; i++) {
+
+                                    currentUser.getLessonsStatus().add(1);
+
+                                }
+                            }
+
+                            refUsers.setValue(currentUser);
                             Toast.makeText(ChooseCourse.this, "Please wait", Toast.LENGTH_SHORT).show();
                             Handler handler = new Handler();
                             handler.postDelayed(new Runnable() {
@@ -154,95 +233,28 @@ public class ChooseCourse extends AppCompatActivity implements AdapterView.OnIte
                                     Intent toHomeScreen = new Intent(ChooseCourse.this, HomeScreen.class);
                                     toHomeScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
                                     startActivity(toHomeScreen);
-                                  }
-                                }, 2000);
-
+                                }
+                            }, 2000);
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
 
                         }
+                    };
+                    refLessons.addListenerForSingleValueEvent(lessonLoader);
 
-                        else{
-                            //For lessonsStatus and lessonsRating initialization:
-                            int latestRatingsListIndex = currentUser.getLessonsRating().size() -1;
-                            if (!currentUser.hasFinishedCourse()){
-                                currentUser.getLessonsRating().remove(latestRatingsListIndex);
-                                //WE DO NOT KEEP RATING OF COURSES THAT THE USER DID NOT FINISH AND CHANGE
-                            }
-                            currentUser.setLessonsStatus(new ArrayList<>());
-
-
-                            currentUser.setFinishedCourse(MyConstants.NOT_FINISHED_COURSE);
-                            currentUser.setCookingStyle(cookingStyle);
-                            currentUser.setExperienceLevel(experienceLevel);
-                            currentUser.setHours(weeklyHour);
-                            currentUser.updateSelectedCourse();
-                            refUsers.setValue(currentUser);
-
-
-                            refLessons = FBDB.getReference("Courses").child(currentUser.getSelectedCourse());
-                            lessonLoader = new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    long lessonCount = snapshot.getChildrenCount();
-
-                                    boolean userPickedPreviouslyCompletedCourse = false;
-                                    for (String courseName: currentUser.getCompletedCourses())
-                                    {
-                                        if (currentUser.getSelectedCourse().equals(courseName))
-                                            userPickedPreviouslyCompletedCourse = true;
-
-                                    }
-                                    if (!userPickedPreviouslyCompletedCourse)
-                                    {
-                                        currentUser.getLessonsRating().add(new ArrayList<>());
-                                        int latestRatingsListIndex = currentUser.getLessonsRating().size() -1; //we need to update this variable bc we just added a new list to the list.
-                                        currentUser.getLessonsRating().get(latestRatingsListIndex).add(currentUser.getSelectedCourse());
-                                        for (int i = 0; i < lessonCount; i++) {
-
-                                            currentUser.getLessonsStatus().add(0);
-                                            currentUser.getLessonsRating().get(latestRatingsListIndex).add("0");
-
-                                        }
-                                    }
-                                    else
-                                    {
-                                        for (int i = 0; i < lessonCount; i++) {
-
-                                            currentUser.getLessonsStatus().add(1);
-
-                                        }
-                                    }
-
-                                    refUsers.setValue(currentUser);
-                                    Toast.makeText(ChooseCourse.this, "Please wait", Toast.LENGTH_SHORT).show();
-                                    Handler handler = new Handler();
-                                    handler.postDelayed(new Runnable() {
-                                        public void run() {
-                                            Intent toHomeScreen = new Intent(ChooseCourse.this, HomeScreen.class);
-                                            toHomeScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-                                            startActivity(toHomeScreen);
-                                        }
-                                    }, 2000);
-                                }
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                }
-                            };
-                            refLessons.addListenerForSingleValueEvent(lessonLoader);
-
-                        }
-                    }
-
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                };
-                refUsers.addListenerForSingleValueEvent(changeUsersCourse);
+                }
             }
 
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        refUsers.addListenerForSingleValueEvent(changeUsersCourse);
     }
+
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

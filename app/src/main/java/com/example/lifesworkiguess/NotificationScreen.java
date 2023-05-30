@@ -23,8 +23,6 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 
-import com.example.lifesworkiguess.AlarmReceiver;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -138,22 +136,10 @@ public class NotificationScreen extends AppCompatActivity {
 
     public boolean onOptionsItemSelected(MenuItem item){
         if (item.getTitle().toString().equals("User Authentication") ){
-            Intent si = new Intent(this, MainActivity.class);
-            startActivity(si);
-        }
-        if (item.getTitle().toString().equals("Camera") ){
-            Intent si = new Intent(this, CameraUpload.class);
-            startActivity(si);
-        }
-        if (item.getTitle().toString().equals("Gallary Upload") ){
-            Intent si = new Intent(this, GallaryChoose.class);
+            Intent si = new Intent(this, StartScreen.class);
             startActivity(si);
         }
 
-        if (item.getTitle().toString().equals("Create Recipe") ){
-            Intent si = new Intent(this, ExEmElFormat.class);
-            startActivity(si);
-        }
 
         return true;
     }

@@ -296,30 +296,6 @@ public class User {
     }
 
 
-    //The next 2 methods are for keeping the user's rating of the community lessons they completed,
-    // but they arent responsible for keeping the ratings on the lessons themselves in the firebase!
-    public void rateCommunityLesson(String creatorID, String lessonName, String rating){
-
-    }
-
-    public void rateCommunityLesson(String creatorID, String lessonName, String rating, String Review){
-
-    }
-
-    public float getRatingForHistory(String courseName, int positionofLesson){
-        for (int i = 0; i<this.getLessonsRating().size(); i++){
-            ArrayList<String> lessonsRating = this.getLessonsRating().get(i);
-            if (lessonsRating.get(MyConstants.COURSE_NAME_POSITION_IN_LESSONS_RATINGS).equals(courseName))
-            {
-               return Float.parseFloat(this.getLessonsRating().get(i).get(positionofLesson+1)); //we add 1 to positionOfLesson bc the positionOfLesson
-                // is its position in the lessonsStatus list/picked course LessonsList
-                //those lists contain just the lessons, unlike the lists in lessonRating, which all start with the Course Name and only then have the the lessons themselves
-
-            }
-
-        }
-        return  Float.parseFloat(MyConstants.NOT_YET_RATED); //this return line will never execute bc the for loop always finds the lesson but just in case
-    }
 
     public void setLessonFinished(int lessonPosition){
         this.LessonsStatus.set(lessonPosition, MyConstants.FINISHED_LESSON);
@@ -345,6 +321,11 @@ public class User {
 
         if (UploadedRecipeStatuses == null) UploadedRecipeStatuses = new ArrayList<>();
         UploadedRecipeStatuses.add(1);
+    }
+
+    public void changeCustomRecipeName(int number, String newName)
+    {
+        UploadedRecipeNames.set(number, newName);
     }
 
     public void addFinishedCommunityLesson(String creatorID, int lessonNumber){

@@ -194,6 +194,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:onClick="goToHomePage"
                 android:text="Course"
                 android:textColor="@color/gray" />
         </LinearLayout>
@@ -218,7 +219,8 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Profile"
-                android:textColor="@color/orange" />
+                android:textColor="@color/orange"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout
@@ -241,6 +243,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:onClick="goToCommunityPage"
                 android:text="Community"
                 android:textColor="@color/gray" />
         </LinearLayout>

@@ -126,10 +126,6 @@ public class SignUp extends AppCompatActivity {
 
 
 
-
-
-
-
     public void Register(View view){
         email = emailET.getText().toString();
         password = passwordET.getText().toString();
@@ -142,7 +138,7 @@ public class SignUp extends AppCompatActivity {
                     if (noFieldsClear() && myServices.emailInFormat(email ) && myServices.passwordValid(password))
                     {
                         email = email.toLowerCase(Locale.ROOT);
-                        Intent usernameScreen = new Intent(SignUp.this, UsernameScreen.class);
+                        Intent usernameScreen = new Intent(SignUp.this, FinishSignUpScreen.class);
                         usernameScreen.putExtra("Cooking Style", cookingStyle);
                         usernameScreen.putExtra("Experience Level", experienceLevel);
                         usernameScreen.putExtra("Weekly Hours", weeklyHour);
