@@ -148,6 +148,7 @@ public class CommunityScreen extends AppCompatActivity implements CommunityDishe
     {
             //First we get the user Details
         usernamesList = new ArrayList<>();
+
         refUsers = FBDB.getReference("Users");
         usernameGetter = new ValueEventListener() {
             @Override
@@ -165,7 +166,6 @@ public class CommunityScreen extends AppCompatActivity implements CommunityDishe
                 }
 
                 //Now to make the Community Lessons RV
-                makeFoundLessonsRV();
 
 
             }
