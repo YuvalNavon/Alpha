@@ -1,3 +1,10 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Class is for the CommunityLesson Object.
+ */
+
 package com.example.lifesworkiguess;
 
 import java.util.ArrayList;
@@ -46,6 +53,16 @@ public class Course {
         lessonsList.add(addedPermanentLesson);
     }
 
+
+    /**
+     * this function sorts the Course's PermanentLesson list by their number, from low to high.
+     * <p>
+     *
+     * @param
+     *
+     *
+     * @return	None
+     */
     public void sortLessonsListByNumber(){  //By default, FB sorts items by ABC, so this is used to sort lessons by predetermined numbers set by me
         ArrayList<PermanentLesson> sorted =new ArrayList<>();
         int searchedIndex = 0;

@@ -1,3 +1,14 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Activity is where the user can view the full details of a picked Step in the CommunityLesson
+ * they are writing/editing/about to publish/about to start.
+ * if the Activity is started when the user is writing/editing a CommunityLesson, than the user can
+ * also edit the picked Step's details.
+ */
+
+
 package com.example.lifesworkiguess;
 
 import androidx.activity.OnBackPressedCallback;
@@ -145,6 +156,19 @@ public class SingleStepScreen extends AppCompatActivity {
     }
 
 
+
+    /**
+     * if the User edited the picked Step, the function makes sure they're valid,and if they are,
+     * the function saves the changed Step's details in Shared Preferences, and closes the activity.
+     * otherwise, the function alerts the user that their input is invalid.
+     * if the user didn't edit the picked step, the function closes the activity.
+     *
+     *
+     * @param
+     *
+     *
+     * @return
+     */
     public void saveChanges(){
 
         String changedStepName = stepNameET.getText().toString();
@@ -204,6 +228,15 @@ public class SingleStepScreen extends AppCompatActivity {
 
     }
 
+
+    /**
+     * this function either closes the activity or calls the saveChanges() method, depending on the
+     * context that the user is viewing this screen from.
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void clickedSave(View view){
         if (mode!=null &&  mode.equals("From Finish"))
         {
@@ -216,6 +249,13 @@ public class SingleStepScreen extends AppCompatActivity {
         }
     }
 
+    /**
+     * this function resets the EditText Fields of the Step's details to their original values.
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void resetChanges(View view){
 
         AlertDialog.Builder resetStepChangesDialogBuilder = new AlertDialog.Builder(SingleStepScreen.this);

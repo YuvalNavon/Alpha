@@ -1,3 +1,15 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Fragment is where the user can view the Steps
+ * of the Recipe they're writing/editing/about to start in a RecyclerView.
+ *  the user can also click a Step to go to the SingleStepScreen and view/possible Edit
+ *  that Step's details.
+ *
+ */
+
+
 package com.example.lifesworkiguess;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -24,11 +36,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link StepsListFrag#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class StepsListFrag extends Fragment implements AddedStepsViewHolder.OnItemClickListener {
 
 
@@ -83,6 +91,17 @@ public class StepsListFrag extends Fragment implements AddedStepsViewHolder.OnIt
 
     }
 
+
+    /**
+     * this function is called when the Fragment resumes.
+     * it checks if the user edited a Step previously and if so, it implements the changes in the
+     * Step list.
+     * it then erases the data relating to a changed Step from the Shared Preferences.
+     * @param
+     *
+     *
+     * @return
+     */
     @Override
     public void onResume(){
         super.onResume();
@@ -220,6 +239,14 @@ public class StepsListFrag extends Fragment implements AddedStepsViewHolder.OnIt
         return view;
     }
 
+
+    /**
+     * this function creates an ArrayList<Step> from the ArrayList<String[]> List of Steps.
+     * @param
+     *
+     *
+     * @return
+     */
     public void StringListsToSteps(){ //I use this method in a bunch of different activities but it feels like it should be like this for possible changes
         //depending on each activity, instead of putting it in myServices
         stepsList = new ArrayList<>();
@@ -236,6 +263,14 @@ public class StepsListFrag extends Fragment implements AddedStepsViewHolder.OnIt
         }
     }
 
+
+    /**
+     * this function creates and sets an AddedStepsCustomAdapter to the RecyclerView.
+     * @param
+     *
+     *
+     * @return
+     */
     public void makeRecyclerView(){
 
 
@@ -251,7 +286,16 @@ public class StepsListFrag extends Fragment implements AddedStepsViewHolder.OnIt
     }
 
 
-
+    /**
+     * this function allows the user to either view the details of a picked Step from
+     * the RecyclerView in the SingleStepScreen activity, or if the user is viewing this
+     * Fragment from the CreateRecipeFinishScreen Activity while editing a CommunityLesson, then
+     * this function opens the toCreateRecipeStepsTabbed Activity.
+     * @param
+     *
+     *
+     * @return
+     */
     @Override
     public void onItemClick(int position) {
 

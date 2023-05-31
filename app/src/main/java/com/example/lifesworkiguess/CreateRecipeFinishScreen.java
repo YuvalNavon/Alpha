@@ -1,3 +1,10 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Activity is where the user can View all of the details for the CommunityLesson they have written/edited.
+ */
+
 package com.example.lifesworkiguess;
 
 import android.content.DialogInterface;

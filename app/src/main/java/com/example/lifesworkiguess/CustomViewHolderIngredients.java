@@ -1,3 +1,10 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Class is the ViewHolder that is used to show Ingredients in a Recycler View.
+ */
+
 package com.example.lifesworkiguess;
 
 import android.view.View;

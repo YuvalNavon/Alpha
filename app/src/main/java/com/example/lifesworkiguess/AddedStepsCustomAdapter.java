@@ -1,3 +1,10 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Class is the Adapter that is used to show added Steps in a Recycler View.
+ */
+
 package com.example.lifesworkiguess;
 
 import android.content.Context;
@@ -69,7 +76,14 @@ public class AddedStepsCustomAdapter extends RecyclerView.Adapter<AddedStepsView
     }
 
 
-
+    /**
+     * this function sets every Step's number to its index in the stepsList
+     * <p>
+     *
+     * @param
+     *
+     * @return	None
+     */
     public void updateStepNumbers(){
         for (int i = 0; i<stepsList.size(); i++)
         {
@@ -81,6 +95,15 @@ public class AddedStepsCustomAdapter extends RecyclerView.Adapter<AddedStepsView
 
     }
 
+    /**
+     * this function swaps 2 Steps positions in the stepsList
+     * <p>
+     *
+     * @param fromPosition - the position of the item that was dragged.
+     *        toPosition - the position the Item was dragged to.
+     *
+     * @return	None
+     */
     public void swapItems(int fromPosition, int toPosition) {
         // Update the data set to reflect the new item positions
         Collections.swap(stepsList, fromPosition, toPosition);
@@ -92,6 +115,15 @@ public class AddedStepsCustomAdapter extends RecyclerView.Adapter<AddedStepsView
 
     }
 
+    /**
+     * this function removes a swiped Step from the stepsList
+     * <p>
+     *
+     * @param position - the position of the item that was swiped.
+     *
+     *
+     * @return	None
+     */
     public void removeItem(int position) {
         // Remove the item from the data set
         stepsList.remove(position);

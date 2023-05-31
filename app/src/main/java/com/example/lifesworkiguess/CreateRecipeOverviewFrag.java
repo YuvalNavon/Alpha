@@ -1,3 +1,12 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Fragment is where the user can View all of the details for the CommunityLesson they have written/edited, excluding Ingredients and Steps.
+ * In addition, the user can upload their lesson in this fragment.
+ */
+
+
 package com.example.lifesworkiguess;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -42,11 +51,7 @@ import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CreateRecipeOverviewFrag#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class CreateRecipeOverviewFrag extends Fragment {
 
     String recipeName, recipeDescription;
@@ -238,6 +243,14 @@ public class CreateRecipeOverviewFrag extends Fragment {
     }
 
 
+    /**
+     * this function creates an ArrayList<Ingredient> of Ingredients from the ArrayList<String[]> List of Ingredient.
+     * Then, this function sets that Step List in the StepViewModel.
+     * @param
+     *
+     *
+     * @return
+     */
         public void StringListsToIngredients(){  //I use this method in a bunch of different activities but it feels like it should be like this for possible changes
         //depending on each activity, instead of putting it in myServices
 
@@ -256,6 +269,14 @@ public class CreateRecipeOverviewFrag extends Fragment {
 
     }
 
+    /**
+     * this function creates an ArrayList<Step> of steps from the ArrayList<String[]> List of Steps.
+     * Then, this function sets that Step List in the StepViewModel.
+     * @param
+     *
+     *
+     * @return
+     */
     public void StringListsToSteps(){ //I use this method in a bunch of different activities but it feels like it should be like this for possible changes
         //depending on each activity, instead of putting it in myServices
         stepsList = new ArrayList<>();
@@ -272,6 +293,15 @@ public class CreateRecipeOverviewFrag extends Fragment {
         }
     }
 
+
+    /**
+     * this function  uploads the CommunityLesson and Recipe created/edited by the user to Firebase.
+     *
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void uploadRecipe(View view){
 
         //Adding the Recipe to the LoggedInUser List of made recipes

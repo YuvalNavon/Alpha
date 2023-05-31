@@ -1,3 +1,11 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Class is for the ViewPagerAdapter Object, which is used to set up Fragments in
+ * Tabbed Activities.
+ */
+
 package com.example.lifesworkiguess;
 
 import androidx.annotation.NonNull;

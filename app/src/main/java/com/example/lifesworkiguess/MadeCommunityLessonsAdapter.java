@@ -1,3 +1,12 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Class is the Adapter that is used to show active CommunityLessons made by the user in a Recycler View (In the HomeScreen Activity).
+ * also, it lets the user start, edit, or delete their lessons.
+ */
+
+
 package com.example.lifesworkiguess;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -172,6 +181,14 @@ public class MadeCommunityLessonsAdapter extends RecyclerView.Adapter<MadeCommun
         return lessons.size();
     }
 
+
+    /**
+     * this function gets the picked Lesson details and starts the NewLessonIntro activity.
+     * @param lesson - the Lesson picked
+     *
+     *
+     * @return
+     */
     public void startLesson(CommunityLesson lesson)
     {
         Intent toLessonIntro = new Intent(context, NewLessonIntro.class);
@@ -185,6 +202,15 @@ public class MadeCommunityLessonsAdapter extends RecyclerView.Adapter<MadeCommun
         context.startActivity(toLessonIntro);
     }
 
+
+    /**
+     * this function gets the picked Lesson details and starts the CreateRecipeFinishScreen activity
+     * in edit mode.
+     * @param lesson - the Lesson picked
+     *
+     *
+     * @return
+     */
     public void editRecipe(CommunityLesson lesson)
     {
         myServices.downloadXML(context, MyConstants.RECIPE_STORAGE_NAME,
@@ -339,6 +365,19 @@ public class MadeCommunityLessonsAdapter extends RecyclerView.Adapter<MadeCommun
 
     }
 
+    /**
+     * this function creates an Alert Dialog asking the user if they're sure they want to
+     * delete the picked Lesson.
+     * if the user agrees, the function sets the Lesson's active property as false and updates
+     * the Firebase.
+     * otherwise, the Alert Dialog is closed.
+     *
+     * @param lesson - the Lesson picked
+     *        position - the position of lesson in the lessons list.
+     *
+     *
+     * @return
+     */
     public void deleteRecipe(CommunityLesson lesson, int position)
     {
         AlertDialog.Builder deleteLessonDialogBuilder = new AlertDialog.Builder(context);

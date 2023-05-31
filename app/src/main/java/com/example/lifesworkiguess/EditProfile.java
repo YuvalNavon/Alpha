@@ -1,3 +1,12 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Activity is where the user can edit his Profile Settings (email address, password, username, profile picture),
+ * change course, and log out.
+ */
+
+
 package com.example.lifesworkiguess;
 
 import static com.example.lifesworkiguess.MyConstants.SELECT_PICTURE;
@@ -285,6 +294,16 @@ public class EditProfile extends AppCompatActivity {
     }
 
 
+    /**
+     * this function starts the process of picking an image from the Gallery.
+     * <p>
+     *
+     * @param
+     *
+     *
+     *
+     * @return	None
+     */
     public void imageChooser() {
 
         // create an instance of the
@@ -344,6 +363,16 @@ public class EditProfile extends AppCompatActivity {
     }
 
 
+    /**
+     * this function creates a File for the image picked and returns it.
+     * <p>
+     *
+     * @param
+     *
+     *
+     *
+     * @return	File
+     */
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd__HHmmss").format(new Date());
@@ -381,6 +410,18 @@ public class EditProfile extends AppCompatActivity {
         }
     }
 
+
+    /**
+     * this function asks for the permission to use the camera, if they haven't been granted.
+     * if granted, the function starts the Intent for taking a photo.
+     * <p>
+     *
+     * @param
+     *
+     *
+     *
+     * @return
+     */
     private void askCameraPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
         {
@@ -401,19 +442,49 @@ public class EditProfile extends AppCompatActivity {
         }
     }
 
+    /**
+     * this function returns true if none of the EditTextFields are empty.
+     * otherwise, it returns false.
+     * <p>
+     *
+     * @param
+     *
+     *
+     * @return	true/false
+     */
     public boolean noFieldsClear(){
         return !emailET.getText().toString().isEmpty() &&
                 !passwordET.getText().toString().isEmpty() &&
                 !usernameET.getText().toString().isEmpty();
     }
 
+    /**
+     * this function returns true if the user didn't change any detail about his profile.
+     * otherwise, it returns false.
+     * <p>
+     *
+     * @param
+     *
+     *
+     * @return	true/false
+     */
     public boolean noChangesMade(String email, String password, String username){
         return email.equals(originalEmail) && password.equals(originalPassword) &&
                 username.equals(originalUsername) && !PFPChanged;
     }
 
 
-
+    /**
+     * this function creates the Alert Dialog that asks the user if they're sure they want to change course.
+     * if the user agrees, this function starts the ChooseCourse Activity.
+     * otherwise, the alert dialog is closed.
+     * <p>
+     *
+     * @param
+     *
+     *
+     * @return	None
+     */
     public void makeCourseChangeDialog(){
         fAuth = FirebaseAuth.getInstance();
         loggedInUser = fAuth.getCurrentUser();
@@ -473,6 +544,15 @@ public class EditProfile extends AppCompatActivity {
 
     }
 
+    /**
+     * this function disables all of the child Views of the received View, and the received View itself.
+     * <p>
+     *
+     * @param view - the view that is disabled
+     *
+     *
+     * @return
+     */
     public void disableClickableViews(View view) {
         if (view instanceof ViewGroup) {
             ViewGroup viewGroup = (ViewGroup) view;
@@ -485,6 +565,16 @@ public class EditProfile extends AppCompatActivity {
         }
     }
 
+
+    /**
+     * this function enabled all of the child Views of the received View, and the received View itself..
+     * <p>
+     *
+     * @param view - the view that is enabled
+     *
+     *
+     * @return
+     */
     public void enableClickableViews(View view) {
         if (view instanceof ViewGroup) {
             ViewGroup viewGroup = (ViewGroup) view;
@@ -499,7 +589,17 @@ public class EditProfile extends AppCompatActivity {
 
 
 
-
+    /**
+     * if the user's changes exist and are valid, this function saves the user's changes, and either closes the activity or
+     * starts the ChooseCourse activity, depending on the inputted mode.
+     * otherwise, this function alerts the user about invalid input.
+     * <p>
+     *
+     * @param mode - the mode that dictates whether the user chose to only save, or to save and change course.
+     *
+     *
+     * @return
+     */
     public void save(int mode){
 
         View rootView = findViewById(R.id.EditProfileLL);
@@ -690,6 +790,16 @@ public class EditProfile extends AppCompatActivity {
         }
     }
 
+    /**
+     * this function uses Alert dialog to ask the user if they want to
+     * pick an image from their gallery, or by using their camera,
+     * and starts the process for the selected option.
+     *
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void changePFP(View view){
 
         AlertDialog.Builder selectPictureDialogBuilder = new AlertDialog.Builder(EditProfile.this);
@@ -723,6 +833,17 @@ public class EditProfile extends AppCompatActivity {
         selectPictureDialog.show();    }
 
 
+
+    /**
+     * this function uses Alert dialog to ask the user if they want to
+     * save their changes (only if changes were made).
+     *
+     * @param origin - String that dictates if this method was called from the SaveChanges button,
+     *               or from the back press method.
+     *
+     *
+     * @return
+     */
     public void preSave(String origin){
 
 
@@ -777,11 +898,28 @@ public class EditProfile extends AppCompatActivity {
 
     }
 
+    /**
+     * this function calls the preSave method with the "Pressed Save" origin.
+     *
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void saveChanges(View view){
 
         preSave("Pressed Save");
     }
 
+    /**
+     * this function starts the process for changing course, using Alert Dialogs to ask the user
+     * if they want to save their changes (if there are any), and if they want to change course.
+     *
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void changeCourse(View view){
         String email = emailET.getText().toString();
         String password = passwordET.getText().toString();
@@ -833,6 +971,18 @@ public class EditProfile extends AppCompatActivity {
 
     }
 
+    /**
+     * this function creates an Alert Dialog that asks the user if they're sure they want to
+     * sign out.
+     * if the user agrees, this function signs them out and deletes their log in info from
+     * Shared Preferences.
+     * otherwise, the Alert Dialog is closed.
+     *
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void signOut(View view){
 
         AlertDialog.Builder signOutBuilder = new AlertDialog.Builder(this);

@@ -1,3 +1,10 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Activity is where the user can view and start PermanentLessons from their selected Course.
+ */
+
 package com.example.lifesworkiguess;
 
 import androidx.annotation.NonNull;
@@ -172,12 +179,36 @@ public class HomeScreen extends AppCompatActivity implements CustomViewHolder.On
 
 //    }
 
+    /**
+     * this function return true if the picked lesson is the last one in its Course.
+     * otherwise it returns false.
+     * <p>
+     *
+     * @param course - the user's current Course.
+     *        position - the position of the picked Lesson.
+     *
+     *
+     *
+     * @return
+     */
     public boolean setLastLesson(Course course, int position){
         ArrayList<PermanentLesson> permanentLessons = course.getLessonsList();
         if (position == permanentLessons.size()-1) return true;
         else return false;
     }
 
+
+    /**
+     * this function gets the details of the lesson that was clicked by the user,
+     * and starts the NewLessonIntro Activity.
+     * <p>
+     *
+     * @param position - the position of the picked Lesson.
+     *
+     *
+     *
+     * @return
+     */
     @Override
     public void onItemClick(int position) {
 

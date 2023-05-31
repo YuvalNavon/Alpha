@@ -1,3 +1,11 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Activity is where the user can see the details and Ingredients of the Lesson they're
+ * about to start.
+ * if the Lesson is a CommunityLesson, the user can also view the Lesson's Steps and Reviews.
+ */
 package com.example.lifesworkiguess;
 
 import android.content.Intent;
@@ -105,6 +113,15 @@ public class NewLessonIntro extends AppCompatActivity {
 
     }
 
+    /**
+     * this function sets the Fragments for the ViewPagerAdapter and sets the screen as visible
+     *
+     * @param
+
+     *
+     *
+     * @return
+     */
     public void setUpScreen(){
 
         //Used right after recipe is downloaded
@@ -152,6 +169,17 @@ public class NewLessonIntro extends AppCompatActivity {
         tabs.setupWithViewPager(viewPager);
     }
 
+    /**
+     * this function gets the details for the picked PermanentLesson from the Intent
+     * and from Firebase Database,packs them in a bundle
+     * and calls the setUpIngredients() and setUpScreen() methods.
+     *
+     * @param
+     *
+     *
+     *
+     * @return
+     */
     public void permanentLessonSetup(){
         lessonName = getLessonData.getStringExtra("Lesson Name");
         courseName = getLessonData.getStringExtra("Course Name");
@@ -221,6 +249,17 @@ public class NewLessonIntro extends AppCompatActivity {
 
     }
 
+    /**
+     * this function gets the details for the picked CommunityLesson from the Intent
+     * and from Firebase Database,packs them in a bundle
+     * and calls the setUpIngredients(), setUpSteps(), setupRatings(), and setUpScreen() methods.
+     *
+     * @param
+     *
+     *
+     *
+     * @return
+     */
     public void communityLessonSetup(){
         lessonName = getLessonData.getStringExtra(MyConstants.LESSON_NAME_KEY);
         creatorUsername = getLessonData.getStringExtra(MyConstants.LESSON_CREATOR_USERNAME_KEY);
@@ -282,6 +321,17 @@ public class NewLessonIntro extends AppCompatActivity {
         refLessons.addListenerForSingleValueEvent(lessonGetter);
     }
 
+
+    /**
+     * this function gets the Ingredients list from the recipe of the picked Lesson,
+     * and packs it as an ArrayList<String[]> in a bundle .
+     *
+     * @param
+     *
+     *
+     *
+     * @return
+     */
     public void setUpIngredients(){
 
         ArrayList<Ingredient> ingredientsList = recipe.getIngredients();
@@ -299,6 +349,17 @@ public class NewLessonIntro extends AppCompatActivity {
 
     }
 
+
+    /**
+     * this function gets the Steps list from the recipe of the picked Lesson,
+     * and packs it as an ArrayList<String[]> in a bundle.
+     *
+     * @param
+     *
+     *
+     *
+     * @return
+     */
     public void setUpSteps(){
 
         ArrayList<Step> stepsList = recipe.getSteps();
@@ -319,6 +380,16 @@ public class NewLessonIntro extends AppCompatActivity {
         stepsBundle.putBoolean("From Lesson Intro", true);
     }
 
+    /**
+     * this function gets the Ratings list from the recipe of the picked Lesson,
+     * and packs it as an ArrayList<ArrayList<String>> in a bundle.
+     *
+     * @param
+     *
+     *
+     *
+     * @return
+     */
     public void setUpRatings()
     {
 

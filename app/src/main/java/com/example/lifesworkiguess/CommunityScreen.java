@@ -1,3 +1,10 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Activity is where the user can see Uploaded Recipes, and be directed to write their own Recipe.
+ */
+
 package com.example.lifesworkiguess;
 
 import androidx.annotation.NonNull;
@@ -95,7 +102,15 @@ public class CommunityScreen extends AppCompatActivity implements CommunityDishe
     }
 
 
-
+    /**
+     * this function deletes all of the details saved while writing a recipe from SharedPreferences
+     * <p>
+     *
+     * @param
+     *
+     *
+     * @return	None
+     */
     public void deleteEverythingFromLastRecipe(){
 
         //General - no need, as its the first screen in making recipes so if its closed then the recipe should be gone
@@ -127,6 +142,15 @@ public class CommunityScreen extends AppCompatActivity implements CommunityDishe
 
     }
 
+    /**
+     * this function makes and sets the CommunityDishesAdapter for the Recycler view showing the Main Dish Types.
+     * <p>
+     *
+     * @param
+     *
+     *
+     * @return	None
+     */
     public void makeDishCatagoryRV(){
 
 
@@ -144,6 +168,16 @@ public class CommunityScreen extends AppCompatActivity implements CommunityDishe
         dishesCatagoryRV.setAdapter(communityDishesAdapter);
     }
 
+
+    /**
+     * this function gets the List of usernames whose recipes were found.
+     * <p>
+     *
+     * @param
+     *
+     *
+     * @return	None
+     */
     public void getUsernamesList()
     {
             //First we get the user Details
@@ -179,6 +213,15 @@ public class CommunityScreen extends AppCompatActivity implements CommunityDishe
 
     }
 
+    /**
+     * this function makes and sets the CommunityLessonCustomAdapter for the Recycler view showing the Found Community Lessons.
+     * <p>
+     *
+     * @param
+     *
+     *
+     * @return	None
+     */
     public void makeFoundLessonsRV()
     {
 
@@ -204,6 +247,16 @@ public class CommunityScreen extends AppCompatActivity implements CommunityDishe
         foundCommunityLessonsRV.addItemDecoration(dividerItemDecoration);
     }
 
+
+    /**
+     * this function uses the database to create a list of all the lessons that include the input of the user in the search bar, in their name or description.
+     * <p>
+     *
+     * @param view - the button that was clicked
+     *
+     *
+     * @return	None
+     */
     public void search(View view)
     {
         EditText searchBar = findViewById(R.id.CommunityScreen_Searchbar);
@@ -254,6 +307,15 @@ public class CommunityScreen extends AppCompatActivity implements CommunityDishe
 
     }
 
+    /**
+     * this function uses the database to create a list of all the lessons that include the Main Dish Type name that the user clicked, in their name or description.
+     * <p>
+     *
+     * @param position - the position of the item that was clicked
+     *
+     *
+     * @return	None
+     */
     @Override
     public void onItemClick(int position) {
 
@@ -310,6 +372,15 @@ public class CommunityScreen extends AppCompatActivity implements CommunityDishe
     }
 
 
+    /**
+     * this function sends the user to the NewLessonIntro Activity, to start the Lesson that was clicked.
+     * <p>
+     *
+     * @param position - the position of the item that was clicked
+     *
+     *
+     * @return	None
+     */
     @Override
     public void onItemClick2(int position) {
 

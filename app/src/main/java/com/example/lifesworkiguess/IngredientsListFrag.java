@@ -1,3 +1,10 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Fragment is where the user can View all of the ingredients for the Lesson they're starting.
+ */
+
 package com.example.lifesworkiguess;
 
 import android.content.Context;
@@ -87,9 +94,5 @@ public class IngredientsListFrag extends Fragment {
         return view;
     }
 
-//    public void makeRecyclerView(){
-//
-//      this is now in onCreateView
-//
-//    }
+
 }

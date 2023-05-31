@@ -1,3 +1,13 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Activity is where the user can view 3 different Lists of details:
+ * 1. the User's Completed Courses and PermanentLessons
+ * 2. the User's Completed CommunityLessons
+ * 3. the User's Uploaded and active CommunityLessons
+ */
+
 package com.example.lifesworkiguess;
 
 import androidx.annotation.NonNull;
@@ -115,6 +125,14 @@ public class moreDetailsLists extends AppCompatActivity implements
 
     //Completed Lessons and Courses:
 
+    /**
+     * this function gets from Firebase the List of completed Courses by the user, and calls
+     * the  makeCompletedCoursesRecyclerView() method.
+     * @param
+     *
+     *
+     * @return
+     */
     public void getCompletedLessonsAndCourses()
     {
 
@@ -148,6 +166,14 @@ public class moreDetailsLists extends AppCompatActivity implements
         refUsers.addListenerForSingleValueEvent(infoGetter);
     }
 
+
+    /**
+     * this function creates and sets a CompletedCoursesAdapter to the secondary RecyclerView.
+     * @param
+     *
+     *
+     * @return
+     */
     public void makeCompletedCoursesRecyclerView(){
 
         // Create an instance of your adapter
@@ -167,7 +193,13 @@ public class moreDetailsLists extends AppCompatActivity implements
 
 
 
-
+    /**
+     * this function gets the details of the completed PermanentLessons in the Course that was clicked.
+     * @param position - the position of the Course that was picked in the Course list.
+     *
+     *
+     * @return
+     */
     @Override
     public void onItemClickCompletedCourses(int position) {
 
@@ -256,6 +288,14 @@ public class moreDetailsLists extends AppCompatActivity implements
         refLesson.addListenerForSingleValueEvent(getLessonName);
     }
 
+
+    /**
+     * this function creates and sets a CompletedLessonsAdapter to the main RecyclerView.
+     * @param
+     *
+     *
+     * @return
+     */
     public void makeCompletedLessonsRecyclerView(String pickedCourseName, ArrayList<String> lessonsNames, ArrayList<String> lessonsRatings){
 
         CompletedLessonsAdapter adapter =
@@ -281,6 +321,15 @@ public class moreDetailsLists extends AppCompatActivity implements
 
     //Completed Community Lessons:
 
+    /**
+     * this function gets the details of the completed CommunityLessons by the user, the usernames of
+     * the creators of those Lessons, and then it creates and sets a CompletedCommunityLessonsAdapter
+     * to the main RecyclerView.
+     * @param
+     *
+     *
+     * @return
+     */
     public void getCompletedCommunityLessonsList()
     {
 
@@ -386,6 +435,15 @@ public class moreDetailsLists extends AppCompatActivity implements
 
 
 
+
+    /**
+     * this function gets the details of the uploaded and active CommunityLessons of the user,
+     * and calls the makeRecipesMadeByUserRV() method.
+     * @param
+     *
+     *
+     * @return
+     */
     //Recipes Made by User:
     public void getRecipesMadeByUser(){
         refLesson = FBDB.getReference("Community Lessons By User").child(loggedInUser.getUid());
@@ -428,6 +486,13 @@ public class moreDetailsLists extends AppCompatActivity implements
         refLesson.addListenerForSingleValueEvent(getLessonName);
     }
 
+    /**
+     * this function creates and sets a MadeCommunityLessonsAdapter to the main RecyclerView.
+     * @param
+     *
+     *
+     * @return
+     */
     public void makeRecipesMadeByUserRV()
     {
         MadeCommunityLessonsAdapter adapter =

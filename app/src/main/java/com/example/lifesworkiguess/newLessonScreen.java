@@ -1,3 +1,11 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Activity is where the user performs the Recipe of the Lesson they started.
+ * they can view the ingredients of the Recipe as well.
+ */
+
 package com.example.lifesworkiguess;
 
 import android.content.Intent;
@@ -63,6 +71,17 @@ public class newLessonScreen extends AppCompatActivity {
 
     }
 
+
+    /**
+     * this function gets the details for the picked Lesson from the Intent
+     * and passes it in a bundle to the LessonScreenFrag Fragment.
+     *
+     * @param
+     *
+     *
+     *
+     * @return
+     */
     public void lessonIntroSetUp(){
         int permanentOrCommunity = getLessonDetails.getIntExtra(MyConstants.LESSON_INTRO_MODE_KEY, MyConstants.LESSON_INTRO_MODE_ERROR);
         Bundle intentDataForLessonFrag = new Bundle();

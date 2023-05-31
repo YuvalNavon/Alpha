@@ -1,3 +1,10 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Activity where the user can input, edit, and view the Steps for the Recipe/CommunityLesson they're writing/editing.
+ */
+
 package com.example.lifesworkiguess;
 
 import android.content.DialogInterface;
@@ -155,7 +162,13 @@ public class CreateRecipeStepsTabbed extends AppCompatActivity {
     }
 
 
-
+    /**
+     * this function saves the added Steps to Shared Preferences
+     * @param
+     *
+     *
+     * @return
+     */
     public void saveCurrentlyAddedSteps(){
 
         //The added Steps ArrayLists of String are deleted when the user finishes the recipe, either by uploading it or by going back to the community screen
@@ -169,6 +182,14 @@ public class CreateRecipeStepsTabbed extends AppCompatActivity {
         editor.commit();
     }
 
+    /**
+     * this function creates an ArrayList<Step> from the ArrayList<String[]> List of Steps.
+     * Then, this function sets that Step List in the StepViewModel.
+     * @param stepsInStringLists - the ArrayList<String[]> List of Steps.
+     *
+     *
+     * @return
+     */
     public void makeRecyclerViewForReopen(ArrayList<String[]> stepsInStringLists ){
         //Basically we just put the saved steps in the stepsViewModel and that updates it so that in the ViewStepsFrag,
         // the StepsViewModel Observe method is called and that method makes the RV
@@ -190,6 +211,14 @@ public class CreateRecipeStepsTabbed extends AppCompatActivity {
 
     }
 
+    /**
+     * this function creates an ArrayList<String[]> of steps from the ArrayList<Step> List of Steps.
+     * Then, this function sets that Step List in the StepViewModel.
+     * @param stepsList - the ArrayList<Step> List of Steps.
+     *
+     *
+     * @return
+     */
     public void stepListToStringList(ArrayList<Step> stepsList){  //See note on method "addStepToStringList"
         stepsInStringLists = new ArrayList<>();
         for (Step currStep : stepsList){
@@ -208,7 +237,17 @@ public class CreateRecipeStepsTabbed extends AppCompatActivity {
 
 
 
-
+    /**
+     * this function checks if the step's list size is larger than 1.
+     * if not, the function will alert the user to add at least 2 Steps.
+     * if yes, this function saves the added Steps to Shared Preferences and opens the
+     * CreateRecipeExtraInfo Activity.
+     *
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void next(View view){
 
         ArrayList<Step> stepsList = stepsViewModel.getStepsList().getValue();
@@ -251,6 +290,18 @@ public class CreateRecipeStepsTabbed extends AppCompatActivity {
 
     }
 
+
+    /**
+     * this function checks if the step's list size is larger than 1.
+     * if not, the function will alert the user to add at least 2 Steps.
+     * if yes, this function saves the added Steps to Shared Preferences and opens the
+     * CreateRecipeFinishScreen Activity.
+     *
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void saveEdit(View view)
     {
         ArrayList<Step> stepsList = stepsViewModel.getStepsList().getValue();
@@ -290,6 +341,13 @@ public class CreateRecipeStepsTabbed extends AppCompatActivity {
         }
     }
 
+    /**
+     * this function closes the activity.
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void back(View view){
         //No need to save the string Lists of Steps bc finish() calls onDestroy and we save there
         finish();

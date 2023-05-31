@@ -1,3 +1,12 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Activity is where the user resumes their Sign Up Process by inputting an email address
+ * and password for their profile.
+ */
+
+
 package com.example.lifesworkiguess;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -119,6 +128,16 @@ public class SignUp extends AppCompatActivity {
 
     }
 
+    /**
+     * this function returns true if none of the EditTextFields are empty.
+     * otherwise, it returns false.
+     * <p>
+     *
+     * @param
+     *
+     *
+     * @return	true/false
+     */
     public boolean noFieldsClear(){
         return !emailET.getText().toString().isEmpty() &&
                 !passwordET.getText().toString().isEmpty();
@@ -126,6 +145,16 @@ public class SignUp extends AppCompatActivity {
 
 
 
+    /**
+     * this function checks if the input of the user is full and valid.
+     * if yes, the function saves their input and starts the FinishSignUpScreen activity.
+     * <p>
+     *
+     * @param view - the button pressed
+     *
+     *
+     * @return	None
+     */
     public void Register(View view){
         email = emailET.getText().toString();
         password = passwordET.getText().toString();
@@ -172,6 +201,14 @@ public class SignUp extends AppCompatActivity {
     }
 
 
+    /**
+     * this function starts the LogIn Activity.
+     *
+     * @param view - the button pressed
+     *
+     *
+     * @return	None
+     */
     public void toLogIn(View view){
         Intent logInScreen = new Intent(this, LogIn.class);
         startActivity(logInScreen);

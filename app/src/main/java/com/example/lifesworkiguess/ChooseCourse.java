@@ -1,3 +1,10 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Activity is where the User can select all of the details of the Cooking course they want to learn.
+ */
+
 package com.example.lifesworkiguess;
 
 import androidx.annotation.NonNull;
@@ -119,7 +126,15 @@ public class ChooseCourse extends AppCompatActivity implements AdapterView.OnIte
     }
 
 
-
+    /**
+     * this function decides if the user on the activity is signing up, or choosing a new course.
+     * <p>
+     *
+     * @param	view - The button clicked.
+     *
+     *
+     * @return	None
+     */
     public void signUpORChangeCourse(View view){
 
         Intent getOrigin = getIntent();
@@ -133,7 +148,15 @@ public class ChooseCourse extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-
+    /**
+     * this function saves the selected details for the course and sends the user to the SignUp Activity.
+     * <p>
+     *
+     * @param
+     *
+     *
+     * @return	None
+     */
     public void toSignUp()
     {
         Intent makeUser = new Intent(this, SignUp.class);
@@ -145,6 +168,15 @@ public class ChooseCourse extends AppCompatActivity implements AdapterView.OnIte
         startActivity(makeUser);
     }
 
+    /**
+     * this function saves the selected details for the new course and sends the user to the ProfileScreen Activity.
+     * <p>
+     *
+     * @param
+     *
+     *
+     * @return	None
+     */
     public void changeCourse()
     {
 
@@ -255,6 +287,16 @@ public class ChooseCourse extends AppCompatActivity implements AdapterView.OnIte
         refUsers.addListenerForSingleValueEvent(changeUsersCourse);
     }
 
+
+    /**
+     * this function sets the details picked by the user for the course.
+     * <p>
+     *
+     * @param
+     *
+     *
+     * @return	None
+     */
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

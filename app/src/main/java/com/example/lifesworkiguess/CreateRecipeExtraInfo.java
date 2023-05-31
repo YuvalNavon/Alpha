@@ -1,3 +1,11 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Activity is where the user can put the Extra Info for the Recipe/CommunityLesson they're writing/editing.
+ * The Extra Info is the Time it takes to make the Recipe, How hard the Recipe is, How many people the Recipe is for, and whether the Recipe is Kosher or not.
+ */
+
 package com.example.lifesworkiguess;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -218,6 +226,15 @@ public class CreateRecipeExtraInfo extends AppCompatActivity implements AdapterV
 
     }
 
+    /**
+     * this function saves all the inputted Extra Info into SharedPreferences
+     * <p>
+     *
+     * @param
+     *
+     *
+     * @return	None
+     */
     public void saveCurrentExtraInfo(){
         SharedPreferences settings=getSharedPreferences("PREFS_NAME",MODE_PRIVATE);
         SharedPreferences.Editor editor=settings.edit();
@@ -231,7 +248,15 @@ public class CreateRecipeExtraInfo extends AppCompatActivity implements AdapterV
     }
 
 
-
+    /**
+     * this function sets up the Spinner for the Hours Options for the Recipe.
+     * <p>
+     *
+     * @param
+     *
+     *
+     * @return	None
+     */
     public void makeHoursSpinner(){
 
         ArrayAdapter<String> adpTimeHours = new ArrayAdapter<String>(this, R.layout.extra_info_spinner_items,R.id.extra_info_spinner_curr, MyConstants.CUSTOM_RECIPE_TIME_HOUR_OPTIONS_FOR_SPINNER) {
@@ -364,6 +389,15 @@ public class CreateRecipeExtraInfo extends AppCompatActivity implements AdapterV
         });
     }
 
+    /**
+     * this function sets up the Spinner for the Minutes Options for the Recipe.
+     * <p>
+     *
+     * @param
+     *
+     *
+     * @return	None
+     */
     public void makeMinutesSpinner(){
 
         ArrayAdapter<String> adpTimeMinutes = new ArrayAdapter<String>(this, R.layout.extra_info_spinner_items,R.id.extra_info_spinner_curr, MyConstants.CUSTOM_RECIPE_TIME_MINUTE_OPTIONS_FOR_SPINNER) {
@@ -494,6 +528,17 @@ public class CreateRecipeExtraInfo extends AppCompatActivity implements AdapterV
         });
     }
 
+
+    /**
+     * this function sets The String that contains the Time it takes to make the Recipe in finalRecipeTime
+     * <p>
+     *
+     * @param hours - the hours inputted.
+     *        minutes - the minutes inputted.
+     *
+     *
+     * @return	None
+     */
     public void makeFinalRecipeTime(int hours, int minutes){
         if (hours != 0 && minutes != 0){
             if (hours==1){
@@ -531,6 +576,16 @@ public class CreateRecipeExtraInfo extends AppCompatActivity implements AdapterV
 
 
 
+    /**
+     * this function sets The Difficulty Level for the Recipe, bases on the button pressed.
+     * <p>
+     *
+     * @param view - the button pressed.
+     *
+     *
+     *
+     * @return	None
+     */
     public void difficultyPicked(View view){
 
 
@@ -567,7 +622,18 @@ public class CreateRecipeExtraInfo extends AppCompatActivity implements AdapterV
 
 
 
-
+    /**
+     * this function checks that all the inputted info is valid.
+     * if so, the function saves the info in Shared Preferences and starts the CreateRecipeFinishScreen Activity.
+     * if not, the function alerts the user bases on the info that isn't valid.
+     * <p>
+     *
+     * @param view - the button pressed.
+     *
+     *
+     *
+     * @return	None
+     */
     public void next(View view){
 
         //Checking For Valid Input
@@ -610,6 +676,18 @@ public class CreateRecipeExtraInfo extends AppCompatActivity implements AdapterV
         finish();
     }
 
+    /**
+     * this function checks that all the inputted info is valid.
+     * if so, the function saves the info in Shared Preferences and starts the CreateRecipeFinishScreen Activity.
+     * if not, the function alerts the user bases on the info that isn't valid.
+     * <p>
+     *
+     * @param view - the button pressed.
+     *
+     *
+     *
+     * @return	None
+     */
     public void saveEdit(View view)
     {
         //Checking For Valid Input

@@ -1,3 +1,11 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Fragment is where the user can add Steps for the CommunityLesson they have written/edited.
+ */
+
+
 package com.example.lifesworkiguess;
 
 import android.app.Activity;
@@ -102,7 +110,13 @@ public class CreateRecipeMakeStepFrag extends Fragment {
     }
 
 
-
+    /**
+     * this function creates a Step from the inputted info, if all of the EditText fields aren't empty
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void addStep(View view){
         stepName = stepNameET.getText().toString();
         stepDescription = stepDescriptionET.getText().toString();

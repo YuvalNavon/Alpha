@@ -1,3 +1,12 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Activity is where the user can view their Profile Details, and be directed to edit them,
+ * change course, or view more details.
+ */
+
+
 package com.example.lifesworkiguess;
 
 import androidx.annotation.NonNull;
@@ -103,6 +112,17 @@ public class ProfileScreen extends AppCompatActivity implements AdapterView.OnIt
 
     }
 
+
+    /**
+     * this function gets the details of the currently logged in User from Firebase,
+     * and displays them.
+     *
+     * @param
+     *
+     *
+     *
+     * @return
+     */
     public void loadCurrentUserData()
     {
         fAuth = FirebaseAuth.getInstance();
@@ -164,7 +184,17 @@ public class ProfileScreen extends AppCompatActivity implements AdapterView.OnIt
 
 
 
-
+    /**
+     * this function creates the Alert Dialog that asks the user if they're sure they want to change course.
+     * if the user agrees, this function starts the ChooseCourse Activity.
+     * otherwise, the alert dialog is closed.
+     * <p>
+     *
+     * @param view - the button pressed
+     *
+     *
+     * @return	None
+     */
     public void changeCourse(View view){
 
         //Setting up Alert Dialogs
@@ -195,6 +225,16 @@ public class ProfileScreen extends AppCompatActivity implements AdapterView.OnIt
 
     }
 
+
+    /**
+     * this function starts the EditProfile Activity
+     * <p>
+     *
+     * @param view - the button pressed
+     *
+     *
+     * @return	None
+     */
     public void editProfile(View view){
         Intent toEditProfileScreen = new Intent(this, EditProfile.class);
         startActivity(toEditProfileScreen);

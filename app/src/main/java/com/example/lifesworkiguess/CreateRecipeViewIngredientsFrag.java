@@ -1,3 +1,11 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Fragment is where the user can View all their added Ingredients in the CommunityLesson they have written/edited.
+ */
+
+
 package com.example.lifesworkiguess;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -82,6 +90,13 @@ public class CreateRecipeViewIngredientsFrag extends Fragment implements customA
         return view;
     }
 
+    /**
+     * this function creates an ArrayList<Ingredient> from the ArrayList<String[]> List of Ingredients.
+     * @param
+     *
+     *
+     * @return
+     */
     public void StringListsToIngredients(){  //I use this method in a bunch of different activities but it feels like it should be like this for possible changes
         //depending on each activity, instead of putting it in myServices
 
@@ -100,7 +115,13 @@ public class CreateRecipeViewIngredientsFrag extends Fragment implements customA
 
     }
 
-
+    /**
+     * this function starts the CreateRecipeIngredients Activity, if the user is editing the recipe.
+     * @param
+     *
+     *
+     * @return
+     */
     @Override
     public void onItemClick(int position) {
 

@@ -1,3 +1,11 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Activity is where the user can rate, review (if the Lesson finished is a CommunityLesson),
+ * and add a photo of the dish they made.
+ */
+
 package com.example.lifesworkiguess;
 
 
@@ -221,6 +229,16 @@ public class LessonFinished extends AppCompatActivity {
     }
 
 
+    /**
+     * this function creates a File for the image picked and returns it.
+     * <p>
+     *
+     * @param
+     *
+     *
+     *
+     * @return	File
+     */
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd__HHmmss").format(new Date());
@@ -258,6 +276,17 @@ public class LessonFinished extends AppCompatActivity {
         }
     }
 
+    /**
+     * this function asks for the permission to use the camera, if they haven't been granted.
+     * if granted, the function starts the Intent for taking a photo.
+     * <p>
+     *
+     * @param
+     *
+     *
+     *
+     * @return
+     */
     private void askCameraPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
         {
@@ -278,11 +307,34 @@ public class LessonFinished extends AppCompatActivity {
         }
     }
 
+
+    /**
+     * this function starts the process of taking a photo with the Camera.
+     * <p>
+     *
+     * @param view - the button pressed.
+     *
+     *
+     *
+     * @return	None
+     */
     public void addDishPhoto(View view){
         askCameraPermissions();
 
     }
 
+    /**
+     * this function saves and uploads the rating, review, and photo inputted by the user,
+     * on the condition they are valid.
+     * otherwise, the function alerts the user that some input is invalid with Alert Dialog
+     * <p>
+     *
+     * @param
+     *
+     *
+     *
+     * @return	None
+     */
     public void next(View view){
 
         fAuth = FirebaseAuth.getInstance();

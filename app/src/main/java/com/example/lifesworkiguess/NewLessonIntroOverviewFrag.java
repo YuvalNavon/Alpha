@@ -1,3 +1,12 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Fragment is where the user can see the details of the Lesson they're about to start,
+ * and start it as well.
+ */
+
+
 package com.example.lifesworkiguess;
 
 import android.content.Intent;
@@ -143,7 +152,16 @@ public class NewLessonIntroOverviewFrag extends Fragment {
         return view;
     }
 
-
+    /**
+     * this function gets the details for the picked PermanentLesson from the Bundle
+     * and from Firebase Storage, and displays them on screen.
+     *
+     * @param
+     *
+     *
+     *
+     * @return
+     */
     public void permenantLessonSetup(){
         if (lessonFinal) lessonPositionOrCreatorTV.setText("Final Lesson");
         else lessonPositionOrCreatorTV.setText(MyConstants.LESSON_POSITIONS[lessonPosition] + " Lesson");
@@ -184,6 +202,17 @@ public class NewLessonIntroOverviewFrag extends Fragment {
 
     }
 
+
+    /**
+     * this function gets the details for the picked CommunityLesson from the Bundle
+     * and from Firebase Storage, and displays them on screen.
+     *
+     * @param
+     *
+     *
+     *
+     * @return
+     */
     public void communityLessonSetup(){
         lessonPositionOrCreatorTV.setText(creatorUsername + "'s Recipe" );
         lessonNameTV.setText(lessonName);
@@ -217,6 +246,15 @@ public class NewLessonIntroOverviewFrag extends Fragment {
     }
 
 
+    /**
+     * this function saves the details of the picked Lesson and starts the NewLessonScreen Activity.
+     *
+     * @param view - the button pressed
+     *
+     *
+     *
+     * @return
+     */
     public void startLesson(View view){
 
         Intent toLessonScreen = new Intent(getContext(), newLessonScreen.class);

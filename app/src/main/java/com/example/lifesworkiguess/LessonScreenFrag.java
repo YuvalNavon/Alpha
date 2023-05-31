@@ -1,3 +1,10 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Fragment is where the user can perform the Steps of the Recipe they're making.
+ */
+
 package com.example.lifesworkiguess;
 
 import android.content.Context;
@@ -207,7 +214,13 @@ public class LessonScreenFrag extends Fragment {
     }
 
 
-
+    /**
+     * this function sets the details of the currently performed Step on Screen.
+     * @param stepNumber - the number of the currently performed Step
+     *
+     *
+     * @return
+     */
     public void setStepDetails(int stepNumber){
         if (recipe.getSteps()!= null && !recipe.getSteps().isEmpty() )
         {
@@ -233,12 +246,29 @@ public class LessonScreenFrag extends Fragment {
 
     }
 
+    /**
+     * this function returns true if the currently performed Step is the last in the Recipe.
+     * otherwise it return false.
+     * @param stepNumber - the number of the currently performed Step
+     *
+     *
+     * @return true/false
+     */
     public boolean stepIsLast(int stepNumber){
         if (stepNumber==recipe.getSteps().size()-1) return true;
         else return false;
     }
 
 
+    /**
+     * this function progresses the current Step number by 1, and sets its details on screen.
+     *  if its called during the last Step,
+     * then it sets the Lesson as Finished, updates the Firebase, and starts the LessonFinished Activity.
+     * @param view - the button pressed
+     *
+     *
+     * @return true/false
+     */
     public void nextStep(View view){
 
         Context context = getContext();
@@ -391,6 +421,15 @@ public class LessonScreenFrag extends Fragment {
 //        formatStepName(recipe.getSteps().get(currStepNumber).getName());
     }
 
+
+    /**
+     * this function decreases the current Step number by 1, and sets its details on screen.
+     *
+     * @param view - the button pressed
+     *
+     *
+     * @return true/false
+     */
     public void prevStep(View view){
 
             currStepNumber-=1;

@@ -1,3 +1,10 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Class is used to define all of the frequently used methods of the app.
+ */
+
 package com.example.lifesworkiguess;
 
 import android.app.DownloadManager;
@@ -64,7 +71,16 @@ public class myServices {
 
 
     //SIGN UP INFO VALIDATION
-
+    /**
+     * this function checks in the FirebaseDatabase if the inputted email is not used by other users,
+     * and calls the onEmailCheck method with the result.
+     *
+     * @param email - the checked email address
+     *        listener - the listener for defining the onEmailCheck method.
+     *
+     *
+     * @return
+     */
     public static void isEmailAvailable(String email, OnEmailCheckListener listener) {
         FirebaseDatabase FDBD = FirebaseDatabase.getInstance("https://cookproject-ac2c0-default-rtdb.europe-west1.firebasedatabase.app");
         DatabaseReference refUsers = FDBD.getReference("Users");
@@ -83,15 +99,45 @@ public class myServices {
         });
     }
 
+    /**
+     * this function returns true if the inputted email is formatted like a valid email address.
+     * otherwise it returns false.
+     *
+     * @param email - the checked email address
+     *
+     *
+     *
+     * @return true/false
+     */
     public static boolean emailInFormat(String email){
         String regex = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
         return email.matches(regex);
     }
 
+    /**
+     * this function returns true if the inputted password is longer than 6 characters.
+     * otherwise it returns false.
+     * @param password - the checked password
+     *
+     *
+     *
+     * @return true/false
+     */
     public static boolean passwordValid(String password){
         return password.length()>6;
     }
 
+
+    /**
+     * this function checks in the FirebaseDatabase if the inputted username is not used by other users,
+     * and calls the onEmailCheck method with the result.
+     *
+     * @param username - the checked username
+     *        listener - the listener for defining the onEmailCheck method.
+     *
+     *
+     * @return
+     */
     public static void isUsernameAvailable(String username, OnUsernameCheckListener listener) {
         FirebaseDatabase FDBD = FirebaseDatabase.getInstance("https://cookproject-ac2c0-default-rtdb.europe-west1.firebasedatabase.app");
         DatabaseReference refUsers = FDBD.getReference("Users");
@@ -113,6 +159,16 @@ public class myServices {
 
 
     //RECIPE, XML, DOWNLOADS
+
+    /**
+     * this function returns a Recipe made from a saved XML file.
+     *
+     * @param context - the context this method was called from.
+     *        filename - the path of the XML file
+     *
+     *
+     * @return Recipe
+     */
     public static Recipe XMLToRecipe(Context context, String fileName){
         String recipeName = "ERROR";
         Recipe recipe = new Recipe(recipeName);
@@ -186,6 +242,16 @@ public class myServices {
     }
 
 
+    /**
+     * this function creates a document formatted in XML from a Recipe.
+     * it then calls the writeXML method and passes that document.
+     *
+     * @param context - the context this method was called from.
+     *        Recipe - the Recipe that the file is made from.
+     *
+     *
+     * @return
+     */
     public static void recipeToXML(Context context, Recipe recipe){
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = null;
@@ -297,6 +363,15 @@ public class myServices {
     }
 
 
+    /**
+     * this function creates an XML file from a Recipe.
+     *
+     * @param doc - the document containing the Recipe details
+     *        output - the output path of the file.
+     *
+     *
+     * @return
+     */
     //This is the one that actually makes the file available in the app's data that you can see in Android Studio!!
     //As long as you use DownloadFiles, the file is in the phone's data anyway.
     public static void writeXml(Document doc,
@@ -317,6 +392,16 @@ public class myServices {
 
     }
 
+    /**
+     * this function uploads a saved XML file to the LoggedIn User's folder
+     * in the Community Recipes folder in Firebase Storage.
+     *
+     * @param context - the context this method was called from.
+     *        filename - the name of the XML file
+     *
+     *
+     * @return
+     */
     public static void uploadXML(Context context, String fileName){
 
         FirebaseAuth fAuth = FirebaseAuth.getInstance();
@@ -345,7 +430,16 @@ public class myServices {
     }
 
 
-
+    /**
+     * this function downloads an XML file from Firebase Storage using the inputted path and filename .
+     *
+     * @param context - the context this method was called from.
+     *        filename - the name of the XML file
+     *        path - the path to the file.
+     *
+     *
+     * @return
+     */
     public static void downloadXML(Context context, String fileName, String path){
 
         if (isFileExists(context, MyConstants.DOWNLOADED_RECIPE_NAME))
@@ -382,6 +476,18 @@ public class myServices {
     }
 
 
+    /**
+     * this function returns true if a file with the inputted filename exists in
+     * the application's storage.
+     * otherwise it returns false.
+     *
+     * @param context - the context this method was called from.
+     *        filename - the name of the file
+
+     *
+     *
+     * @return true/false
+     */
     public static boolean isFileExists(Context context, String filename){
 
 
@@ -391,6 +497,18 @@ public class myServices {
 
     }
 
+    /**
+     * this function returns true if it was able to delete a file with the inputted filename from
+     * the application's storage.
+     * otherwise it returns false.
+     *
+     * @param context - the context this method was called from.
+     *        filename - the name of the file
+
+     *
+     *
+     * @return true/false
+     */
     public static boolean deleteFile(Context context, String filename) {
 
 //        File folder1 = new File(context.getExternalFilesDir("MyDir"), filename);
@@ -402,21 +520,17 @@ public class myServices {
 
     //PHOTOS
 
-    public static void uploadProfilePhotoToFirebase(Context context, Uri imageUri){
-        FirebaseAuth fAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = fAuth.getCurrentUser();
-        FirebaseStorage fStorage = FirebaseStorage.getInstance();
-        StorageReference fDownRef = fStorage.getReference("Users").child(currentUser.getUid()).child(MyConstants.PROFILE_PICTURE);
-        fDownRef.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(context, "Photo Uploaded!", Toast.LENGTH_LONG).show();
+    /**
+     *  this function gets the profile picture for the inputted user id from Firebase Storage,
+     *  and displays it on the inputted imageView
+     *
+     * @param iv - the ImageView where the image is displayed.
+     *        userID - the id of the user whom's photo is being received.
 
-            }
-        });
-    }
-
-
+     *
+     *
+     * @return
+     */
     public static void getProfilePhotoFromFirebase(ImageView iv, String userID){
 
         iv.setImageResource(R.drawable.default_profile_picture);
@@ -485,6 +599,15 @@ public class myServices {
     }
 
     //ROUND IMAGE
+    /**
+     * this function returns a rounded version of the bitmap received.
+     *
+     * @param bitmap - the bitmap of the image being rounded.
+
+     *
+     *
+     * @return
+     */
     public static Bitmap getCircularBitmap(Bitmap bitmap) {
         Bitmap output;
 
@@ -520,17 +643,43 @@ public class myServices {
 
 
     //NAVIGATING THE HOME MENU
+    /**
+     * this function starts the HomeScreen activity.
+     *
+     * @param context - the context this method was called from.
 
+     *
+     *
+     * @return
+     */
     public static void goToHomePage(Context context){
         Intent toHomeScreen = new Intent(context, HomeScreen.class);
         context.startActivity(toHomeScreen);
     }
 
+    /**
+     * this function starts the ProfileScreen activity.
+     *
+     * @param context - the context this method was called from.
+
+     *
+     *
+     * @return
+     */
     public static void goToProfilePage(Context context){
         Intent toProfileScreen = new Intent(context, ProfileScreen.class);
         context.startActivity(toProfileScreen);
     }
 
+    /**
+     * this function starts the CommunityScreen activity.
+     *
+     * @param context - the context this method was called from.
+
+     *
+     *
+     * @return
+     */
     public static void goToCommunityPage(Context context){
         Intent toCommunityScreen = new Intent(context, CommunityScreen.class);
         context.startActivity(toCommunityScreen);

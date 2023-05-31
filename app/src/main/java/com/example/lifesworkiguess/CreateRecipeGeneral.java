@@ -1,3 +1,11 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Fragment is where the user can Input the Name and Description of the CommunityLesson they are writing/editing.
+ */
+
+
 package com.example.lifesworkiguess;
 
 import androidx.annotation.NonNull;
@@ -93,11 +101,29 @@ public class CreateRecipeGeneral extends AppCompatActivity {
 
 
 
-
+    /**
+     * this function returns true if the inputted recipe's name has a comma in it.
+     * otherwise, false is returned
+     * <p>
+     *
+     * @param recipeName - the Recipe's name
+     *
+     *
+     * @return	true/false
+     */
     public boolean recipeNameHasComma(String recipeName) {
         return recipeName.contains(",");
     }
 
+    /**
+     * this function returns the inputted recipe's name without unnecessary spaces.
+     * <p>
+     *
+     * @param input - the Recipe's name
+     *
+     *
+     * @return String
+     */
     public String removeLeadingTrailingSpaces(String input) {
         if (input == null) {
             return null;
@@ -119,6 +145,19 @@ public class CreateRecipeGeneral extends AppCompatActivity {
         return input.substring(start, end + 1);
     }
 
+
+    /**
+     * this function checks that all the inputted info is valid.
+     * if so, the function saves the info in Shared Preferences and starts the CreateRecipeImage Activity.
+     * if not, the function alerts the user bases on the info that isn't valid.
+     * <p>
+     *
+     * @param view - the button pressed.
+     *
+     *
+     *
+     * @return	None
+     */
     public void next(View view){
 
         recipeName = recipeNameET.getText().toString();
@@ -236,6 +275,19 @@ public class CreateRecipeGeneral extends AppCompatActivity {
 
     }
 
+
+    /**
+     * this function checks that all the inputted info is valid.
+     * if so, the function saves the info in Shared Preferences and starts the CreateRecipeFinishScreen Activity.
+     * if not, the function alerts the user bases on the info that isn't valid.
+     * <p>
+     *
+     * @param view - the button pressed.
+     *
+     *
+     *
+     * @return	None
+     */
     public void saveEdit(View view)
     {
 

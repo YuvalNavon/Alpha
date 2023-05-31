@@ -1,3 +1,12 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Activity is the First Activity a new user will experience.
+ * in it, the user can start the SignUp or LogIn process.
+ */
+
+
 package com.example.lifesworkiguess;
 
 import androidx.annotation.NonNull;
@@ -71,12 +80,27 @@ public class StartScreen extends AppCompatActivity {
 
 
 
+    /**
+     * this function starts the ChooseCourse Activity.
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void getStarted(View view){
         Intent toChooseCourse = new Intent(this, ChooseCourse.class);
         toChooseCourse.putExtra(MyConstants.CHOOSE_COURSE_ORIGIN, MyConstants.FROM_MAIN_ACTIVITY);
         startActivity(toChooseCourse);
     }
 
+
+    /**
+     * this function starts the LogIn Activity.
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void logIn(View view){
         Intent si = new Intent(this, LogIn.class);
         startActivity(si);

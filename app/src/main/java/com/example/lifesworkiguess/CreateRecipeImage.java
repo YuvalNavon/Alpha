@@ -1,3 +1,11 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Activity is where the user can Select an Image for the CommunityLesson they have written/edited.
+ */
+
+
 package com.example.lifesworkiguess;
 
 import androidx.annotation.NonNull;
@@ -106,6 +114,17 @@ public class CreateRecipeImage extends AppCompatActivity {
 
     }
 
+
+    /**
+     * this function saves the inputted image in the application's storage.
+     * <p>
+     *
+     * @param
+     *
+     *
+     *
+     * @return	None
+     */
     public void saveRecipeImage(){
 
 
@@ -126,7 +145,16 @@ public class CreateRecipeImage extends AppCompatActivity {
     }
 
 
-
+    /**
+     * this function gets the image stored in the application's storage and displays it.
+     * <p>
+     *
+     * @param
+     *
+     *
+     *
+     * @return	None
+     */
     public void getSavedImage(){
         // Check if the image file already exists in the app's internal storage directory
         File SelectedImageFile = new File(getFilesDir(), MyConstants.IMAGE_FILE_NAME);
@@ -179,7 +207,16 @@ public class CreateRecipeImage extends AppCompatActivity {
 
 
 
-
+    /**
+     * this function starts the process of picking an image from the Gallery.
+     * <p>
+     *
+     * @param
+     *
+     *
+     *
+     * @return	None
+     */
     void imageChooser() {
 
         // create an instance of the
@@ -239,6 +276,17 @@ public class CreateRecipeImage extends AppCompatActivity {
 
     }
 
+
+    /**
+     * this function creates a File for the image picked and returns it.
+     * <p>
+     *
+     * @param
+     *
+     *
+     *
+     * @return	File
+     */
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd__HHmmss").format(new Date());
@@ -254,6 +302,7 @@ public class CreateRecipeImage extends AppCompatActivity {
         currentPhotoPath = imageFL.getAbsolutePath();
         return imageFL;
     }
+
 
     private void dispatchTakePictureIntent(){
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -276,6 +325,17 @@ public class CreateRecipeImage extends AppCompatActivity {
         }
     }
 
+    /**
+     * this function asks for the permission to use the camera, if they haven't been granted.
+     * if granted, the function starts the Intent for taking a photo.
+     * <p>
+     *
+     * @param
+     *
+     *
+     *
+     * @return
+     */
     private void askCameraPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
         {
@@ -296,6 +356,17 @@ public class CreateRecipeImage extends AppCompatActivity {
         }
     }
 
+
+    /**
+     * this function uses Alert dialog to ask the user if they want to
+     * pick an image from their gallery, or by using their camera,
+     * and starts the process for the selected option.
+     *
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void selectPicture(View view){
 
 
@@ -336,7 +407,16 @@ public class CreateRecipeImage extends AppCompatActivity {
 
 
 
+    /**
+     * this function deletes the saved image from the storage and displays the default photo on screen.
+     *
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     //BACK TO NORMAL
+
     public void clearPhoto (View view)
     {
         userSelectedImage = false;
@@ -352,6 +432,20 @@ public class CreateRecipeImage extends AppCompatActivity {
     }
 
 
+    /**
+     *If the user chose an image, this function saves the inputted image to the storage and starts the
+     * CreateRecipeIngredients Activity.
+     * Otherwise, this function uses Alert dialog to ask the user if they want to
+     *  proceed without an image for their lesson.
+     *  If the user agrees, this function starts the
+     *  CreateRecipeIngredients Activity.
+     *  otherwise, the Dialog box is closed.
+     *
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void next(View view){
 
         if (userSelectedImage && recipeImageUri !=null){
@@ -408,6 +502,21 @@ public class CreateRecipeImage extends AppCompatActivity {
 
     }
 
+
+    /**
+     *If the user chose an image, this function saves the inputted image to the storage and starts the
+     * CreateRecipeFinishScreen Activity.
+     * Otherwise, this function uses Alert dialog to ask the user if they want to
+     *  proceed without an image for their lesson.
+     *  If the user agrees, this function starts the
+     *  CreateRecipeIngredients Activity.
+     *  otherwise, the Dialog box is closed.
+     *
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void saveEdit(View view)
     {
         if (userSelectedImage && recipeImageUri !=null){
@@ -454,6 +563,14 @@ public class CreateRecipeImage extends AppCompatActivity {
         }
     }
 
+
+    /**
+     * this function closes the activity.
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void back(View view){
         finish();
 

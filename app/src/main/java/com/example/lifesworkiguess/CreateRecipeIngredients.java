@@ -1,3 +1,10 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Activity where the user can input, edit, and view the Ingredients for the Recipe/CommunityLesson they're writing/editing.
+ */
+
 package com.example.lifesworkiguess;
 
 import androidx.annotation.NonNull;
@@ -29,11 +36,7 @@ import java.util.ArrayList;
 public class CreateRecipeIngredients extends AppCompatActivity {
 
 
-    //From General
-    String recipeName, recipeDescription;
 
-    //From Image
-    Uri recipeImageUri;
 
     //From This
     EditText ingredientNameET, ingredientAmountET, ingredientUnitsET;
@@ -148,6 +151,14 @@ public class CreateRecipeIngredients extends AppCompatActivity {
     }
 
 
+
+    /**
+     * this function saves the added Ingredients to Shared Preferences
+     * @param
+     *
+     *
+     * @return
+     */
     public void saveCurrentlyAddedIngredients(){
 
         //The added Ingredients ArrayLists of String are deleted when the user finishes the recipe, either by uploading it or by going back to the community screen
@@ -163,6 +174,15 @@ public class CreateRecipeIngredients extends AppCompatActivity {
     }
 
 
+    /**
+     * this function checks if the user inputted info in all of the fields.
+     * if yes, the function creates an Ingredient from the info and adds it to the ingredients list.
+     * otherwise, the function alerts the user that they must input in all fields.
+     * @param view - the button pressed
+     *
+     *
+     * @return
+     */
     public void addIngredient(View view){
 
         ingredientName = ingredientNameET.getText().toString();
@@ -203,6 +223,13 @@ public class CreateRecipeIngredients extends AppCompatActivity {
 
     }
 
+    /**
+     * this function adds the added Ingredient to the String[] List of Ingredients.
+     * @param ingredient - the added Ingredient
+     *
+     *
+     * @return
+     */
     public void addIngredientToStringLists(Ingredient ingredient){
 
         String[] addedIngredientList = new String[]{ingredient.getName(), ingredient.getAmount(), ingredient.getUnits()};
@@ -210,6 +237,13 @@ public class CreateRecipeIngredients extends AppCompatActivity {
         ingredientsInStringLists.add(addedIngredientList);
     }
 
+    /**
+     * this function creates an ArrayList<String[]> from the Ingredient List
+     * @param ingredients - the Ingredient List.
+     *
+     *
+     * @return
+     */
     public void ingredientsListToStringLists(ArrayList<Ingredient> ingredients){
 
         ingredientsInStringLists = new ArrayList<>();
@@ -225,7 +259,13 @@ public class CreateRecipeIngredients extends AppCompatActivity {
 
 
 
-
+    /**
+     * this function creates and sets a customAdapterIngredients for the Recycler View.
+     * @param
+     *
+     *
+     * @return
+     */
     public void makeRecyclerView(){
 
         upArrowIV.setVisibility(View.VISIBLE);
@@ -267,6 +307,14 @@ public class CreateRecipeIngredients extends AppCompatActivity {
         touchHelper.attachToRecyclerView(ingredientsRV);
     }
 
+    /**
+     * this function creates an ArrayList<Ingredient> from the ArrayList<String[]> List of Ingredients.
+     * Then, this function creates and sets a customAdapterIngredients for the Recycler View.
+     * @param
+     *
+     *
+     * @return
+     */
     public void makeRecyclerViewForReopen(ArrayList<String[]> ingredientsInLists){
 
         //Each ArrayList<String> in the ingredientsInLists is of the following format: name, amount, units
@@ -286,6 +334,20 @@ public class CreateRecipeIngredients extends AppCompatActivity {
 
     }
 
+
+    /**
+     * this function checks alerts the user that they are still writing an Ingredients if there is info in the EditTextFields.
+     * this function checks that the ingredient list has at least 1 Ingredient
+     * if not, the function will alert the user to add an ingredient.
+     * if yes, this function saves the added Ingredients to Shared Preferences and opens the
+     * CreateRecipeStepsTabbed Activity.
+     *
+     *
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void next(View view){
         ingredientsListToStringLists(ingredientsList);
         if (!ingredientsList.isEmpty())
@@ -368,6 +430,20 @@ public class CreateRecipeIngredients extends AppCompatActivity {
 
     }
 
+
+    /**
+     * this function checks alerts the user that they are still writing an Ingredients if there is info in the EditTextFields.
+     * this function checks that the ingredient list has at least 1 Ingredient
+     * if not, the function will alert the user to add an ingredient.
+     * if yes, this function saves the added Ingredients to Shared Preferences and opens the
+     * CreateRecipeFinishScreen Activity.
+     *
+     *
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void saveEdit(View view){
         ingredientsListToStringLists(ingredientsList);
         if (!ingredientsList.isEmpty())
@@ -454,6 +530,13 @@ public class CreateRecipeIngredients extends AppCompatActivity {
 
     }
 
+    /**
+     * this function closes the activity.
+     * @param view - the button pressed.
+     *
+     *
+     * @return
+     */
     public void back(View view){
 
         //No need to save the string lists of ingredients bc finish() calls onDestroy and we save there

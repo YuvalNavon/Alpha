@@ -1,3 +1,11 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Activity is where the user can Log In.
+ */
+
+
 package com.example.lifesworkiguess;
 
 import androidx.annotation.NonNull;
@@ -43,6 +51,17 @@ FirebaseAuth fAuth;
 
     }
 
+
+    /**
+     * this function checks if the inputted log in info exists for a user.
+     * if it is, then the function logs in as that user, saves its log in info in Shared Preferences,
+     * and starts the HomeScreen Activity.
+     * otherwise, the function alerts the user that the log in info is invalid.
+     * @param view - the button pressed
+     *
+     *
+     * @return
+     */
     public void signIn(View view){
         email = emailET.getText().toString();
         email = email.toLowerCase(Locale.ROOT);
@@ -76,6 +95,14 @@ FirebaseAuth fAuth;
         });
     }
 
+
+    /**
+     * this function starts the ChooseCourse Activity.
+     * @param view - the button pressed
+     *
+     *
+     * @return
+     */
     public void toSignUp(View view){
         Intent toChooseCourse = new Intent(this, ChooseCourse.class);
         toChooseCourse.putExtra("Previous Activity", MyConstants.FROM_MAIN_ACTIVITY);

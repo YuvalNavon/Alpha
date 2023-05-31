@@ -1,3 +1,11 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Class isn't currently used but it can generate timed notifications.
+ */
+
+
 package com.example.lifesworkiguess;
 
 import androidx.appcompat.app.AppCompatActivity;

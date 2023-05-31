@@ -1,3 +1,12 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Class is for the StepsViewModel Object, which is used to detect changes to the StepsList
+ * while writing/editing a communityRecipe
+ * across the 2 Fragments of the toCreateRecipeStepsTabbed Activity.
+ */
+
 package com.example.lifesworkiguess;
 
 import androidx.lifecycle.LiveData;

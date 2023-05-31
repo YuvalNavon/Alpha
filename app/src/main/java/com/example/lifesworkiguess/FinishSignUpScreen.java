@@ -1,3 +1,11 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Activity is where the user can finish their Sign Up Process, by choosing a username and
+ * profile picture.
+ */
+
 package com.example.lifesworkiguess;
 
 import static com.example.lifesworkiguess.MyConstants.*;
@@ -92,10 +100,7 @@ public class FinishSignUpScreen extends AppCompatActivity {
 
         fStorage = FirebaseStorage.getInstance().getReference("Profile Pictures");
         iv = findViewById(R.id.addPFPIV);
-//        //FIX NOT ROUNDING IMAGE
-//        Bitmap bm = ((BitmapDrawable) iv.getDrawable()).getBitmap();
-//        iv.setImageBitmap(myServices.getCircularBitmap(bm));
-//        //FIX NOT ROUNDING IMAGE
+
 
         imagePicked = false;
         imageUploaded = false;
@@ -166,7 +171,16 @@ public class FinishSignUpScreen extends AppCompatActivity {
     }
 
 
-
+    /**
+     * this function starts the process of picking an image from the Gallery.
+     * <p>
+     *
+     * @param
+     *
+     *
+     *
+     * @return	None
+     */
     public void imageChooser() {
 
         // create an instance of the
@@ -225,7 +239,16 @@ public class FinishSignUpScreen extends AppCompatActivity {
         }
     }
 
-
+    /**
+     * this function creates a File for the image picked and returns it.
+     * <p>
+     *
+     * @param
+     *
+     *
+     *
+     * @return	File
+     */
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd__HHmmss").format(new Date());
@@ -263,6 +286,17 @@ public class FinishSignUpScreen extends AppCompatActivity {
         }
     }
 
+    /**
+     * this function asks for the permission to use the camera, if they haven't been granted.
+     * if granted, the function starts the Intent for taking a photo.
+     * <p>
+     *
+     * @param
+     *
+     *
+     *
+     * @return
+     */
     private void askCameraPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
         {
@@ -315,6 +349,18 @@ public class FinishSignUpScreen extends AppCompatActivity {
         selectPictureDialog.show();
     }
 
+
+    /**
+     * if all of the input from the user is valid, this function creates a User for the user and uploads its details to Firebase
+     * otherwise, this function alerts the user about invalid input.
+     * <p>
+     *
+     * @param view - the button pressed
+     *
+     *
+     *
+     * @return
+     */
     public void finishSignUp(View view){
         username = usernameET.getText().toString();
 
@@ -405,6 +451,16 @@ public class FinishSignUpScreen extends AppCompatActivity {
 
     }
 
+    /**
+     * this function starts the LogIn Activity.
+     * <p>
+     *
+     * @param view - the button pressed
+     *
+     *
+     *
+     * @return
+     */
     public void toLogIn(View view){
         Intent logInScreen = new Intent(this, LogIn.class);
         startActivity(logInScreen);

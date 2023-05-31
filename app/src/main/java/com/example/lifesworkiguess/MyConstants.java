@@ -1,3 +1,10 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Class is used to define all of the Constants of the app.
+ */
+
 package com.example.lifesworkiguess;
 
 import android.Manifest;

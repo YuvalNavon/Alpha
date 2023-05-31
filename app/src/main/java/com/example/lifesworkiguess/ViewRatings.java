@@ -1,3 +1,12 @@
+/**
+ * @author		Yuval Navon <yuvalnavon8@gmail.com>
+ * @version 	1
+ * @since		31/5/2023
+ * This Fragment is where the user can view the Reviews of the CommunityLesson they're about
+ * to start.
+ */
+
+
 package com.example.lifesworkiguess;
 
 import android.graphics.Bitmap;
