@@ -1,6 +1,7 @@
 package com.example.lifesworkiguess;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -9,15 +10,11 @@ import android.media.ExifInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -25,116 +22,50 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
-public class CommunityLessonCustomAdapter extends RecyclerView.Adapter<CommunityLessonViewHolder>  {
+public class CompletedCommunityLessonsAdapter  extends RecyclerView.Adapter<CompletedCommunityLessonsViewHolder>{
 
     Context context;
-    ArrayList<CommunityLesson> communityLessonsList;
-    ArrayList<String> userIDsList, usernamesList;
-    OnItemClickListener listener;
+    ArrayList<CommunityLesson> lessons;
+    ArrayList<String> creatorUsernames;
+    FirebaseStorage fStorage;
 
-
-    public CommunityLessonCustomAdapter(Context context, ArrayList<CommunityLesson> communityLessonsList,
-                                        ArrayList<String> userIDsList, ArrayList<String> usernamesList,  OnItemClickListener listener) {
+    public CompletedCommunityLessonsAdapter(Context context, ArrayList<CommunityLesson> lessons, ArrayList<String> creatorUsernames) {
         this.context = context;
-        this.communityLessonsList = communityLessonsList;
-        this.userIDsList = userIDsList;
-        this.usernamesList = usernamesList;
-        this.listener = listener;
+        this.lessons = lessons;
+        this.creatorUsernames = creatorUsernames;
+        fStorage = FirebaseStorage.getInstance();
+
     }
 
     @NonNull
     @Override
-    public CommunityLessonViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.found_community_lesson_item, parent, false);
-        return new CommunityLessonViewHolder(view);
+    public CompletedCommunityLessonsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.completed_community_lessons_item, parent, false);
+        return new CompletedCommunityLessonsViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CommunityLessonViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull CompletedCommunityLessonsViewHolder holder, int position) {
 
-        CommunityLesson currLesson = communityLessonsList.get(position);
-        String lessonName = currLesson.getLessonName();
-        String lessonTime = currLesson.getTime();
-        String lessonDifficulty = currLesson.getDifficulty();
-        boolean lessonKosher = currLesson.isKosher();
+        CommunityLesson currentLesson = lessons.get(position);
+        String lessonName = currentLesson.getLessonName();
+        String creatorID = currentLesson.getUserID();
+        String creatorUsername = creatorUsernames.get(position);
 
-        String userID = userIDsList.get(position);
-        String username = usernamesList.get(position);
+        holder.lessonName.setText(lessonName);
+        holder.creatorUsername.setText(creatorUsername);
 
-        ArrayList<ArrayList<String>> ratingsList = currLesson.getRatings();
-        int ratingCount = 0;
-        float averageRating = 2;
-
-        holder.lessonRB.setEnabled(false);
-        holder.lessonRB.setNumStars(5);
-
-        if (ratingsList!= null && !ratingsList.isEmpty())
-        {
-
-            float sumRating = 0;
-            int countOfReviewListsThatMeanUserOnlyUploadedPhotoAndDidntRateAndReview = 0;
-            for (int i = 0; i<ratingsList.size(); i++)
-            {
-                   ArrayList<String> currentRating  = ratingsList.get(i);
-                   if (!currentRating.get(1).equals(MyConstants.NO_RATING_FOR_COMMUNITY_LESSON))
-                   {
-                       sumRating+= Float.parseFloat(currentRating.get(1));
-                   }
-                   else
-                   {
-                       countOfReviewListsThatMeanUserOnlyUploadedPhotoAndDidntRateAndReview+=1;
-
-                   }
-
-            }
-
-            ratingCount = ratingsList.size() - countOfReviewListsThatMeanUserOnlyUploadedPhotoAndDidntRateAndReview;
-            if (ratingCount!=0)
-            {
-                averageRating = sumRating/ratingCount;
-                holder.lessonRatingCountTV.setText(Integer.toString(ratingCount));
-                holder.lessonRB.setRating(averageRating);
-            }
-            else
-            {
-                holder.lessonRatingCountTV.setText("No Ratings Yet");
-                holder.lessonRB.setVisibility(View.GONE);
-            }
-        }
-        else
-        {
-            holder.lessonRatingCountTV.setText("No Ratings Yet");
-            holder.lessonRB.setVisibility(View.GONE);
-        }
-
-        holder.lessonNameTV.setText(lessonName);
-        holder.lessonTimeTV.setText(lessonTime);
-        holder.lessonDifficultyTV.setText(lessonDifficulty);
-        if (lessonKosher) {
-            holder.lessonKosherTV.setText("KOSHER");
-        }
-        else{
-            holder.lessonKosherTV.setText("NOT\nKOSHER");
-        }
-        holder.usernameTV.setText(username);
-
-
-
-
-        FirebaseStorage FBStorage = FirebaseStorage.getInstance();
-        StorageReference storagePFPRef = FBStorage.getReference("Users").child(userID).child(MyConstants.PROFILE_PICTURE);
+        StorageReference storagePFPRef = fStorage.getReference("Users").child(creatorID).child(MyConstants.PROFILE_PICTURE);
         long MAXBYTES = 1024 * 1024 * 5;
-        holder.userIV.setImageResource(R.drawable.default_profile_picture);
-        Bitmap bitmap = ((BitmapDrawable) holder.userIV.getDrawable()).getBitmap();
+        holder.creatorPFP.setImageResource(R.drawable.default_profile_picture);
+        Bitmap bitmap = ((BitmapDrawable) holder.creatorPFP.getDrawable()).getBitmap();
         bitmap = myServices.getCircularBitmap(bitmap);
-        holder.userIV.setImageBitmap(bitmap);
+        holder.creatorPFP.setImageBitmap(bitmap);
         storagePFPRef.getBytes(MAXBYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                bitmap = myServices.getCircularBitmap(bitmap);
                 // Create a temporary file to save the image data
                 File tempFile = null;
                 try {
@@ -169,20 +100,20 @@ public class CommunityLessonCustomAdapter extends RecyclerView.Adapter<Community
                     Matrix matrix = new Matrix();
                     matrix.setRotate(rotationAngle);
                     bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-
+                    bitmap = myServices.getCircularBitmap(bitmap);
 
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                holder.userIV.setImageBitmap(bitmap);
+                holder.creatorPFP.setImageBitmap(bitmap);
             }
         });
 
 
-        StorageReference storageLessonImageRef =  FBStorage.getReference("Community Recipes").child(userID)
-                .child(Integer.toString(currLesson.getNumber())).child(MyConstants.RECIPE_IMAGE_STORAGE_NAME);
-        holder.lessonIV.setImageResource(R.drawable.add_dish_photo);
+        StorageReference storageLessonImageRef =  fStorage.getReference("Community Recipes").child(creatorID)
+                .child(Integer.toString(currentLesson.getNumber())).child(MyConstants.RECIPE_IMAGE_STORAGE_NAME);
+        holder.lessonImage.setImageResource(R.drawable.add_dish_photo);
         storageLessonImageRef.getBytes(MAXBYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
@@ -227,34 +158,32 @@ public class CommunityLessonCustomAdapter extends RecyclerView.Adapter<Community
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                holder.lessonIV.setImageBitmap(bitmap);
+                holder.lessonImage.setImageBitmap(bitmap);
             }
         });
 
-
-        holder.setOnItemClickListener(new CommunityLessonViewHolder.OnItemClickListener() {
+        // Set the click listeners for imageView1 and textView
+        holder.lessonImage.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick2(int position) {
-                if (listener != null) {
-                    listener.onItemClick2(position);
-                }
+            public void onClick(View v) {
+
+                Intent toLessonIntro = new Intent(context, NewLessonIntro.class);
+                toLessonIntro.putExtra(MyConstants.LESSON_INTRO_MODE_KEY, MyConstants.COMMUNITY_LESSON_INTRO);
+                toLessonIntro.putExtra(MyConstants.LESSON_CREATOR_ID_KEY, creatorID);
+                toLessonIntro.putExtra(MyConstants.LESSON_CREATOR_USERNAME_KEY, creatorID);
+                toLessonIntro.putExtra(MyConstants.LESSON_NAME_KEY, currentLesson.getLessonName());
+                toLessonIntro.putExtra(MyConstants.COMMUNITY_LESSON_DESCRIPTION_KEY, currentLesson.getDescription());
+                toLessonIntro.putExtra(MyConstants.COMMUNITY_LESSON_NUMBER_KEY, currentLesson.getNumber());
+
+                context.startActivity(toLessonIntro);
+
             }
         });
-
 
     }
 
     @Override
     public int getItemCount() {
-        return communityLessonsList.size();
+        return lessons.size();
     }
-
-    public interface OnItemClickListener {
-        void onItemClick2(int position);
-    }
-
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
-    }
-
 }

@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -75,6 +77,46 @@ public class MadeCommunityLessonsAdapter extends RecyclerView.Adapter<MadeCommun
             @Override
             public void onSuccess(byte[] bytes) {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                // Create a temporary file to save the image data
+                File tempFile = null;
+                try {
+                    tempFile = File.createTempFile("tempImage", ".jpg");
+                    FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
+                    fileOutputStream.write(bytes);
+                    fileOutputStream.close();
+
+                    // Get the EXIF orientation information
+                    ExifInterface exifInterface = new ExifInterface(tempFile.getAbsolutePath());
+                    int orientation = exifInterface.getAttributeInt(
+                            ExifInterface.TAG_ORIENTATION,
+                            ExifInterface.ORIENTATION_UNDEFINED);
+
+                    int rotationAngle = 0;
+                    switch (orientation) {
+                        case ExifInterface.ORIENTATION_ROTATE_90:
+                            rotationAngle = 90;
+                            break;
+                        case ExifInterface.ORIENTATION_ROTATE_180:
+                            rotationAngle = 180;
+                            break;
+                        case ExifInterface.ORIENTATION_ROTATE_270:
+                            rotationAngle = 270;
+                            break;
+                        default:
+                            rotationAngle = 0;
+                            break;
+                    }
+
+                    // Rotate the Bitmap by the calculated rotation angle
+                    Matrix matrix = new Matrix();
+                    matrix.setRotate(rotationAngle);
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 holder.lessonImage.setImageBitmap(bitmap);
 
             }
@@ -220,6 +262,46 @@ public class MadeCommunityLessonsAdapter extends RecyclerView.Adapter<MadeCommun
                     @Override
                     public void onSuccess(byte[] bytes) {
                         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        // Create a temporary file to save the image data
+                        File tempFile = null;
+                        try {
+                            tempFile = File.createTempFile("tempImage", ".jpg");
+                            FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
+                            fileOutputStream.write(bytes);
+                            fileOutputStream.close();
+
+                            // Get the EXIF orientation information
+                            ExifInterface exifInterface = new ExifInterface(tempFile.getAbsolutePath());
+                            int orientation = exifInterface.getAttributeInt(
+                                    ExifInterface.TAG_ORIENTATION,
+                                    ExifInterface.ORIENTATION_UNDEFINED);
+
+                            int rotationAngle = 0;
+                            switch (orientation) {
+                                case ExifInterface.ORIENTATION_ROTATE_90:
+                                    rotationAngle = 90;
+                                    break;
+                                case ExifInterface.ORIENTATION_ROTATE_180:
+                                    rotationAngle = 180;
+                                    break;
+                                case ExifInterface.ORIENTATION_ROTATE_270:
+                                    rotationAngle = 270;
+                                    break;
+                                default:
+                                    rotationAngle = 0;
+                                    break;
+                            }
+
+                            // Rotate the Bitmap by the calculated rotation angle
+                            Matrix matrix = new Matrix();
+                            matrix.setRotate(rotationAngle);
+                            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
+
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         try {
                             FileOutputStream fos = context.openFileOutput(MyConstants.IMAGE_FILE_NAME, MODE_PRIVATE);
                             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);

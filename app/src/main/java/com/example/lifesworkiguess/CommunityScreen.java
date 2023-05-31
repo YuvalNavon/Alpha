@@ -153,9 +153,9 @@ public class CommunityScreen extends AppCompatActivity implements CommunityDishe
         usernameGetter = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot childSnapshot : snapshot.getChildren()) {
+                for (String checkedID : userIDsList) {
 
-                    for (String checkedID : userIDsList)
+                    for (DataSnapshot childSnapshot : snapshot.getChildren())
                     {
                         if (childSnapshot.getKey().equals(checkedID))
                         {
@@ -166,7 +166,7 @@ public class CommunityScreen extends AppCompatActivity implements CommunityDishe
                 }
 
                 //Now to make the Community Lessons RV
-
+                makeFoundLessonsRV();
 
             }
 

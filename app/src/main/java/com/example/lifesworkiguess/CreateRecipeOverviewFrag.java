@@ -374,7 +374,6 @@ public class CreateRecipeOverviewFrag extends Fragment {
                             fRef.putFile(selectedRecipeImageFileURI).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                 @Override
                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    Toast.makeText(context, "Image Uploaded!", Toast.LENGTH_LONG).show();
 
                                 }
                             });
@@ -496,7 +495,6 @@ public class CreateRecipeOverviewFrag extends Fragment {
                             fRef.putFile(selectedRecipeImageFileURI).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                 @Override
                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    Toast.makeText(context, "Image Uploaded!", Toast.LENGTH_LONG).show();
 
                                 }
                             });

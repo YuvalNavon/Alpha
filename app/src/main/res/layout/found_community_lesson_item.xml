@@ -30,6 +30,10 @@
                 android:visibility="visible"
                 tools:srcCompat="@tools:sample/avatars" />
 
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="15dp" />
+
             <LinearLayout
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
@@ -104,8 +108,8 @@
                 <TextView
                     android:id="@+id/CL_TimeTV"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_height="50dp"
+                    android:layout_weight="1.2"
                     android:text="Time"
                     android:textColor="@color/gray"
                     android:textSize="16sp" />
@@ -118,7 +122,7 @@
                 <TextView
                     android:id="@+id/CL_DifficultyTV"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="50dp"
                     android:layout_weight="1"
                     android:text="Difficulty"
                     android:textColor="@color/gray"
@@ -132,7 +136,7 @@
                 <TextView
                     android:id="@+id/CL_KosherTV"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="50dp"
                     android:layout_weight="1"
                     android:text="Kosher"
                     android:textColor="@color/gray"

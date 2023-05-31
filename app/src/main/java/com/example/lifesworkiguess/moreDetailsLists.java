@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.Space;
 import android.widget.TextView;
@@ -34,10 +33,12 @@ public class moreDetailsLists extends AppCompatActivity implements
     Space secondaryDetailsRVSpace;
 
     User globalCurrentlyLoggedInUser;
-    ValueEventListener infoGetter, getLessonName;
-    DatabaseReference refUsers, refLesson;
+    ValueEventListener infoGetter, getLessonName, getCreatorUsernames;
+    DatabaseReference refUsers, refLesson, refCreatorUsernames;
 
     ArrayList<String> completedCoursesNames;
+    ArrayList<String> finishedCommunityLessonsCreatorsUsernames;
+    ArrayList<CommunityLesson> finishedCommunityLessons;
     ArrayList<CommunityLesson> activeRecipesMadeByUser;
 
     FirebaseDatabase FBDB;
@@ -71,6 +72,9 @@ public class moreDetailsLists extends AppCompatActivity implements
         if (mode.equals("Completed Community Recipes"))
         {
             titleTV.setText("Completed Community Recipes");
+            secondaryRV.setVisibility(View.GONE);
+            secondaryDetailsRVSpace.setVisibility(View.GONE);
+            getCompletedCommunityLessonsList();
 
         }
 
@@ -98,8 +102,7 @@ public class moreDetailsLists extends AppCompatActivity implements
     protected void onResume() {
 
         super.onResume();
-        if (refUsers!=null && infoGetter !=null) refUsers.addListenerForSingleValueEvent(infoGetter);
-        if (refLesson!=null && getLessonName!=null) refLesson.addListenerForSingleValueEvent(getLessonName);
+
     }
 
     public void onDestroy() {
@@ -169,8 +172,6 @@ public class moreDetailsLists extends AppCompatActivity implements
     public void onItemClickCompletedCourses(int position) {
 
         String pickedCourseName =  completedCoursesNames.get(position);
-
-
 
         refLesson= FBDB.getReference("Courses").child(pickedCourseName);
         getLessonName = new ValueEventListener() {
@@ -276,6 +277,114 @@ public class moreDetailsLists extends AppCompatActivity implements
     public void onItemClickCompletedLessons(int position) {
 
     }
+
+
+    //Completed Community Lessons:
+
+    public void getCompletedCommunityLessonsList()
+    {
+
+        ArrayList<String> creatorIDs = new ArrayList<>();
+        finishedCommunityLessons = new ArrayList<>();
+        finishedCommunityLessonsCreatorsUsernames = new ArrayList<>();
+
+        refUsers = FBDB.getReference("Users").child(loggedInUser.getUid());
+        infoGetter = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                User currentlyLoggedInUser = snapshot.getValue(User.class);
+                ArrayList<ArrayList<String>> allFinishedLessonsList = currentlyLoggedInUser.getFinishedCommunityLessons();
+
+                refLesson = FBDB.getReference("Community Lessons");
+                getLessonName = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                        for (ArrayList<String> currFinishedLessonList : allFinishedLessonsList) {
+
+                                String creatorID = currFinishedLessonList.get(0);
+                                creatorIDs.add(creatorID);
+                                String lessonNumber = currFinishedLessonList.get(1);
+                                String currLessonKey = creatorID + " , " + lessonNumber;
+                                for (DataSnapshot childSnapshot : snapshot.getChildren())
+                                {
+                                    if (currLessonKey.equals(childSnapshot.getKey()))
+                                    {
+                                        CommunityLesson addedLesson = childSnapshot.getValue(CommunityLesson.class);
+                                        finishedCommunityLessons.add(addedLesson);
+                                    }
+                                }
+
+
+
+                        }
+
+                        refCreatorUsernames = FBDB.getReference("Users");
+                        getCreatorUsernames = new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                                for (String checkedID : creatorIDs) {
+
+                                    for (DataSnapshot childSnapshot : snapshot.getChildren())
+                                    {
+                                        if (childSnapshot.getKey().equals(checkedID))
+                                        {
+                                            User addedUser = childSnapshot.getValue(User.class);
+                                            finishedCommunityLessonsCreatorsUsernames.add(addedUser.getUsername());
+                                        }
+                                    }
+                                }
+
+                                CompletedCommunityLessonsAdapter adapter = new CompletedCommunityLessonsAdapter(moreDetailsLists.this,
+                                        finishedCommunityLessons, finishedCommunityLessonsCreatorsUsernames);
+
+                                // Set the layout manager for the RecyclerView
+                                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(moreDetailsLists.this);
+                                linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
+                                mainRV.setLayoutManager(linearLayoutManager);
+
+                                // Set the adapter for the RecyclerView
+                                mainRV.setAdapter(adapter);
+
+                                //DividerItemDecoration
+                                DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(moreDetailsLists.this, DividerItemDecoration.VERTICAL);
+                                dividerItemDecoration.setDrawable(ContextCompat.getDrawable(mainRV.getContext(),
+                                        R.drawable.divider_black));
+                                mainRV.addItemDecoration(dividerItemDecoration);
+
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        };
+                        refCreatorUsernames.addListenerForSingleValueEvent(getCreatorUsernames);
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                };
+                refLesson.addListenerForSingleValueEvent(getLessonName);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        refUsers.addListenerForSingleValueEvent(infoGetter);
+    }
+
+
+
 
     //Recipes Made by User:
     public void getRecipesMadeByUser(){
