@@ -192,7 +192,11 @@ public class User {
 
 
     public ArrayList<ArrayList<String>> getFinishedCommunityLessons() {
-        return FinishedCommunityLessons;
+        if (FinishedCommunityLessons == null)
+        {
+            FinishedCommunityLessons = new ArrayList<>();
+        }
+        return  FinishedCommunityLessons;
     }
 
     public int getFinishedCourse() {
