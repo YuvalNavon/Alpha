@@ -687,9 +687,6 @@ public class myServices {
 
 
 
-//    public void goToCommunityScreen(Context context){
-//        Intent toCommunityScreen = new Intent(context, CommunityScreen.class);
-//        context.startActivity(toCommunityScreen);
-//    }
+
 
 }

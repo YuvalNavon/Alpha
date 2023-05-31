@@ -18,6 +18,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -48,6 +50,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
@@ -123,6 +126,41 @@ public class CreateRecipeOverviewFrag extends Fragment {
         File SelectedImageFile = new File(getContext().getFilesDir(), MyConstants.IMAGE_FILE_NAME);
         if (SelectedImageFile.exists()) {
             Bitmap bitmap = BitmapFactory.decodeFile(SelectedImageFile.getAbsolutePath());
+
+            recipeImage.setImageBitmap(bitmap);
+
+            //TO make sure image isnt DISPLAYED HORIZONTALLY (FROM CHATGPT)
+            try
+            {
+                // Check the orientation of the image using its EXIF metadata
+                ExifInterface exif = new ExifInterface(SelectedImageFile.getAbsolutePath());
+                int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+
+                // Rotate the image if necessary
+                Matrix matrix = new Matrix();
+                switch (orientation)
+                {
+                    case ExifInterface.ORIENTATION_ROTATE_90:
+                        matrix.postRotate(90);
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_180:
+                        matrix.postRotate(180);
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_270:
+                        matrix.postRotate(270);
+                        break;
+                    default:
+                        break;
+                }
+
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            }
+
+            catch (IOException e)
+            {
+
+            }
+
             recipeImage.setImageBitmap(bitmap);
         }
 
