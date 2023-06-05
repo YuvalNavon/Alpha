@@ -95,6 +95,8 @@ public class CommunityLesson  extends  Lesson {
     }
 
     public ArrayList<ArrayList<String>> getRatings() {
+
+        if (ratings ==null) ratings = new ArrayList<>();
         return ratings;
     }
 
